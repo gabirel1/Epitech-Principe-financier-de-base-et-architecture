@@ -8,6 +8,14 @@ using UserId = uint64_t;
 using Quantity = uint64_t;
 using Price = double;
 using Order = std::pair<Quantity, UserId>;
+using OrderList = std::forward_list<Order>;
+using Book = std::unordered_map<Price, OrderList>;
+
+enum class OrderType
+{
+    Bid,
+    Ask
+};
 
 class OrderBook
 {
@@ -16,23 +24,20 @@ class OrderBook
         virtual ~OrderBook() = default;
 
         // BID
-        [[nodiscard]] std::vector<double> bid_getPrice() const; // front only
-        [[nodiscard]] const std::forward_list<Order> &bid_getOrders(double);
-        [[nodiscard]] uint64_t bidsumQuantity(double);
-
         [[nodiscard]] bool bid_add(Price _price, Quantity &_quant, UserId &_user);
         [[nodiscard]] bool bid_modify(Price _price, Quantity &_quant, UserId &_user);
 
-
         // ASK
-        [[nodiscard]] std::vector<double> ask_getPrice() const; // front only
-        [[nodiscard]] const std::forward_list<Order> &ask_getOrders(double) const;
-        [[nodiscard]] uint64_t ask_sumQuantity(double) const;
-
         [[nodiscard]] bool ask_add(Price _price, Quantity &_quant, UserId &_user);
         [[nodiscard]] bool ask_modify(Price _price, Quantity &_quant, UserId &_user);
 
+        // front only
+        [[nodiscard]] std::vector<Price> getPrice(OrderType _type) const;
+        [[nodiscard]] bool contain(OrderType _type, Price _price) const;
+        [[nodiscard]] const OrderList &getOrders(OrderType _type, Price _price) const;
+        [[nodiscard]] Quantity sumQuantity(OrderType _type, Price _price) const;
+
     private:
-        std::unordered_map<Price, std::forward_list<Order>> m_bid;
-        std::unordered_map<Price, std::forward_list<Order>> m_ask;
+        Book m_bid;
+        Book m_ask;
 };
