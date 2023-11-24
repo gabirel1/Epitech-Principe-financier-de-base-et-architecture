@@ -28,30 +28,65 @@ Quantity OrderBook::sumQuantity(OrderType _type, Price _price) const
     const OrderList &ref = getOrders(_type, _price);
 
     return std::accumulate(ref.begin(), ref.end(), 0ull, [] (Quantity _total, const Order& _order) {
-        return std::move(_total) + _order.first;
+        return std::move(_total) + _order.quantity;
     });
 }
 
-bool OrderBook::bid_add(Price _price, Quantity &_quant, UserId &_user)
+bool OrderBook::bid_add(Price _price, Order &_order)
+{
+    if (add(m_ask, m_ask_price, _price, _order)) {
+        m_bid.at(_price).push_back(_order);
+        return true;
+    }
+    return false;
+}
+
+bool OrderBook::bid_modify(Price _price, Order &_order)
 {
     // todo
     return false;
 }
 
-bool OrderBook::bid_modify(Price _price, Quantity &_quant, UserId &_user)
+bool OrderBook::ask_add(Price _price, Order &_order)
+{
+    if (add(m_bid, m_bid_price, _price, _order)) {
+        m_ask.at(_price).push_back(_order);
+        return true;
+    }
+    return false;
+}
+
+bool OrderBook::ask_modify(Price _price, Order &_order)
 {
     // todo
     return false;
 }
 
-bool OrderBook::ask_add(Price _price, Quantity &_quant, UserId &_user)
+bool OrderBook::add(Book &_book, PriceSet &_ps, Price _price, Order &_order)
 {
-    // todo
-    return false;
-}
+    for (const Price &_aprice : _ps) {
+        if (_aprice > _price)
+            break;
+        OrderList &ol = _book.at(_aprice);
 
-bool OrderBook::ask_modify(Price _price, Quantity &_quant, UserId &_user)
-{
-    // todo
-    return false;
+        for (size_t i = 0; i < ol.size(); i++) {
+            Order &order = ol.at(i);
+
+            if (order.quantity == _order.quantity) {
+                ol.erase(ol.begin() + i);
+                if (ol.size())
+                    _ps.erase(_aprice);
+                return false;
+            } else if (order.quantity < _order.quantity) {
+                _order.quantity -= order.quantity;
+                ol.erase(ol.begin() + i);
+            } else {
+                order.quantity -= _order.quantity;
+                if (ol.size())
+                    _ps.erase(_aprice);
+                return false;
+            }
+        }
+    }
+    return true;
 }
