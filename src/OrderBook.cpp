@@ -32,25 +32,65 @@ Quantity OrderBook::sumQuantity(OrderType _type, Price _price) const
     });
 }
 
-bool OrderBook::bid_add(Price _price, Quantity &_quant, UserId &_user)
+bool OrderBook::bid_add(Price _price, Order &_order)
+{
+    for (const Price &_aprice : m_ask_price) {
+        if (_aprice > _price)
+            break;
+        OrderList &ol = m_ask.at(_aprice);
+
+        for (size_t i = 0; i < ol.size(); i++) {
+            Order &order = ol.at(i);
+
+            if (order.quantity == _order.quantity) {
+                ol.erase(i);
+                return true;
+            } else if (order.quantity < _order.quantity) {
+                _order.quantity -= order.quantity;
+                ol.erase(i);
+            } else {
+                order.quantity -= _order.quantity;
+                return true;
+            }
+        }
+    }
+    m_bid.at(_price).push_back(_order);
+    return false;
+}
+
+bool OrderBook::bid_modify(Price _price, Order &_order)
 {
     // todo
     return false;
 }
 
-bool OrderBook::bid_modify(Price _price, Quantity &_quant, UserId &_user)
+bool OrderBook::ask_add(Price _price, Order &_order)
 {
-    // todo
+    for (const Price &_aprice : m_bid_price) {
+        if (_aprice > _price)
+            break;
+        OrderList &ol = m_bid.at(_aprice);
+
+        for (size_t i = 0; i < ol.size(); i++) {
+            Order &order = ol.at(i);
+
+            if (order.quantity == _order.quantity) {
+                ol.erase(i);
+                return true;
+            } else if (order.quantity < _order.quantity) {
+                _order.quantity -= order.quantity;
+                ol.erase(i);
+            } else {
+                order.quantity -= _order.quantity;
+                return true;
+            }
+        }
+    }
+    m_bid.at(_price).push_back(_order);
     return false;
 }
 
-bool OrderBook::ask_add(Price _price, Quantity &_quant, UserId &_user)
-{
-    // todo
-    return false;
-}
-
-bool OrderBook::ask_modify(Price _price, Quantity &_quant, UserId &_user)
+bool OrderBook::ask_modify(Price _price, Order &_order)
 {
     // todo
     return false;
