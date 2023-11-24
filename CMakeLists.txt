@@ -11,7 +11,7 @@ file(GLOB_RECURSE SRC_ENGINE
     src/**.cpp
 )
 
-add_library(Market SHARED
+add_executable(Market
     ${SRC_ENGINE}
 )
 

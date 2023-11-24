@@ -17,7 +17,8 @@ struct Order
 
 using Price = double;
 using OrderList = std::vector<Order>;
-using Book = std::map<Price, OrderList>;
+using AskBook = std::map<Price, OrderList, std::greater<Price>>;
+using BidBook = std::map<Price, OrderList, std::less<Price>>;
 using PriceSet = std::set<Price>;
 
 enum class OrderType
@@ -32,19 +33,25 @@ class OrderBook
         OrderBook() = default;
         virtual ~OrderBook() = default;
 
-        bool add(OrderType _type, Price _price, Order &_order);
-        [[nodiscard]] bool modify(OrderType _type, Price _price, Order &_order);
+        bool add(OrderType _type, Price _price, Order& _order);
+        [[nodiscard]] bool modify(OrderType _type, Price _price, Order& _order);
 
         // front only
         [[nodiscard]] std::vector<Price> getPrice(OrderType _type) const;
         [[nodiscard]] bool contain(OrderType _type, Price _price) const;
-        [[nodiscard]] const OrderList &getOrders(OrderType _type, Price _price) const;
+        [[nodiscard]] const OrderList& getOrders(OrderType _type, Price _price) const;
         [[nodiscard]] Quantity sumQuantity(OrderType _type, Price _price) const;
 
     protected:
-        static bool add(Book& _book, Price _price, Order &_order);
+        template<class T>
+        static bool add(T& _book, Price _price, Order& _order);
+
+        template<class T>
+        [[nodiscard]] static std::vector<double> getPrice(const T &_book);
 
     private:
-        Book m_bid;
-        Book m_ask;
+        BidBook m_bid;
+        AskBook m_ask;
 };
+
+#include "OrderBook.inl"
