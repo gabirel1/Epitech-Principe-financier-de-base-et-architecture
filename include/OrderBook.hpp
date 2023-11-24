@@ -1,6 +1,6 @@
 #pragma once
 
-#include <unordered_map>
+#include <map>
 #include <vector>
 #include <set>
 
@@ -17,7 +17,7 @@ struct Order
 
 using Price = double;
 using OrderList = std::vector<Order>;
-using Book = std::unordered_map<Price, OrderList>;
+using Book = std::map<Price, OrderList>;
 using PriceSet = std::set<Price>;
 
 enum class OrderType
@@ -32,13 +32,8 @@ class OrderBook
         OrderBook() = default;
         virtual ~OrderBook() = default;
 
-        // BID
-        bool bid_add(Price _price, Order &_order);
-        [[nodiscard]] bool bid_modify(Price _price, Order &_order);
-
-        // ASK
-        bool ask_add(Price _price, Order &_order);
-        [[nodiscard]] bool ask_modify(Price _price, Order &_order);
+        bool add(OrderType _type, Price _price, Order &_order);
+        [[nodiscard]] bool modify(OrderType _type, Price _price, Order &_order);
 
         // front only
         [[nodiscard]] std::vector<Price> getPrice(OrderType _type) const;
@@ -47,11 +42,9 @@ class OrderBook
         [[nodiscard]] Quantity sumQuantity(OrderType _type, Price _price) const;
 
     protected:
-        bool add(Book& _book, PriceSet& _ps, Price _price, Order &_order);
+        static bool add(Book& _book, Price _price, Order &_order);
 
     private:
         Book m_bid;
-        PriceSet m_bid_price;
         Book m_ask;
-        PriceSet m_ask_price;
 };
