@@ -9,11 +9,11 @@ namespace fix
 
     Message::operator std::string () const
     {
-        size_t size = sum();
         std::string str = header;
 
         for (const auto &[_key, _val] : m_params)
-            str += _key + "=" + _val;
+            str += _key + "=" + _val + "^";
+        str += "10" + std::to_string(sum()) + "^";
         return str;
     }
 }

@@ -17,7 +17,7 @@ namespace fix
 
             operator std::string () const;
 
-            size_t sum() const;
+            [[nodiscard]] size_t sum() const;   // 10: Sum
 
         protected:
             std::unordered_map<std::string, std::string> m_params;

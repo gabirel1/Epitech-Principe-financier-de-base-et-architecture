@@ -2,19 +2,21 @@
 
 #include <string>
 
+// https://www.onixs.biz/fix-dictionary/4.2/tagNum_10.html
+
 namespace fix
 {
     class Header
     {
         public:
-            std::string BeginString;
-            std::string BodyLength;
-            std::string MsgType;
-            std::string SenderCompId;
-            std::string TargetCompId;
-            std::string MsgSeqNum;
-            std::string SendingTime;
+            std::string BeginString;    // 8
+            std::string BodyLength;     // 9
+            std::string MsgType;        // 35
+            std::string SenderCompId;   // 49
+            std::string TargetCompId;   // 56
+            std::string MsgSeqNum;      // 34
+            std::string SendingTime;    // 56
 
-            operator std::string() const;
+            inline operator std::string() const;
     };
 }
