@@ -23,15 +23,15 @@ namespace fix
     }
 
     template<IsKey T, class _T>
-    typename InsertMap<T, _T>::Pair &InsertMap<T, _T>::at(const T &_key)
+    typename _T &InsertMap<T, _T>::at(const T &_key)
     {
-        return *find(_key);
+        return find(_key)->second;
     }
 
     template<IsKey T, class _T>
-    const typename InsertMap<T, _T>::Pair &InsertMap<T, _T>::at(const T &_key) const
+    const _T &InsertMap<T, _T>::at(const T &_key) const
     {
-        return *find(_key);
+        return find(_key)->second;
     }
 
     template<IsKey T, class _T>

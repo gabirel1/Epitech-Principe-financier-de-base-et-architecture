@@ -4,6 +4,7 @@
 #include <string>
 
 #include "Message/Header.hpp"
+#include "InsertMap.hpp"
 
 namespace fix
 {
@@ -20,6 +21,8 @@ namespace fix
             [[nodiscard]] size_t sum() const;   // 10: Sum
 
         protected:
-            std::unordered_map<std::string, std::string> m_params;
+            friend class Serializer;
+
+            InsertMap<std::string, std::string> m_params{};
     };
 }

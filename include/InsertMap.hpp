@@ -24,8 +24,8 @@ namespace fix
             [[nodiscard]] Iterator find(const T &_key) const;
             void emplace(const Pair &&_pair);
 
-            [[nodiscard]] Pair &at(const T &_key);
-            [[nodiscard]] const Pair &at(const T &_key) const;
+            [[nodiscard]] _T &at(const T &_key);
+            [[nodiscard]] const _T &at(const T &_key) const;
 
             [[nodiscard]] constexpr size_t size() const;
 
@@ -36,6 +36,7 @@ namespace fix
             ConstIterator end() const;
 
         private:
+            // check for reimplementation of a hash map
             std::vector<Pair> m_map;
     };
 }
