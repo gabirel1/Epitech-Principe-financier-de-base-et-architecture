@@ -34,7 +34,7 @@ class OrderBook
         virtual ~OrderBook() = default;
 
         bool add(OrderType _type, Price _price, Order& _order);
-        [[nodiscard]] bool modify(OrderType _type, Price _price, Order& _order);
+        void modify(OrderType _type, Price _price, Price _oprice, Order &_order);
 
         // front only
         [[nodiscard]] std::vector<Price> getPrice(OrderType _type) const;
@@ -44,7 +44,9 @@ class OrderBook
 
     protected:
         template<class T>
-        static bool add(T& _book, Price _price, Order& _order);
+        static bool add(T &_book, Price _price, Order& _order);
+        template<class T>
+        static void modify(T &_book, Price _price, Price _oprice, Order &_order);
 
         template<class T>
         [[nodiscard]] static std::vector<double> getPrice(const T &_book);

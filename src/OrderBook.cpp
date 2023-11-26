@@ -46,8 +46,10 @@ bool OrderBook::add(OrderType _type, Price _price, Order &_order)
     return res;
 }
 
-bool OrderBook::modify(OrderType _type, Price _price, Order &_order)
+void OrderBook::modify(OrderType _type, Price _price, Price _oprice, Order &_order)
 {
-    // todo
-    return false;
+    if (_type == OrderType::Ask)
+        modify<BidBook>(m_bid, _price, _oprice, _order);
+    else
+        modify<AskBook>(m_ask, _price, _oprice, _order);
 }

@@ -10,6 +10,6 @@ namespace fix
                 "49=" + SendingTime + "^" \
                 "56=" + TargetCompId + "^" \
                 "34=" + MsgSeqNum + "^" \
-                "56=" + TargetCompId + "^";
+                "56=" + SendingTime + "^";
     }
 }

@@ -17,6 +17,6 @@ namespace fix
             std::string MsgSeqNum;      // 34
             std::string SendingTime;    // 56
 
-            inline operator std::string() const;
+            operator std::string() const;
     };
 }

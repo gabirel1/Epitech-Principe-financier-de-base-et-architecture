@@ -1,5 +1,6 @@
-#include "OrderBook.hpp"
+#include <algorithm>
 
+#include "OrderBook.hpp"
 
 template<class T>
 bool OrderBook::add(T &_book, Price _price, Order &_order)
@@ -36,4 +37,22 @@ std::vector<double> OrderBook::getPrice(const T &_book)
     for (auto [_price, _order] : _book)
         price[i++] = _price;
     return price;
+}
+
+template<class T>
+void OrderBook::modify(T &_book, Price _price, Price _oprice, Order &_order)
+{
+    OrderList &loprice = _book.at(_oprice);
+    auto it = std::find_if(loprice.begin(), loprice.end(), [_order] (const Order &_iorder) {
+        return _iorder.orderId == _order.orderId && _iorder.userId == _order.userId;
+    });
+
+    if (_price == _oprice) {
+        it->quantity = _order.quantity;
+    } else {
+        OrderList &lprice = _book.at(_oprice);
+
+        lprice.emplace_back(std::move(*it));
+        lprice.erase(it);
+    }
 }
