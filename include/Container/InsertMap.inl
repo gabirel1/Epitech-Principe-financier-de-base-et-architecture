@@ -11,6 +11,8 @@ namespace fix
     template<IsKey T, class _T>
     InsertMap<T, _T>::Iterator InsertMap<T, _T>::find(const T &_key) const
     {
+        std::lock_guard<std::mutex> guard(m_mutex);
+
         return std::find_if(m_map.begin(), m_map.end(), [_key] (const T &_mkey) {
             return _key == _mkey;
         });
@@ -19,6 +21,8 @@ namespace fix
     template<IsKey T, class _T>
     void InsertMap<T, _T>::emplace(const Pair &&_pair)
     {
+        std::lock_guard<std::mutex> guard(m_mutex);
+
         m_map.emplace_back(std::move(_pair));
     }
 

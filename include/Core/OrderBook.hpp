@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <mutex>
 #include <vector>
 #include <set>
 
@@ -73,6 +74,8 @@ class OrderBook
         [[nodiscard]] static std::vector<double> getPrice(const T &_book);
 
     private:
+        std::mutex m_mutex;
+
         BidBook m_bid;
         AskBook m_ask;
 };

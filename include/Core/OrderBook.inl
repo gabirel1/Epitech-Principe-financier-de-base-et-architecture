@@ -6,6 +6,8 @@
 template<class T>
 bool OrderBook::add(T &_book, Price _price, Order &_order)
 {
+    std::lock_guard<std::mutex> guard(m_mutex);
+
     for (auto &[_key, _val] : _book) {
         if (_key > _price)
             break;
@@ -34,6 +36,7 @@ std::vector<double> OrderBook::getPrice(const T &_book)
 {
     std::vector<double> price(_book.size());
     size_t i = 0;
+    std::lock_guard<std::mutex> guard(m_mutex);
 
     for (auto [_price, _order] : _book)
         price[i++] = _price;
@@ -43,6 +46,7 @@ std::vector<double> OrderBook::getPrice(const T &_book)
 template<class T>
 void OrderBook::modify(T &_book, Price _price, Price _oprice, Order &_order)
 {
+    std::lock_guard<std::mutex> guard(m_mutex);
     OrderList &loprice = _book.at(_oprice);
     auto it = std::find_if(loprice.begin(), loprice.end(), [_order] (const Order &_iorder) {
         return _iorder.orderId == _order.orderId && _iorder.userId == _order.userId;
@@ -61,9 +65,11 @@ void OrderBook::modify(T &_book, Price _price, Price _oprice, Order &_order)
 template<class T>
 bool OrderBook::cancel(T& _book, Price _price, UserId _userId, OrderId _orderId)
 {
+    std::lock_guard<std::mutex> guard(m_mutex);
+
     if (_book.contains(_price)) {
         OrderList &ol = _book.at(_price);
-        
+
         std::erase_if(ol, [_userId, _orderId] (const Order& _order) {
             return _order.userId == _userId && _order.orderId == _orderId;
         });

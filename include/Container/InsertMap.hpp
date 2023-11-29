@@ -36,6 +36,8 @@ namespace fix
             ConstIterator end() const;
 
         private:
+            std::mutex m_mutex;
+
             // check for reimplementation of a hash map
             std::vector<Pair> m_map;
     };
