@@ -30,11 +30,30 @@ enum class OrderType
 class OrderBook
 {
     public:
+        struct Data
+        {
+            enum class Action
+            {
+                Add,
+                Modify,
+                Cancel
+            };
+
+            Action action;
+            OrderType type;
+            Price price;
+            UserId userId;
+            OrderId orderId;
+            Price oprice;
+            Order order;
+        };
+
         OrderBook() = default;
         virtual ~OrderBook() = default;
 
         bool add(OrderType _type, Price _price, Order& _order);
         void modify(OrderType _type, Price _price, Price _oprice, Order &_order);
+        bool cancel(OrderType _type, Price _price, UserId _userId, OrderId _orderId);
 
         // front only
         [[nodiscard]] std::vector<Price> getPrice(OrderType _type) const;
@@ -47,6 +66,8 @@ class OrderBook
         static bool add(T &_book, Price _price, Order& _order);
         template<class T>
         static void modify(T &_book, Price _price, Price _oprice, Order &_order);
+        template<class T>
+        static bool cancel(T& _book, Price _price, UserId _userId, OrderId _orderId);
 
         template<class T>
         [[nodiscard]] static std::vector<double> getPrice(const T &_book);
@@ -56,4 +77,4 @@ class OrderBook
         AskBook m_ask;
 };
 
-#include "OrderBook.inl"
+#include "Core/OrderBook.inl"

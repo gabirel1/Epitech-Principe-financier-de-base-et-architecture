@@ -1,6 +1,7 @@
 #include <algorithm>
+#include <vector>
 
-#include "OrderBook.hpp"
+#include "Core/OrderBook.hpp"
 
 template<class T>
 bool OrderBook::add(T &_book, Price _price, Order &_order)
@@ -55,4 +56,18 @@ void OrderBook::modify(T &_book, Price _price, Price _oprice, Order &_order)
         lprice.emplace_back(std::move(*it));
         lprice.erase(it);
     }
+}
+
+template<class T>
+bool OrderBook::cancel(T& _book, Price _price, UserId _userId, OrderId _orderId)
+{
+    if (_book.contains(_price)) {
+        OrderList &ol = _book.at(_price);
+        
+        std::erase_if(ol, [_userId, _orderId] (const Order& _order) {
+            return _order.userId == _userId && _order.orderId == _orderId;
+        });
+        return true;
+    }
+    return false;
 }
