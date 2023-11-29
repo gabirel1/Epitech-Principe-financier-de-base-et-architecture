@@ -17,6 +17,8 @@ add_executable(Market
 
 target_include_directories(Market PRIVATE include)
 
+target_compile_definitions(Market PRIVATE TS_SIZE_OB=1)
+
 if (MSVC)
     target_compile_options(Market PRIVATE /W4)
     target_compile_definitions(Market PUBLIC NOMINMAX)
