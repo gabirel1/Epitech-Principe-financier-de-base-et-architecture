@@ -1,15 +1,20 @@
 #pragma once
 
+#include "Network/Socket.hpp"
+
 namespace net
 {
-    class Acceptor
+    template<IsSocket T>
+    class Acceptor : public c::Socket
     {
         public:
-            Acceptor();
-            ~Acceptor();
+            using Client = std::shared_ptr<T>;
 
-            std::shared_ptr<Socket> accept();
+            Acceptor() = default;
+            ~Acceptor() = default;
 
-            
+            int listen(uint32_t _port);
+
+            Client accept();
     };
 }
