@@ -1,9 +1,10 @@
 #pragma once
 
+#include <map>
 #include <memory>
 
+#include "Network/Acceptor.hpp"
 #include "Network/CEPoll.hpp"
-#include "Network/Socket.hpp"
 
 #ifndef MAX_EVENT_EPOLL
     #define MAX_EVENT_EPOLL
@@ -15,11 +16,12 @@
 
 namespace net
 {
-    using Client = std::unique_ptr<Socket>;
-
+    template<IsSocket T>
     class Selector : public c::EPoll
     {
         public:
+            using Client = Acceptor<T>::Client;
+
             Selector() = default;
             ~Selector() = default;
 
@@ -36,3 +38,5 @@ namespace net
             float m_to;
     };
 }
+
+#include "Network/Selector.inl"

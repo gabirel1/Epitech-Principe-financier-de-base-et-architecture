@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <type_traits>
 
 #include "Network/CSocket.hpp"
 #include "Network/Ip.hpp"
@@ -36,6 +37,9 @@ namespace net
         private:
             int m_type = 0;
     };
+
+    template<class T>
+    concept IsSocket = std::is_base_of_v<Socket, T>;
 
     namespace tcp
     {
