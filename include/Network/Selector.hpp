@@ -30,7 +30,7 @@ namespace net
             void timeout(float _to);
             [[nodiscard]] float timeout() const;
 
-            Client pull();
+            std::vector<Client> pull();
 
         private:
             std::map<int, Client> m_clients;
