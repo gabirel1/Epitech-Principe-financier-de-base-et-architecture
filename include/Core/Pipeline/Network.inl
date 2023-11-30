@@ -44,6 +44,6 @@ namespace pip
     template<IsSocket T>
     void Network<T>::process(Client &_client)
     {
-        m_output.enqueue();
+        m_output.enqueue(std::move(_client->receive(NET_RECV_SIZE)));
     }
 }

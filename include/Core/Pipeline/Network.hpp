@@ -5,6 +5,10 @@
 #include "Network/Acceptor.hpp"
 #include "Network/Selector.hpp"
 
+#ifndef NET_RECV_SIZE
+    #define NET_RECV_SIZE 4096
+#endif
+
 namespace pip
 {
     template<IsSocket T>
