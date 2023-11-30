@@ -18,7 +18,7 @@ namespace net::c
             virtual ~EPoll() = default;
 
             void create();
-            [[nodiscard]] int wait(int _to);
+            [[nodiscard]] int wait(int _to, , Event *_event);
             [[nodiscard]] int ctl(int _op, int _fd, Event *_event);
 
         private:
@@ -27,6 +27,5 @@ namespace net::c
             int m_fd;
 
             Event m_event;
-            Event *m_events;
     };
 }

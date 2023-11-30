@@ -10,7 +10,7 @@ namespace net
         m_block = _block;
     }
 
-    bool Socket::isBlocking() const
+    bool Socket::blocking() const
     {
         return m_block;
     }
@@ -34,32 +34,27 @@ namespace net
 
     size_t Socket::send(const uint8_t *_data, size_t _size)
     {
-        return m_socket.send(_data.c_str(), _data.size());
+        return send(_data.c_str(), _data.size());
     }
 
     const uint8_t *Socket::receive(size_t _size, int &_error)
     {
-        return m_socket.receive(_size, _error);
+        return receive(_size, _error);
     }
 
     bool Socket::close()
     {
-        m_socket.close();
+        close();
     }
 
     Socket::Socket(int _proto)
-        : m_socket(AF_INET, _proto, 0)
+        : c::Socket(AF_INET, _proto, 0)
     {
     }
 
     int Socket::create(int _dom)
     {
-        m_socket.create();
-    }
-
-    int Socket::raw() const
-    {
-        return m_fd;
+        create();
     }
 
     namespace tcp

@@ -27,13 +27,13 @@ namespace net::c
         m_fd = create(m_max);
     }
 
-    int EPoll::wait(int _to)
+    int EPoll::wait(int _to, Event *_event)
     {
-        return wait(m_fd, m_events, m_max, _to);
+        return wait(m_fd, _events, m_max, _to);
     }
 
-    ubt EPoll::ctl(int _op, int _fd)
+    int EPoll::ctl(int _op, int _fd, Event *_event)
     {
-        return clt(m_fd, _op, _fd, &m_event);
+        return clt(m_fd, _op, _fd, _events);
     }
 }
