@@ -1,6 +1,12 @@
 #include "Core/Pipeline/Core.hpp"
 
 template<class T>
+Pipeline<T>::~Pipeline()
+{
+    stop();
+}
+
+template<class T>
 std::future_status Pipeline<T>::stop()
 {
     std::future_status ret = std::future_status::ready;
