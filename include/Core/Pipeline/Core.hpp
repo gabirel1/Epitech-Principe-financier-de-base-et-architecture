@@ -10,7 +10,7 @@ class Pipeline
 {
     public:
         Pipeline() = default;
-        virtual ~Pipeline() = default;
+        virtual ~Pipeline();
 
         [[nodiscard]] std::future_status stop();
 
