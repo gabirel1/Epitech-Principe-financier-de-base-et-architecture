@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "Core/Core.hpp"
 
 Core::Core()
@@ -16,7 +18,12 @@ void Core::start()
     internal_start();
     while (m_running)
     {
-        m_market.status();
+        try {
+            m_market.status();
+        } catch (std::future_error &_e) {
+            std::cout << "exception: " << _e.what() << " | " << _e.code() << std::endl;
+            m_running = false;
+        }
     }
     stop();
 }

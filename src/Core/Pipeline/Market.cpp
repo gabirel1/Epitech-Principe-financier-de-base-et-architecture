@@ -18,7 +18,7 @@ namespace pip
             m_running = true;
             tstart(this);
         }
-        return !m_running;
+        return m_running;
     }
 
     void Market::status(float _to)
