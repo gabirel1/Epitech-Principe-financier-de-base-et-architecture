@@ -19,7 +19,7 @@ namespace net
             void connect(uint32_t _ip, uint32_t _port);
 
             void blocking(bool _block);
-            [[nodiscard]] bool isBlocking() const;
+            [[nodiscard]] bool blocking() const;
 
             size_t send(const std::string &_data);
             size_t send(const uint8_t *_data, size_t _size);
@@ -35,8 +35,6 @@ namespace net
 
         private:
             int m_type = 0;
-
-            int m_fd;
     };
 
     namespace tcp

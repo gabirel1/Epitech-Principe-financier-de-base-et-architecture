@@ -27,7 +27,7 @@ namespace net::c
 
     }
 
-    bool Socket::isBlocking(int _fd) const
+    bool Socket::blocking(int _fd) const
     {
 
     }
@@ -69,7 +69,7 @@ namespace net::c
 
     }
 
-    bool Socket::isBlocking() const
+    bool Socket::blocking() const
     {
 
     }

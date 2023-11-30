@@ -21,7 +21,7 @@ namespace net
                 [[nodiscard]] static const uint8_t *receive(int _fd, size_t _size, int &_error);
 
                 static void blocking(int _fd, bool _block);
-                [[nodiscard]] static bool isBlocking(int _fd) const;
+                [[nodiscard]] static bool blocking(int _fd) const;
 
                 [[nodiscard]] static bool close(int _fd);
 
