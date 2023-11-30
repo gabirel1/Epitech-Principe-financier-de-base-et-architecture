@@ -25,7 +25,6 @@ namespace net
 
                 [[nodiscard]] static bool close(int _fd);
 
-
             protected:
                 void create();
 
