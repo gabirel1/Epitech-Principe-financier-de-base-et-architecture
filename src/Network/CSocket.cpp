@@ -2,11 +2,41 @@
 
 namespace net::c
 {
+    Socket::Socket(int _dom, int _type, int _proto)
+        : m_dom(_dom), m_type(_type), m_proto(_proto)
+    {
+    }
+
+    Socket::~Socket()
+    {
+        void = close();
+    }
+
+    int Socket::create(int _dom, int _type, int _proto)
+    {
+        return ::create(_dom, _type, _proto);
+    }
+
+    void Socket::bind(int _fd, struct sockaddr *_addr)
+    {
+        ::bind(_fd, _addr, sizeof(_addr));
+    }
+
+    void Socket::listen(int _fd, int _max)
+    {
+        ::listen(_fd, _max);
+    }
+
     bool Socket::connect(int _fd, struct sockaddr *_addrs)
     {
-        if (::connect(_fd, (struct sockaddr *)_addrs, sizeof(_addrs)) < 0)
+        if (::connect(_fd, _addrs, sizeof(_addrs)) < 0)
             return false;
         return true;
+    }
+
+    void Socket::accept(int _fd)
+    {
+        return accept(_fd, (struct sockaddr *)NULL, NULL);
     }
 
     size_t Socket::send(int _fd, const uint8_t *_data, size_t _size)
@@ -44,11 +74,31 @@ namespace net::c
 
     // non static function:
 
+    void Socket::create()
+    {
+        m_fd = create(m_dom, m_type, m_proto);
+    }
+
+    void Socket::bind(struct sockaddr *_addr)
+    {
+        bind(m_fd, _addr);
+    }
+
+    void Socket::listen(int _max)
+    {
+        listen(m_fd, _max);
+    }
+
     bool Socket::connect(struct sockaddr *_addrs)
     {
         if (::connect(m_fd, (struct sockaddr *)_addrs, sizeof(_addrs)) < 0)
             return false;
         return true;
+    }
+
+    int Socket::accept()
+    {
+        return ::accept(m_fd, (struct sockaddr *)NULL, NULL);
     }
 
     size_t Socket::send(const uint8_t *_data, size_t _size)
@@ -79,18 +129,13 @@ namespace net::c
         return close(m_fd);
     }
 
-    void Socket::create()
+    void Socket::raw(int _fd)
     {
-        m_fd = create(m_dom, m_type, m_proto);
+        m_fd = _fd;
     }
 
-    Socket::Socket(int _dom, int _type, int _proto)
-        : m_dom(_dom), m_type(_type), m_proto(_proto)
+    int Socker::raw() const
     {
-    }
-
-    Socket::~Socket()
-    {
-        void = close();
+        return m_fd;
     }
 }
