@@ -2,23 +2,21 @@
 
 #include <string>
 
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-
+#include "Network/CSocket.hpp"
 #include "Network/Ip.hpp"
 #include "Thread/Queue.hpp"
 
 namespace net
 {
-    class Socket
+    class Socket : public c::Socket
     {
         private:
             using Output = ts::Queue<const uint8_t *>;
 
             virtual ~Socket() = default;
 
-            void connect(const Ip &_ip, uint32_t m_port);
+            void connect(const Ip &_ip, uint32_t _port);
+            void connect(uint32_t _ip, uint32_t _port);
 
             void blocking(bool _block);
             [[nodiscard]] bool isBlocking() const;
@@ -26,19 +24,16 @@ namespace net
             size_t send(const std::string &_data);
             size_t send(const uint8_t *_data, size_t _size);
 
-            [[nodiscard]] const uint8_t *receive(int &_error);
+            [[nodiscard]] std::string receive(int &_error);
 
             bool close();
 
         protected:
             Socket(int _type);
 
-            int create(int _dom, int _type);
-
-            [[nodiscard]] int raw() const;
+            int create(int _dom);
 
         private:
-            bool m_block = true;
             int m_type = 0;
 
             int m_fd;

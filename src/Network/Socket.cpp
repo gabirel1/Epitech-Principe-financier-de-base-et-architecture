@@ -1,3 +1,6 @@
+#include <sys/socket.h>
+#include <sys/types.h>
+
 #include "Network/Socket.hpp"
 
 namespace net
@@ -16,48 +19,42 @@ namespace net
     {
         struct sockaddr_in addrs;
 
-        if (!create(AF_INET, 0) && connect(m_fd, (struct sockaddr *)&addrs, sizeof(addrs)) < 0)
-            return false;
         memset(&addrs, 0, sizeof(addrs));
         addrs.sin_family = AF_INET;
         addrs.sin_port = htons(_port);
-        if (inet_pton(AF_INET, _ip.c_str(), &addrs.sin_addr) <= 0 &&
-            ::connect(m_socket, (struct sockaddr *)_addrs, sizeof(addrs)) < 0)
-            return false;
+        m_create.create(AF_INET, SOCK_STREAM, 0);
+        m_socket.connect(&addrs);
         return true;
     }
 
     size_t Socket::send(const std::string &_data)
     {
-        send(_data.c_str(), _data.size());
+        return send(_data.c_str(), _data.size());
     }
 
     size_t Socket::send(const uint8_t *_data, size_t _size)
     {
-        return ::send(m_socket, _data, _size, );
+        return m_socket.send(_data.c_str(), _data.size());
     }
 
-    const uint8_t *Socket::receive(int &_error, size_t _size)
+    const uint8_t *Socket::receive(size_t _size, int &_error)
     {
-        uint8_t *data = nullptr;
-
-        _error = recv(m_socket, data, _size);
-        return data;
+        return m_socket.receive(_size, _error);
     }
 
     bool Socket::close()
     {
-        ::close(m_fd);
+        m_socket.close();
     }
 
     Socket::Socket(int _proto)
-        : m_proto(_proto)
+        : m_socket(AF_INET, _proto, 0)
     {
     }
 
-    int Socket::create(int _dom, int _proto)
+    int Socket::create(int _dom)
     {
-        m_socket = socket(_dom, m_type, _proto);
+        m_socket.create();
     }
 
     int Socket::raw() const
