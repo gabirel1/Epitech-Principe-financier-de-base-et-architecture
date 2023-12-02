@@ -11,13 +11,13 @@ namespace net
 {
     class Socket : public c::Socket
     {
-        private:
+        public:
             using Output = ts::Queue<const uint8_t *>;
 
-            virtual ~Socket() = default;
+            ~Socket() = default;
 
-            void connect(const Ip &_ip, uint32_t _port);
-            void connect(uint32_t _ip, uint32_t _port);
+            bool connect(const Ip &_ip, uint32_t _port);
+            bool connect(uint32_t _ip, uint32_t _port);
 
             void blocking(bool _block);
             [[nodiscard]] bool blocking() const;
@@ -25,14 +25,12 @@ namespace net
             size_t send(const std::string &_data);
             size_t send(const uint8_t *_data, size_t _size);
 
-            [[nodiscard]] std::string receive(int &_error);
+            [[nodiscard]] inline std::string receive(size_t _size, int &_error);
 
             bool close();
 
         protected:
             Socket(int _type);
-
-            int create(int _dom);
 
         private:
             int m_type = 0;

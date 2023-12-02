@@ -1,3 +1,7 @@
+#include <cstddef>
+
+#include <fcntl.h>
+
 #include "Network/CSocket.hpp"
 
 namespace net::c
@@ -9,12 +13,12 @@ namespace net::c
 
     Socket::~Socket()
     {
-        void = close();
+        close();
     }
 
     int Socket::create(int _dom, int _type, int _proto)
     {
-        return ::create(_dom, _type, _proto);
+        return create(_dom, _type, _proto);
     }
 
     void Socket::bind(int _fd, struct sockaddr *_addr)
@@ -34,9 +38,9 @@ namespace net::c
         return true;
     }
 
-    void Socket::accept(int _fd)
+    int Socket::accept(int _fd)
     {
-        return accept(_fd, (struct sockaddr *)NULL, NULL);
+        return accept(_fd);
     }
 
     size_t Socket::send(int _fd, const uint8_t *_data, size_t _size)
@@ -48,28 +52,30 @@ namespace net::c
     {
         uint8_t *data = nullptr;
 
-        _error = ::recv(_fd, data, _size);
+        _error = ::recv(_fd, data, _size, 0);
         return data;
     }
 
-    void Socket::blocking(int _fd, bool _block)
+    bool Socket::blocking(int _fd, bool _block)
     {
+        int flags = fcntl(_fd, F_GETFL, 0);
 
+        if (flags == -1)
+            return false;
+        flags = _block ? (flags & ~O_NONBLOCK) : (flags | O_NONBLOCK);
+        return fcntl(_fd, F_SETFL, flags) == 0;
     }
 
-    bool Socket::blocking(int _fd) const
+    bool Socket::blocking(int _fd)
     {
+        int flags = fcntl(_fd, F_GETFL, 0);
 
+        return flags & O_NONBLOCK;
     }
 
     bool Socket::close(int _fd)
     {
         return close(_fd);
-    }
-
-    int Socket::create(int _dom, int _type, int _proto)
-    {
-        return socket(_dom, _type, _proto);
     }
 
     // non static function:
@@ -103,25 +109,22 @@ namespace net::c
 
     size_t Socket::send(const uint8_t *_data, size_t _size)
     {
-        return send(_fd, _data, _size);
+        return send(m_fd, _data, _size);
     }
 
     const uint8_t *Socket::receive(size_t _size, int &_error)
     {
-        uint8_t *data = nullptr;
-
-        _error = receive(_fd, data, _size);
-        return data;
+        return receive(m_fd, _size, _error);
     }
 
-    void Socket::blocking(bool _block)
+    bool Socket::blocking(bool _block)
     {
-
+        return blocking(m_fd, _block);
     }
 
     bool Socket::blocking() const
     {
-
+        return blocking();
     }
 
     bool Socket::close()
@@ -134,7 +137,7 @@ namespace net::c
         m_fd = _fd;
     }
 
-    int Socker::raw() const
+    int Socket::raw() const
     {
         return m_fd;
     }

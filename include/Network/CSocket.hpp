@@ -1,10 +1,16 @@
 #pragma once
 
+#include <string>
 #include <sys/socket.h>
 #include <sys/types.h>
 
+#include <cstdint>
+
 namespace net
 {
+    template<class T>
+    class Selector;
+
     namespace c
     {
         class Socket
@@ -25,12 +31,13 @@ namespace net
                 [[nodiscard]] static size_t send(int _fd, const uint8_t *_data, size_t _size);
                 [[nodiscard]] static const uint8_t *receive(int _fd, size_t _size, int &_error);
 
-                static void blocking(int _fd, bool _block);
-                [[nodiscard]] static bool blocking(int _fd) const;
+                [[nodiscard]] static bool blocking(int _fd, bool _block);
+                [[nodiscard]] static bool blocking(int _fd);
 
                 [[nodiscard]] static bool close(int _fd);
 
             protected:
+                template<class T>
                 friend class ::net::Selector;
 
                 void create();
@@ -39,16 +46,17 @@ namespace net
 
                 void listen(int _max);
 
-                [[nodiscard]] bool connect(uint32_t _ip, uint32_t _port, );
+                [[nodiscard]] bool connect(struct sockaddr *_addrs);
                 [[nodiscard]] int accept();
 
+                [[nodiscard]] size_t send(const std::string &_data);
                 [[nodiscard]] size_t send(const uint8_t *_data, size_t _size);
                 [[nodiscard]] const uint8_t *receive(size_t _size, int &_error);
 
-                void blocking(bool _block);
-                [[nodiscard]] bool isBlocking() const;
+                [[nodiscard]] bool blocking(bool _block);
+                [[nodiscard]] bool blocking() const;
 
-                bool close();
+                [[nodiscard]] bool close();
 
                 void raw(int _fd);
                 [[nodiscard]] int raw() const;

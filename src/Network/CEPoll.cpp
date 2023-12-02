@@ -2,7 +2,7 @@
 
 namespace net::c
 {
-    int EPool::create(int _max)
+    int EPoll::create(int _max)
     {
         return epoll_create(_max);
     }
@@ -12,7 +12,7 @@ namespace net::c
         return epoll_wait(_fd, _event, _maxev, _to);
     }
 
-    int EPoll:ctl(int _epfd, int _op, int _fd, Event *_event)
+    int EPoll::ctl(int _epfd, int _op, int _fd, Event *_event)
     {
         return epoll_ctl(_epfd, _op, _fd, _event);
     }
@@ -22,18 +22,18 @@ namespace net::c
     {
     }
 
-    void EPool::create()
+    void EPoll::create()
     {
         m_fd = create(m_max);
     }
 
-    int EPoll::wait(int _to, Event *_event)
+    int EPoll::wait(Event *_events, int _to)
     {
         return wait(m_fd, _events, m_max, _to);
     }
 
     int EPoll::ctl(int _op, int _fd, Event *_event)
     {
-        return clt(m_fd, _op, _fd, _events);
+        return ctl(m_fd, _op, _fd, _event);
     }
 }
