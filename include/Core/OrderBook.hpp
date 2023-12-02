@@ -59,7 +59,7 @@ class OrderBook
         // front only
         [[nodiscard]] std::vector<Price> getPrice(OrderType _type);
         [[nodiscard]] bool contain(OrderType _type, Price _price);
-        [[nodiscard]] const OrderList& getOrders(OrderType _type, Price _price);
+        [[nodiscard]] const OrderList &getOrders(OrderType _type, Price _price);
         [[nodiscard]] Quantity sumQuantity(OrderType _type, Price _price);
 
     protected:

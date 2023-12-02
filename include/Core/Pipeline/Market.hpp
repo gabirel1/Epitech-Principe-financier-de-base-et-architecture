@@ -22,9 +22,9 @@ namespace pip
             void loop();
 
         private:
-            void process(MarketIn _data);
+            void process(MarketIn &_data);
 
-            void send(MarketIn _data);
+            void send(const MarketIn _data);
 
             SerialToMarket &m_input;
             MarketToNet &m_output;

@@ -3,7 +3,7 @@
 namespace pip
 {
     Market::Market(OrderBook &_ob, SerialToMarket &_input, MarketToNet &_output)
-        : m_ob(_ob), m_input(_input), m_output(_output)
+        : m_input(_input), m_output(_output), m_ob(_ob)
     {
     }
 
@@ -34,14 +34,15 @@ namespace pip
             // use a mutex wait?
             if (!m_input.empty()) {
                 input = m_input.pop_front();
-                m_tp.enqueue([this, input]() {
-                    process(input);
+                process(input);
+                m_tp.enqueue([this, input] () {
+                    send(input);
                 });
             }
         }
     }
 
-    void Market::process(MarketIn _data)
+    void Market::process(MarketIn &_data)
     {
         switch (_data.action) {
             case OrderBook::Data::Action::Add:
@@ -57,12 +58,9 @@ namespace pip
                 // send an internal error message
                 return;
         }
-        m_tp.enqueue([this, _data] () {
-            send(_data);
-        });
     }
 
-    void Market::send(MarketIn _data)
+    void Market::send(const MarketIn _data)
     {
         MarketOut out;
 
