@@ -1,9 +1,9 @@
-#include "Core/Logger.hpp"
+#include "Core/Core.hpp"
 
 int main(int _ac, const char **_av)
 {
-    Logger::Init();
+    Core core{};
 
-    Logger::Log("this is a test", 315, "aaaa", 34.5f);
+    core.start();
     return 0;
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <mutex>
 #include <vector>
 #include <set>
 
@@ -56,23 +57,25 @@ class OrderBook
         bool cancel(OrderType _type, Price _price, UserId _userId, OrderId _orderId);
 
         // front only
-        [[nodiscard]] std::vector<Price> getPrice(OrderType _type) const;
-        [[nodiscard]] bool contain(OrderType _type, Price _price) const;
-        [[nodiscard]] const OrderList& getOrders(OrderType _type, Price _price) const;
-        [[nodiscard]] Quantity sumQuantity(OrderType _type, Price _price) const;
+        [[nodiscard]] std::vector<Price> getPrice(OrderType _type);
+        [[nodiscard]] bool contain(OrderType _type, Price _price);
+        [[nodiscard]] const OrderList& getOrders(OrderType _type, Price _price);
+        [[nodiscard]] Quantity sumQuantity(OrderType _type, Price _price);
 
     protected:
         template<class T>
-        static bool add(T &_book, Price _price, Order& _order);
+        bool add(T &_book, Price _price, Order& _order);
         template<class T>
-        static void modify(T &_book, Price _price, Price _oprice, Order &_order);
+        void modify(T &_book, Price _price, Price _oprice, Order &_order);
         template<class T>
-        static bool cancel(T& _book, Price _price, UserId _userId, OrderId _orderId);
+        bool cancel(T& _book, Price _price, UserId _userId, OrderId _orderId);
 
         template<class T>
-        [[nodiscard]] static std::vector<double> getPrice(const T &_book);
+        [[nodiscard]] std::vector<Price> inter_getPrice(const T &_book);
 
     private:
+        std::mutex m_mutex;
+
         BidBook m_bid;
         AskBook m_ask;
 };
