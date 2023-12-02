@@ -37,14 +37,14 @@ bool OrderBook::cancel(OrderType _type, Price _price, UserId _userId, OrderId _o
     return cancel<BidBook>(m_bid, _price, _userId, _orderId);
 }
 
-std::vector<double> OrderBook::getPrice(OrderType _type) const
+std::vector<Price> OrderBook::getPrice(OrderType _type)
 {
     if (_type == OrderType::Ask)
-        return getPrice<AskBook>(m_ask);
-    return getPrice<BidBook>(m_bid);
+        return inter_getPrice<AskBook>(m_ask);
+    return inter_getPrice<BidBook>(m_bid);
 }
 
-bool OrderBook::contain(OrderType _type, Price _price) const
+bool OrderBook::contain(OrderType _type, Price _price)
 {
     std::lock_guard<std::mutex> guard(m_mutex);
 
@@ -53,7 +53,7 @@ bool OrderBook::contain(OrderType _type, Price _price) const
     return m_bid.contains(_price);
 }
 
-const OrderList& OrderBook::getOrders(OrderType _type, Price _price) const
+const OrderList& OrderBook::getOrders(OrderType _type, Price _price)
 {
     std::lock_guard<std::mutex> guard(m_mutex);
 
@@ -63,7 +63,7 @@ const OrderList& OrderBook::getOrders(OrderType _type, Price _price) const
 }
 
 
-Quantity OrderBook::sumQuantity(OrderType _type, Price _price) const
+Quantity OrderBook::sumQuantity(OrderType _type, Price _price)
 {
     const OrderList &ref = getOrders(_type, _price);
     std::lock_guard<std::mutex> guard(m_mutex);

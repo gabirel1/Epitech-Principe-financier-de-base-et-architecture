@@ -27,7 +27,7 @@ namespace fix
     }
 
     template<IsKey T, class _T>
-    typename _T &InsertMap<T, _T>::at(const T &_key)
+    _T &InsertMap<T, _T>::at(const T &_key)
     {
         return find(_key)->second;
     }

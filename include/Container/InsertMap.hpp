@@ -1,6 +1,8 @@
 #pragma once
 
 #include <concepts>
+#include <mutex>
+#include <vector>
 
 template<class T>
 concept IsKey = requires (T _val) {

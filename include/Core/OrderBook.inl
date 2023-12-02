@@ -32,18 +32,6 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
 }
 
 template<class T>
-std::vector<double> OrderBook::getPrice(const T &_book)
-{
-    std::vector<double> price(_book.size());
-    size_t i = 0;
-    std::lock_guard<std::mutex> guard(m_mutex);
-
-    for (auto [_price, _order] : _book)
-        price[i++] = _price;
-    return price;
-}
-
-template<class T>
 void OrderBook::modify(T &_book, Price _price, Price _oprice, Order &_order)
 {
     std::lock_guard<std::mutex> guard(m_mutex);
@@ -76,4 +64,16 @@ bool OrderBook::cancel(T& _book, Price _price, UserId _userId, OrderId _orderId)
         return true;
     }
     return false;
+}
+
+template<class T>
+std::vector<Price> OrderBook::inter_getPrice(const T &_book)
+{
+    std::vector<Price> price(_book.size());
+    size_t i = 0;
+    std::lock_guard<std::mutex> guard(m_mutex);
+
+    for (auto [_price, _order] : _book)
+        price[i++] = _price;
+    return price;
 }
