@@ -6,9 +6,11 @@
 
 #include <cstdint>
 
+#include "Core/meta.hpp"
+
 namespace net
 {
-    template<class T>
+    template<IsSocket T>
     class Selector;
 
     namespace c
@@ -37,7 +39,7 @@ namespace net
                 [[nodiscard]] static bool close(int _fd);
 
             protected:
-                template<class T>
+                template<IsSocket T>
                 friend class ::net::Selector;
 
                 void create();

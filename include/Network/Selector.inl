@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "Network/Selector.hpp"
 
 namespace net
@@ -12,7 +14,7 @@ namespace net
     bool Selector<T>::client(Client _client)
     {
         if (clt(EPOLL_CTL_ADD, _client.raw()) != -1) {
-            m_client.emplace(_client.raw(), _client);
+            m_clients.emplace(_client.raw(), _client);
             return true;
         }
         return false;
@@ -31,14 +33,14 @@ namespace net
     }
 
     template<IsSocket T>
-    std::vector<Selector<T>::Client> Selector<T>::pull()
+    std::vector<typename Selector<T>::Client> Selector<T>::pull()
     {
-        Event *_event;
-        size_t set = wait(m_to, _event);
-        Client client = nullptr;
+        Event *events;
+        size_t set = wait(events, m_to);
+        std::vector<Client> clients{set};
 
         for (size_t it = 0; it < std::min(set, MAX_SOCKET); it++)
-            clients.emplace_back(m_clients.at(_event[it].data.fd));
+            clients.emplace_back(m_clients.at(events[it].data.fd));
         return clients;
     }
 }

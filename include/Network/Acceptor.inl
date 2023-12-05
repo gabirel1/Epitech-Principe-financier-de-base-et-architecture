@@ -17,7 +17,8 @@ namespace net
         listen();
     }
 
-    Client accept()
+    template<IsSocket T>
+    Acceptor<T>::Client Acceptor<T>::accept()
     {
         int fd = accept();
         Client socket = nullptr;
