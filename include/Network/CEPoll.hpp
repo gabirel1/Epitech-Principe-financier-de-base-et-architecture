@@ -6,9 +6,10 @@ namespace net::c
 {
     class EPoll
     {
-        using Event = struct epoll_event;
 
         public:
+            using Event = struct epoll_event;
+
             [[nodiscard]] static int create(int _max = 0);
             [[nodiscard]] static int wait(int _fd, Event *_events, int _maxev, int _to);
             [[nodiscard]] static int ctl(int _epfd, int _op, int _fd, Event *_event);

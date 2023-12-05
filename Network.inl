@@ -3,14 +3,14 @@
 namespace pip
 {
     template<IsSocket T>
-    Network<T>::Network(std::vector<Client> &_clients, NetToSerial &_output, uint32_t _port)
+    InNetwork<typename net::Acceptor<T>::Client>::InNetwork(std::vector<Client> &_clients, NetToSerial &_output, uint32_t _port)
         : m_clients(_clients), m_output(_output)
     {
         listen(_port);
     }
 
     template<IsSocket T>
-    void Network<T>::start()
+    void InNetwork<typename net::Acceptor<T>::Client>::start()
     {
         if (!m_running) {
             m_running = true;
@@ -20,13 +20,13 @@ namespace pip
     }
 
     template<IsSocket T>
-    void Network<T>::status(float _to)
+    void InNetwork<typename net::Acceptor<T>::Client>::status(float _to)
     {
         tstatus(static_cast<ms>(_to * 1000));
     }
 
     template<IsSocket T>
-    void Network<T>::loop()
+    void InNetwork<typename net::Acceptor<T>::Client>::loop()
     {
         Acceptor<T>::Client accept = nullptr;
         std::vector<Client> clients;
@@ -42,7 +42,7 @@ namespace pip
     }
 
     template<IsSocket T>
-    void Network<T>::process(Client &_client)
+    void InNetwork<typename net::Acceptor<T>::Client>::process(Client &_client)
     {
         m_output.enqueue(std::move(_client->receive(NET_RECV_SIZE)));
     }

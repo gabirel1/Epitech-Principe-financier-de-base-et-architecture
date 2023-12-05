@@ -11,7 +11,7 @@
 #endif
 
 #ifndef MAX_SOCKET
-    #define MAX_SOCKET 30
+    #define MAX_SOCKET (size_t)30
 #endif
 
 namespace net
@@ -22,10 +22,10 @@ namespace net
         public:
             using Client = Acceptor<T>::Client;
 
-            Selector() = default;
+            Selector();
             ~Selector() = default;
 
-            void client(Client _client);
+            bool client(Client _client);
 
             void timeout(float _to);
             [[nodiscard]] float timeout() const;
