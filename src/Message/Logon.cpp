@@ -11,4 +11,9 @@ namespace fix
     {
         m_params.emplace({ "108", _val });
     }
+
+    void Logon::set98_EncryptMethod(const std::string &_val)
+    {
+        m_params.emplace({ "98", _val });
+    }
 }
