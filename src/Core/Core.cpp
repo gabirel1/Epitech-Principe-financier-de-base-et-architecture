@@ -2,8 +2,8 @@
 
 #include "Core/Core.hpp"
 
-Core::Core()
-    : m_ob(), m_innet(m_client, m_nt_to_sr), m_market(m_ob, m_sr_to_mk, m_mk_to_nt)
+Core::Core(uint32_t _tcp_port, uint32_t _udp_port)
+    : m_ob(), m_innet(m_client, m_nt_to_sr, _tcp_port), m_market(m_ob, m_sr_to_mk, m_mk_to_nt)
 {
 }
 

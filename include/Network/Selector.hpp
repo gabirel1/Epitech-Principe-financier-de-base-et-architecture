@@ -7,11 +7,11 @@
 #include "Network/CEPoll.hpp"
 
 #ifndef MAX_EVENT_EPOLL
-    #define MAX_EVENT_EPOLL
+    #define MAX_EVENT_EPOLL 30
 #endif
 
 #ifndef MAX_SOCKET
-    #define MAX_SOCKET (size_t)30
+    #define MAX_SOCKET 30
 #endif
 
 namespace net

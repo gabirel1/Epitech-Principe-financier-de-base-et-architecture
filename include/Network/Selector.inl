@@ -6,7 +6,7 @@ namespace net
 {
     template<IsSocket T>
     Selector<T>::Selector()
-        : c::EPoll(MAX_EVENT_EPOLL)
+        : c::EPoll((int)MAX_EVENT_EPOLL)
     {
     }
 
@@ -39,7 +39,7 @@ namespace net
         size_t set = wait(events, m_to);
         std::vector<Client> clients{set};
 
-        for (size_t it = 0; it < std::min(set, MAX_SOCKET); it++)
+        for (size_t it = 0; it < std::min(set, (size_t)MAX_SOCKET); it++)
             clients.emplace_back(m_clients.at(events[it].data.fd));
         return clients;
     }

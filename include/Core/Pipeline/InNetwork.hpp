@@ -21,8 +21,8 @@ namespace pip
             InNetwork(std::vector<Client> &_clients, NetToSerial &_output, uint32_t _port);
             ~InNetwork();
 
-            [[nodiscard]] inline bool start();
-            inline void status(float _to = 1.f);
+            [[nodiscard]] bool start();
+            void status(float _to = 1.f);
 
             void loop();
 

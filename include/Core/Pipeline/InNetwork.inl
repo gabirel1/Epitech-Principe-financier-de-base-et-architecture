@@ -12,17 +12,15 @@ namespace pip
     template<IsSocket T>
     InNetwork<T>::~InNetwork()
     {
-        PipeType::stop();
+        this->template stop();
     }
 
     template<IsSocket T>
     bool InNetwork<T>::start()
     {
-        if (!m_running) {
-            m_running = true;
-            PipeType::tstart(this);
-        }
-        return m_running;
+        if (!this->m_running)
+            this->template tstart(this);
+        return this->m_running;
     }
 
     template<IsSocket T>
@@ -37,7 +35,7 @@ namespace pip
         Client accept = nullptr;
         std::vector<Client> clients;
 
-        while (m_running) {
+        while (this->m_running) {
             accept = m_acceptor.accept();
             if (accept)
                 m_clients.push_back(accept);
@@ -52,6 +50,6 @@ namespace pip
     {
         int error = 0;
 
-        m_output.push(_client->receive(NET_RECV_SIZE, error));
+        // m_output.push(_client->receive(NET_RECV_SIZE, error));
     }
 }
