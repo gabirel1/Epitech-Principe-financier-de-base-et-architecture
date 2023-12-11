@@ -54,7 +54,7 @@ namespace net
 
                 void listen(int _max);
 
-                [[nodiscard]] bool connect(struct sockaddr *_addrs);
+                [[nodiscard]] bool connect(struct sockaddr *_addr);
                 [[nodiscard]] int accept();
 
                 [[nodiscard]] size_t send(const std::string &_data);
