@@ -6,6 +6,8 @@
 #include "Message/Header.hpp"
 #include "Container/InsertMap.hpp"
 
+#define FIX_DELIMITER '^'
+
 namespace fix
 {
     class Message
@@ -16,9 +18,10 @@ namespace fix
 
             Header header;
 
-            operator std::string () const;
+            // operator std::string () const;
+            operator std::string ();
 
-            [[nodiscard]] size_t sum() const;   // 10: Sum
+            [[nodiscard]] std::string checkSum(const std::string &_val) const;   // 10: Sum
 
         protected:
             friend class Serializer;

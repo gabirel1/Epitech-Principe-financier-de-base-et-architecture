@@ -25,11 +25,13 @@ namespace fix
             [[nodiscard]] bool contains(const T &_key) const;
             [[nodiscard]] Iterator find(const T &_key) const;
             void emplace(const Pair &&_pair);
+            void emplace_back(const Pair &&_pair);
 
             [[nodiscard]] _T &at(const T &_key);
             [[nodiscard]] const _T &at(const T &_key) const;
 
             [[nodiscard]] constexpr size_t size() const;
+            [[nodiscard]] void clear();
 
             Iterator begin();
             Iterator end();

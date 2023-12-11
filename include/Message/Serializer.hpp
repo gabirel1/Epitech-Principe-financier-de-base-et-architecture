@@ -20,5 +20,6 @@ namespace fix
 
             static Error run(std::string &_msg, AnonMessage &_map);
             static Error token(std::string &_msg, Token &_pair);
+            static std::string serialize(const AnonMessage &_map);
     };
 }

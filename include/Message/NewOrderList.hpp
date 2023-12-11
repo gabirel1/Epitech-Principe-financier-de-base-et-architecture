@@ -6,6 +6,8 @@ namespace fix
 {
     class NewOrderList: public Message
     {
+    public:
+        NewOrderList() { header.setMsgType(_msgType); }
         /**
          * Unique identifier of list as assigned by institution, used to associate multiple individual orders.
          */
@@ -50,5 +52,8 @@ namespace fix
          * 9 = Cross short
          */
         void set54_Side(const std::string &_val);
+
+    protected:
+        static constexpr const char *_msgType = "E";
     };
 }

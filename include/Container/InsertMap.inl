@@ -67,4 +67,20 @@ namespace fix
     {
         return m_map.end();
     }
+
+    template<IsKey T, class _T>
+    void InsertMap<T, _T>::clear()
+    {
+        std::lock_guard<std::mutex> guard(m_mutex);
+
+        m_map.clear();
+    }
+
+    template<IsKey T, class _T>
+    void InsertMap<T, _T>::emplace_back(const Pair &&_pair)
+    {
+        std::lock_guard<std::mutex> guard(m_mutex);
+
+        m_map.emplace_back(std::move(_pair));
+    }
 }
