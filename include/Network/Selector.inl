@@ -8,6 +8,7 @@ namespace net
     Selector<T>::Selector()
         : c::EPoll((int)MAX_EVENT_EPOLL)
     {
+        Logger::Log("[Selector] New selector with maximum of event from epoll: ", MAX_EVENT_EPOLL);
     }
 
     template<IsSocket T>

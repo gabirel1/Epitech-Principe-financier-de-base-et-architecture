@@ -1,4 +1,11 @@
 #include "Core/Pipeline/Core.hpp"
+#include "Core/Logger.hpp"
+
+template<class T>
+Pipeline<T>::Pipeline()
+{
+    Logger::Log("[Pipeline] New pipeline created");
+}
 
 template<class T>
 Pipeline<T>::~Pipeline()

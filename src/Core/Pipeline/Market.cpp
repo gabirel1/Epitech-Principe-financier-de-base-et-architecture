@@ -1,10 +1,13 @@
 #include "Core/Pipeline/Market.hpp"
+#include "Core/Logger.hpp"
+#include "Core/meta.hpp"
 
 namespace pip
 {
     Market::Market(OrderBook &_ob, SerialToMarket &_input, MarketToNet &_output)
         : m_input(_input), m_output(_output), m_ob(_ob)
     {
+        
     }
 
     Market::~Market()
@@ -14,10 +17,9 @@ namespace pip
 
     bool Market::start()
     {
-        if (!m_running) {
-            m_running = true;
+        if (!m_running)
             tstart(this);
-        }
+        Logger::Log("[Market] Running: ", m_running);
         return m_running;
     }
 
@@ -28,6 +30,7 @@ namespace pip
 
     void Market::loop()
     {
+        Logger::SetThreadName(THIS_THREAD_ID, "Market");
         MarketIn input;
 
         while (m_running) {
@@ -44,6 +47,8 @@ namespace pip
 
     void Market::process(MarketIn &_data)
     {
+        Logger::Log("[Market] Processing action: "); // todo log
+
         switch (_data.action) {
             case OrderBook::Data::Action::Add:
                 m_ob.add(_data.type, _data.price, _data.order);

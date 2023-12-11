@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "Core/Logger.hpp"
 #include "Core/Core.hpp"
 
 Core::Core(uint32_t _tcp_port, uint32_t _udp_port)
@@ -14,6 +15,7 @@ Core::~Core()
 
 void Core::start()
 {
+    Logger::Log("[Core] Starting...");
     m_running = true;
     internal_start();
     while (m_running)
@@ -22,8 +24,8 @@ void Core::start()
             m_innet.status();
             m_market.status();
         } catch (std::future_error &_e) {
-            std::cout << "exception: " << _e.what() << " | " << _e.code() << std::endl;
-            m_running = false;
+            Logger::Log("[Core] Pipeline have crash: ", _e.what(), "\n\t> with the code: ", _e.code());
+            stop();
         }
     }
     stop();
@@ -33,13 +35,17 @@ void Core::stop()
 {
     if (m_running) {
         m_running = false;
+        Logger::Log("[Core] Stoping...");
         m_market.stop();
         m_innet.stop();
+        Logger::Log("[Core] All pipeline are stoped");
     }
 }
 
 void Core::internal_start()
 {
+    Logger::Log("[Core] Starting pipeline...");
     m_market.start();
     m_innet.start();
+    Logger::Log("[Core] All pipeline are running");
 }
