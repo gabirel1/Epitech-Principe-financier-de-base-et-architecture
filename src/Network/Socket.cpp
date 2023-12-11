@@ -54,7 +54,6 @@ namespace net
     Socket::Socket(int _type)
         : c::Socket(AF_INET, _type, 0)
     {
-        Logger::Log("[Socket] New socket with: ", MAX_EVENT_EPOLL);
     }
 
     namespace tcp
