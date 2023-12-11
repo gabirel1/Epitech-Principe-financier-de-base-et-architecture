@@ -2,6 +2,7 @@
 
 #include <fcntl.h>
 
+#include "Core/Logger.hpp"
 #include "Network/CSocket.hpp"
 
 namespace net::c
@@ -83,44 +84,54 @@ namespace net::c
 
     void Socket::create()
     {
+        Logger::Log("[c::Socket] Create a new socket with: domain(", m_dom, "), type(", m_type, ") protocol(", m_proto, ")");
         m_fd = create(m_dom, m_type, m_proto);
     }
 
     void Socket::bind(struct sockaddr *_addr)
     {
+        Logger::Log("[c::Socket] Bind socket to: "); // todo log
         bind(m_fd, _addr);
     }
 
     void Socket::listen(int _max)
     {
+        Logger::Log("[c::Socket] Initialisation of listening, with the maximum socket handling: ", _max);
         listen(m_fd, _max);
     }
 
     bool Socket::connect(struct sockaddr *_addr)
     {
+        Logger::Log("[c::Socket] Connect to: "); // todo log
         if (::connect(m_fd, _addr, sizeof(_addr)) < 0) {
+            Logger::Log("[c::Socket] Connection failed");
             return false;
         }
+        Logger::Log("[c::Socket] Connection succed");
         return true;
     }
 
     int Socket::accept()
     {
+        Logger::Log("[c::Socket] Accept new client");
         return ::accept(m_fd, (struct sockaddr *)NULL, NULL);
     }
 
     size_t Socket::send(const uint8_t *_data, size_t _size)
     {
+        Logger::Log("[c::Socket] Send data of size: ", _size);
         return send(m_fd, _data, _size);
     }
 
     const uint8_t *Socket::receive(size_t _size, int &_error)
     {
+        Logger::Log("[c::Socket] Receive data of maximum size: ", _size);
         return receive(m_fd, _size, _error);
     }
 
     bool Socket::blocking(bool _block)
     {
+        Logger::Log("[c::Socket] Set blocking state to: ", _block);
         return blocking(m_fd, _block);
     }
 
@@ -131,6 +142,7 @@ namespace net::c
 
     bool Socket::close()
     {
+        Logger::Log("[c::Socket] Close");
         return close(m_fd);
     }
 

@@ -70,9 +70,9 @@ namespace net
                 [[nodiscard]] int raw() const;
 
             private:
-                int m_dom;
-                int m_type;
-                int m_proto;
+                int m_dom = 0;
+                int m_type = 0;
+                int m_proto = 0;
 
                 int m_fd = 0;
         };

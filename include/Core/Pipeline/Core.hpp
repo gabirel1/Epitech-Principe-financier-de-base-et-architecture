@@ -9,7 +9,7 @@ template<class T>
 class Pipeline
 {
     public:
-        Pipeline() = default;
+        Pipeline();
         virtual ~Pipeline();
 
         [[nodiscard]] std::future_status stop();
