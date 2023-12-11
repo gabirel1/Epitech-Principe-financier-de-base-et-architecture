@@ -3,6 +3,8 @@
 #include <concepts>
 #include <type_traits>
 
+#define THIS_THREAD_ID std::this_thread::get_id()
+
 namespace net
 {
     class Socket;
