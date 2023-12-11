@@ -18,7 +18,7 @@ namespace net::c
 
     int Socket::create(int _dom, int _type, int _proto)
     {
-        return create(_dom, _type, _proto);
+        return socket(_dom, _type, _proto);
     }
 
     void Socket::bind(int _fd, struct sockaddr *_addr)
@@ -95,10 +95,11 @@ namespace net::c
         listen(m_fd, _max);
     }
 
-    bool Socket::connect(struct sockaddr *_addrs)
+    bool Socket::connect(struct sockaddr *_addr)
     {
-        if (::connect(m_fd, (struct sockaddr *)_addrs, sizeof(_addrs)) < 0)
+        if (::connect(m_fd, _addr, sizeof(_addr)) < 0) {
             return false;
+        }
         return true;
     }
 
