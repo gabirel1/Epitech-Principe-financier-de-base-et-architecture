@@ -113,7 +113,6 @@ namespace net::c
 
     int Socket::accept()
     {
-        Logger::Log("[c::Socket] Accept new client");
         return ::accept(m_fd, (struct sockaddr *)NULL, NULL);
     }
 
@@ -125,7 +124,6 @@ namespace net::c
 
     const uint8_t *Socket::receive(size_t _size, int &_error)
     {
-        Logger::Log("[c::Socket] Receive data of maximum size: ", _size);
         return receive(m_fd, _size, _error);
     }
 

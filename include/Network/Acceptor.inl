@@ -41,7 +41,7 @@ namespace net
         int fd = c::Socket::accept();
         Client socket = nullptr;
 
-        if (fd == 0)
+        if (fd == -1)
             return nullptr;
         socket = std::make_shared<T>();
         socket->raw(fd);
