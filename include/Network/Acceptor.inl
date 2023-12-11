@@ -1,3 +1,7 @@
+#include <cstring>
+
+#include <netinet/in.h>
+
 #include "Network/Acceptor.hpp"
 
 namespace net
@@ -5,7 +9,7 @@ namespace net
     template<IsSocket T>
     int Acceptor<T>::listen(uint32_t _port)
     {
-        struct sockaddr_in serv_addr;
+        struct sockaddr_in addr;
 
         std::memset(&addr, 0, sizeof(addr));
         addr.sin_family = AF_INET;
@@ -13,14 +17,14 @@ namespace net
         addr.sin_port = htons(_port);
 
         create();
-        bind(&addr);
-        listen();
+        bind((struct sockaddr *)&addr);
+        listen(MAX_SOCKET);
     }
 
     template<IsSocket T>
     Acceptor<T>::Client Acceptor<T>::accept()
     {
-        int fd = accept();
+        int fd = c::Socket::accept();
         Client socket = nullptr;
 
         if (fd == 0)

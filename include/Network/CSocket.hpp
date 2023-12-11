@@ -13,11 +13,15 @@ namespace net
     template<IsSocket T>
     class Selector;
 
+    template<IsSocket T>
+    class Acceptor;
+
     namespace c
     {
         class Socket
         {
             public:
+                Socket() = default;
                 Socket(int _dom, int _type, int _proto);
                 ~Socket();
 
@@ -41,6 +45,8 @@ namespace net
             protected:
                 template<IsSocket T>
                 friend class ::net::Selector;
+                template<IsSocket T>
+                friend class ::net::Acceptor;
 
                 void create();
 

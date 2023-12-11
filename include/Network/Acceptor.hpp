@@ -18,3 +18,5 @@ namespace net
             Client accept();
     };
 }
+
+#include "Network/Acceptor.inl"

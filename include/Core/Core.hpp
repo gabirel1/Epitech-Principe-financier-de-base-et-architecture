@@ -6,7 +6,7 @@
 class Core
 {
     public:
-        Core();
+        Core(uint32_t _tcp_port, uint32_t _udp_port);
         ~Core();
 
         void start();
@@ -19,7 +19,7 @@ class Core
     private:
         bool m_running = false;
 
-        std::vector<std::shared_ptr<net::Acceptor<net::tcp::Socket>::Client>> m_client;
+        std::vector<net::Acceptor<net::tcp::Socket>::Client> m_client;
         OrderBook m_ob;
 
         NetToSerial m_nt_to_sr;
