@@ -20,6 +20,7 @@ namespace net::c
     EPoll::EPoll(int _max)
         : m_max(_max)
     {
+        create();
     }
 
     void EPoll::create()

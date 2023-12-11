@@ -18,7 +18,7 @@ namespace net
 
         create();
         bind((struct sockaddr *)&addr);
-        listen(MAX_SOCKET);
+        c::Socket::listen(MAX_SOCKET);
     }
 
     template<IsSocket T>
