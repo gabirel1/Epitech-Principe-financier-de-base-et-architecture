@@ -10,7 +10,7 @@ namespace net
         public:
             using Client = std::shared_ptr<T>;
 
-            Acceptor() = default;
+            Acceptor();
             ~Acceptor() = default;
 
             int listen(uint32_t _port);
@@ -18,3 +18,5 @@ namespace net
             Client accept();
     };
 }
+
+#include "Network/Acceptor.inl"

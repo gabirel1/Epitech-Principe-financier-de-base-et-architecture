@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 
+#include "Core/Logger.hpp"
 #include "Network/Socket.hpp"
 
 namespace net
@@ -60,6 +61,7 @@ namespace net
         Socket::Socket()
             : ::net::Socket(SOCK_STREAM)
         {
+            Logger::Log("[tcp::Socket] New TCP socket");
         }
     }
 
@@ -68,6 +70,7 @@ namespace net
         Socket::Socket()
             : ::net::Socket(SOCK_DGRAM)
         {
+            Logger::Log("[udp::Socket] New UDP socket");
         }
     }
 }

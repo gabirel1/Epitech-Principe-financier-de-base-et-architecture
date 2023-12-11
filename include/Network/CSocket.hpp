@@ -6,16 +6,22 @@
 
 #include <cstdint>
 
+#include "Core/meta.hpp"
+
 namespace net
 {
-    template<class T>
+    template<IsSocket T>
     class Selector;
+
+    template<IsSocket T>
+    class Acceptor;
 
     namespace c
     {
         class Socket
         {
             public:
+                Socket() = default;
                 Socket(int _dom, int _type, int _proto);
                 ~Socket();
 
@@ -37,8 +43,10 @@ namespace net
                 [[nodiscard]] static bool close(int _fd);
 
             protected:
-                template<class T>
+                template<IsSocket T>
                 friend class ::net::Selector;
+                template<IsSocket T>
+                friend class ::net::Acceptor;
 
                 void create();
 
@@ -46,7 +54,7 @@ namespace net
 
                 void listen(int _max);
 
-                [[nodiscard]] bool connect(struct sockaddr *_addrs);
+                [[nodiscard]] bool connect(struct sockaddr *_addr);
                 [[nodiscard]] int accept();
 
                 [[nodiscard]] size_t send(const std::string &_data);
@@ -62,9 +70,9 @@ namespace net
                 [[nodiscard]] int raw() const;
 
             private:
-                int m_dom;
-                int m_type;
-                int m_proto;
+                int m_dom = 0;
+                int m_type = 0;
+                int m_proto = 0;
 
                 int m_fd = 0;
         };

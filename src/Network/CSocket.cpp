@@ -2,6 +2,7 @@
 
 #include <fcntl.h>
 
+#include "Core/Logger.hpp"
 #include "Network/CSocket.hpp"
 
 namespace net::c
@@ -9,6 +10,7 @@ namespace net::c
     Socket::Socket(int _dom, int _type, int _proto)
         : m_dom(_dom), m_type(_type), m_proto(_proto)
     {
+        create();
     }
 
     Socket::~Socket()
@@ -18,7 +20,7 @@ namespace net::c
 
     int Socket::create(int _dom, int _type, int _proto)
     {
-        return create(_dom, _type, _proto);
+        return socket(_dom, _type, _proto);
     }
 
     void Socket::bind(int _fd, struct sockaddr *_addr)
@@ -82,23 +84,30 @@ namespace net::c
 
     void Socket::create()
     {
+        Logger::Log("[c::Socket] Create a new socket with: domain(", m_dom, "), type(", m_type, ") protocol(", m_proto, ")");
         m_fd = create(m_dom, m_type, m_proto);
     }
 
     void Socket::bind(struct sockaddr *_addr)
     {
+        Logger::Log("[c::Socket] Bind socket to: "); // todo log
         bind(m_fd, _addr);
     }
 
     void Socket::listen(int _max)
     {
+        Logger::Log("[c::Socket] Initialisation of listening, with the maximum socket handling: ", _max);
         listen(m_fd, _max);
     }
 
-    bool Socket::connect(struct sockaddr *_addrs)
+    bool Socket::connect(struct sockaddr *_addr)
     {
-        if (::connect(m_fd, (struct sockaddr *)_addrs, sizeof(_addrs)) < 0)
+        Logger::Log("[c::Socket] Connect to: "); // todo log
+        if (::connect(m_fd, _addr, sizeof(_addr)) < 0) {
+            Logger::Log("[c::Socket] Connection failed");
             return false;
+        }
+        Logger::Log("[c::Socket] Connection succed");
         return true;
     }
 
@@ -109,6 +118,7 @@ namespace net::c
 
     size_t Socket::send(const uint8_t *_data, size_t _size)
     {
+        Logger::Log("[c::Socket] Send data of size: ", _size);
         return send(m_fd, _data, _size);
     }
 
@@ -119,6 +129,7 @@ namespace net::c
 
     bool Socket::blocking(bool _block)
     {
+        Logger::Log("[c::Socket] Set blocking state to: ", _block);
         return blocking(m_fd, _block);
     }
 
@@ -129,6 +140,7 @@ namespace net::c
 
     bool Socket::close()
     {
+        Logger::Log("[c::Socket] Close");
         return close(m_fd);
     }
 

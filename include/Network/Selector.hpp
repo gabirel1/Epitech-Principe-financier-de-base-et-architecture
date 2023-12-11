@@ -7,7 +7,7 @@
 #include "Network/CEPoll.hpp"
 
 #ifndef MAX_EVENT_EPOLL
-    #define MAX_EVENT_EPOLL
+    #define MAX_EVENT_EPOLL 30
 #endif
 
 #ifndef MAX_SOCKET
@@ -22,15 +22,15 @@ namespace net
         public:
             using Client = Acceptor<T>::Client;
 
-            Selector() = default;
+            Selector();
             ~Selector() = default;
 
-            void client(Client _client);
+            bool client(Client _client);
 
             void timeout(float _to);
             [[nodiscard]] float timeout() const;
 
-            Client pull();
+            std::vector<Client> pull();
 
         private:
             std::map<int, Client> m_clients;

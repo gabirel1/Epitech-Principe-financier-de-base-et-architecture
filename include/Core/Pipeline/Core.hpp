@@ -9,8 +9,8 @@ template<class T>
 class Pipeline
 {
     public:
-        Pipeline() = default;
-        virtual ~Pipeline() = default;
+        Pipeline();
+        virtual ~Pipeline();
 
         [[nodiscard]] std::future_status stop();
 
@@ -19,7 +19,7 @@ class Pipeline
 
         [[nodiscard]] std::future_status tstatus(ms _to);
 
-        bool m_running = true;
+        bool m_running = false;
 
     private:
         std::future<void> m_futur;
