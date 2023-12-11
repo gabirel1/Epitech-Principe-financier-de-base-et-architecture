@@ -9,6 +9,7 @@ namespace net::c
     Socket::Socket(int _dom, int _type, int _proto)
         : m_dom(_dom), m_type(_type), m_proto(_proto)
     {
+        create();
     }
 
     Socket::~Socket()
