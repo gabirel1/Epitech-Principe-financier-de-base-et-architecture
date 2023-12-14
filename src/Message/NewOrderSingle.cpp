@@ -2,6 +2,13 @@
 
 namespace fix
 {
+    NewOrderSingle::NewOrderSingle()
+    {
+        header.setMsgType(m_msgType);
+    }
+
+    NewOrderSingle::~NewOrderSingle() {}
+
     void NewOrderSingle::set11_ClOrdID(const std::string &_val)
     {
         m_params.emplace({ "11", _val });

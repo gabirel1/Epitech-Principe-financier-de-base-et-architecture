@@ -7,6 +7,22 @@
 
 namespace fix
 {
+    Header::Header() {}
+
+    Header::Header(fix::Header &_header)
+    {
+        BeginString = _header.BeginString;
+        BodyLength = _header.BodyLength;
+        MsgType = _header.MsgType;
+        SenderCompId = _header.SenderCompId;
+        TargetCompId = _header.TargetCompId;
+        MsgSeqNum = _header.MsgSeqNum;
+        SendingTime = _header.SendingTime;
+        // *this = _header;
+    }
+
+    Header::~Header() {}
+
     Header::operator std::string() const
     {
         return "8=" + BeginString + (char)FIX_DELIMITER +

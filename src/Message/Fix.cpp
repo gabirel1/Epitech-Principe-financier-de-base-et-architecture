@@ -1,4 +1,6 @@
 #include "Message/Fix.hpp"
+#include <numeric>
+#include <iostream>
 
 namespace fix
 {
@@ -7,17 +9,15 @@ namespace fix
         size_t sum = 0;
         std::string formated_checksum = "";
 
-        for (const char &c : _val) {
-            sum += static_cast<int>(c);
-        }
+        sum = std::accumulate(_val.begin(), _val.end(), 0);
+
         sum %= 256;
 
         if (sum < 10)
-            formated_checksum = "00" + std::to_string(sum);
+            formated_checksum = "00";
         else if (sum < 100)
-            formated_checksum = "0" + std::to_string(sum);
-        else
-            formated_checksum = std::to_string(sum);
+            formated_checksum = "0";
+        formated_checksum += std::to_string(sum);
         return formated_checksum;
     }
 

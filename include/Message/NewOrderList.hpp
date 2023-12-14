@@ -7,7 +7,8 @@ namespace fix
     class NewOrderList: public Message
     {
     public:
-        NewOrderList() { header.setMsgType(_msgType); }
+        NewOrderList();
+        ~NewOrderList();
         /**
          * Unique identifier of list as assigned by institution, used to associate multiple individual orders.
          */
@@ -54,6 +55,6 @@ namespace fix
         void set54_Side(const std::string &_val);
 
     protected:
-        static constexpr const char *_msgType = "E";
+        static constexpr const char *m_msgType = "E";
     };
 }

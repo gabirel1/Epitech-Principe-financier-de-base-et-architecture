@@ -6,7 +6,7 @@
 #include "Message/Header.hpp"
 #include "Container/InsertMap.hpp"
 
-#define FIX_DELIMITER '^'
+#define FIX_DELIMITER '^' // change to 1 for real FIX protocol
 
 namespace fix
 {

@@ -7,12 +7,13 @@ namespace fix
     class Logout : public Message
     {
     public:
-        Logout() { header.setMsgType(_msgType); }
+        Logout();
+        ~Logout();
         /**
          * NOT REQUIRED
          */
         void set58_Text(const std::string &_val);
     protected:
-        static constexpr const char *_msgType = "5";
+        static constexpr const char *m_msgType = "5";
     };
 }

@@ -7,6 +7,8 @@ namespace fix
     class NewOrderSingle : public Message
     {
     public:
+        NewOrderSingle();
+        ~NewOrderSingle();
         /**
          * Unique identifier of the order as assigned by institution.
          */
@@ -75,6 +77,6 @@ namespace fix
         void set40_OrdType(const std::string &_val);
 
     protected:
-        static constexpr const char *_msgType = "D";
+        static constexpr const char *m_msgType = "D";
     };
 }

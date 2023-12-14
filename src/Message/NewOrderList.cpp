@@ -2,6 +2,13 @@
 
 namespace fix
 {
+    NewOrderList::NewOrderList()
+    {
+        header.setMsgType(m_msgType);
+    }
+
+    NewOrderList::~NewOrderList() {}
+
     void NewOrderList::set66_ListID(const std::string &_val)
     {
         m_params.emplace({ "66", _val });

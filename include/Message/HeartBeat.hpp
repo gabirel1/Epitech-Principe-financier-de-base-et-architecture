@@ -7,7 +7,8 @@ namespace fix
     class HeartBeat: public Message
     {
     public:
-        HeartBeat() { header.setMsgType(_msgType); }
+        HeartBeat();
+        ~HeartBeat();
         /**
          * NOT REQUIRED
          * @param _val
@@ -15,6 +16,6 @@ namespace fix
          */
         void set112_TestReqID(const std::string &_val);
     protected:
-        static constexpr const char *_msgType = "0";
+        static constexpr const char *m_msgType = "0";
     };
 }
