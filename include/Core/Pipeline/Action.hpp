@@ -11,7 +11,7 @@ namespace pip
 
             using PipeType = Pipeline<Action>;
 
-            Action(NetToSerial &_input, SerialToMarket &_output, RawOutput _raw);
+            Action(NetToSerial &_input, SerialToMarket &_output, RawOutput &_raw);
             ~Action();
 
             [[nodiscard]] bool start();

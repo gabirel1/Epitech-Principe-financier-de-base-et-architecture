@@ -1,8 +1,10 @@
 #include "Core/Pipeline/Action.hpp"
+#include "Core/Logger.hpp"
+#include "Core/meta.hpp"
 
 namespace pip
 {
-    Action::Action(NetToSerial &_input, SerialToMarket &_output, RawOutput _raw)
+    Action::Action(NetToSerial &_input, SerialToMarket &_output, RawOutput &_raw)
         : m_input(_input), m_output(_output), m_raw(_raw)
     {
     }
@@ -16,7 +18,7 @@ namespace pip
     {
         if (!m_running)
             tstart(this);
-        Logger::Log("[InNetwork] Running: ", m_running);
+        Logger::Log("[Action] Running: ", m_running);
         return m_running;
     }
 
@@ -28,6 +30,8 @@ namespace pip
     /// @brief Process all incoming raw message to make action
     void Action::loop()
     {
+        Logger::SetThreadName(THIS_THREAD_ID, "Action convertion");
+
         SerialIn input;
 
         while (m_running) {
