@@ -40,10 +40,9 @@ namespace fix
                SendingTime + (char)FIX_DELIMITER;
     }
 
-    void Header::setBodyLength(const std::string &_body)
+    void Header::setBodyLength(const std::size_t &_len)
     {
-        size_t len = _body.size();
-        BodyLength = std::to_string(len);
+        BodyLength = std::to_string(_len);
     }
 
     void Header::setMsgType(const std::string &_val)
@@ -80,6 +79,11 @@ namespace fix
 
         // std::string formattedTime(timeBuffer);
         SendingTime = formattedTime;
+    }
+
+    void Header::updateMsgSeqNum()
+    {
+        MsgSeqNum = std::to_string(std::stoi(MsgSeqNum) + 1);
     }
 
     std::string Header::getPartialHeader() const

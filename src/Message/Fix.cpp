@@ -1,6 +1,7 @@
 #include "Message/Fix.hpp"
 #include <numeric>
 #include <iostream>
+#include "Utils/Utils.hpp"
 
 namespace fix
 {
@@ -41,8 +42,13 @@ namespace fix
             body_tmp += _key + "=" + _val + (char)FIX_DELIMITER;
 
         header.setSendingTime();
-        header.MsgSeqNum = std::to_string(std::stoi(header.MsgSeqNum) + 1);
-        header.setBodyLength(header.getPartialHeader() + body_tmp);
+        header.updateMsgSeqNum();
+
+        std::size_t _len = utils::Utils::getBodyLength(
+            header.getPartialHeader() + body_tmp
+        );
+
+        header.setBodyLength(_len);
         header_tmp = header;
 
         msg = header_tmp + body_tmp;
