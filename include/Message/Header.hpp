@@ -12,14 +12,16 @@ namespace fix
             Header();
             Header(fix::Header &_header);
             ~Header();
+            operator std::string() const;
             void setBodyLength(const std::size_t &_len);
             void setMsgType(const std::string &_val);
-            void updateMsgSeqNum();
-            void setSendingTime();
-            std::string getPartialHeader() const;
-            operator std::string() const;
 
         protected:
+            friend class Message;
+            void setSendingTime();
+            void updateMsgSeqNum();
+            std::string getPartialHeader() const;
+        private:
             std::string BeginString = "FIX.4.2";    // 8 --> Init at the beginning of the session
             std::string BodyLength = "0";           // 9
             std::string MsgType;                    // 35

@@ -44,7 +44,7 @@ namespace fix
         header.setSendingTime();
         header.updateMsgSeqNum();
 
-        std::size_t _len = utils::Utils::getBodyLength(
+        std::size_t _len = Utils::getBodyLength(
             header.getPartialHeader() + body_tmp
         );
 
