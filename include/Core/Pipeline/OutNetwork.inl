@@ -41,8 +41,8 @@ namespace pip
         while (this->m_running) {
             if (!m_input.empty()) {
                 input = m_input.pop_front();
-                data = static_cast<std::string>(input.message()); 
-                input.Client->send(data.c_str(), data.size());
+                data = static_cast<std::string>(input.Message); 
+                input.Client.getSocket()->send(reinterpret_cast<const uint8_t *>(data.c_str()), data.size());
             }
         }
     }
