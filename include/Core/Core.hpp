@@ -20,7 +20,7 @@ class Core
     private:
         bool m_running = false;
 
-        std::vector<net::Acceptor<net::tcp::Socket>::Client> m_client;
+        std::vector<ClientSocket> m_client;
         OrderBook m_ob;
 
         NetToSerial m_nt_to_sr;

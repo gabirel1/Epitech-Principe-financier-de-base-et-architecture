@@ -3,6 +3,12 @@
 namespace fix
 {
     template<IsKey T, class _T>
+    InsertMap<T, _T>::InsertMap(const InsertMap<T, _T> &&_map)
+        : m_mutex(), m_map(std::move(_map.m_map))
+    {
+    }
+
+    template<IsKey T, class _T>
     bool InsertMap<T, _T>::contains(const T &_key) const
     {
         return find(_key) == m_map.end();

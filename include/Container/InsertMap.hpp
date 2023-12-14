@@ -16,6 +16,7 @@ namespace fix
     {
         public:
             InsertMap() = default;
+            InsertMap(const InsertMap &&_map);
             ~InsertMap() = default;
 
             using Pair = std::pair<T, _T>;

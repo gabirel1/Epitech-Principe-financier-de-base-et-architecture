@@ -56,5 +56,4 @@ namespace ts
         m_queue.pop();
         return data;
     }
-
 }
