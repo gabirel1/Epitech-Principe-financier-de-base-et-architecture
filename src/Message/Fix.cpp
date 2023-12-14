@@ -5,23 +5,6 @@
 
 namespace fix
 {
-    std::string Message::checkSum(const std::string &_val) const
-    {
-        size_t sum = 0;
-        std::string formated_checksum = "";
-
-        sum = std::accumulate(_val.begin(), _val.end(), 0);
-
-        sum %= 256;
-
-        if (sum < 10)
-            formated_checksum = "00";
-        else if (sum < 100)
-            formated_checksum = "0";
-        formated_checksum += std::to_string(sum);
-        return formated_checksum;
-    }
-
     // Message::operator std::string () const
     // {
     //     std::string str = header;
@@ -52,7 +35,7 @@ namespace fix
         header_tmp = header;
 
         msg = header_tmp + body_tmp;
-        msg += "10=" + checkSum(msg) + (char)FIX_DELIMITER;
+        msg += "10=" + Utils::getChecksum(msg) + (char)FIX_DELIMITER;
 
         return msg;
     }

@@ -14,7 +14,7 @@ namespace fix
 
             if (err == Error::None)
                 return err;
-            _map.emplace_back(std::move(pair));
+            _map.emplace(std::move(pair));
         }
         return Error::None;
     }

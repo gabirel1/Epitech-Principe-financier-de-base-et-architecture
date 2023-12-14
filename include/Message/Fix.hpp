@@ -21,8 +21,6 @@ namespace fix
             // operator std::string () const;
             operator std::string ();
 
-            [[nodiscard]] std::string checkSum(const std::string &_val) const;   // 10: Sum
-
         protected:
             friend class Serializer;
 
