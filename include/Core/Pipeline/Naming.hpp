@@ -24,10 +24,14 @@ namespace data
         OrderBook::Data OrderData{};
     };
 
-    struct MarketToNet
+    class MarketToNet
     {
-        ClientSocket Client{};
-        fix::Message Message{};
+        public:
+            MarketToNet() = default;
+            MarketToNet(const MarketToNet &&_data) noexcept;
+            ~MarketToNet() = default;
+            ClientSocket Client{};
+            fix::Message Message{};
     };
 }
 

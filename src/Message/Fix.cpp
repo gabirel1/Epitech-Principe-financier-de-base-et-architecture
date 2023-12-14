@@ -2,6 +2,11 @@
 
 namespace fix
 {
+    Message::Message(const Message &&_msg) noexcept
+        : header(std::move(_msg.header)), m_params(std::move(m_params))
+    {
+    }
+
     size_t Message::sum() const
     {
         return 0;

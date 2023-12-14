@@ -6,4 +6,9 @@ namespace data
         : Client(std::move(_data.Client)), Message(std::move(_data.Message))
     {
     }
+
+    MarketToNet::MarketToNet(const MarketToNet &&_data) noexcept
+        : Client(std::move(_data.Client)), Message(std::move(_data.Message))
+    {
+    }
 }
