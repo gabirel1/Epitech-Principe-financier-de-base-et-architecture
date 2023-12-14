@@ -30,6 +30,7 @@ namespace data
             MarketToNet() = default;
             MarketToNet(const MarketToNet &&_data) noexcept;
             ~MarketToNet() = default;
+
             ClientSocket Client{};
             fix::Message Message{};
     };

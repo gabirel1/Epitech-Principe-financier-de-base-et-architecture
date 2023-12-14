@@ -36,6 +36,8 @@ namespace pip
         while (m_running) {
             if (!m_input.empty()) {
                 NetIn input(std::move(m_input.pop_front()));
+
+                Logger::Log("[OutNetwork] Sending data to: "); // todo
                 data = static_cast<std::string>(input.Message); 
                 input.Client.getSocket()->send(reinterpret_cast<const uint8_t *>(data.c_str()), data.size());
             }
