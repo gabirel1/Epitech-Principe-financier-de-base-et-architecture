@@ -14,8 +14,12 @@ namespace net
     template<IsSocket T>
     bool Selector<T>::client(Client _client)
     {
-        if (clt(EPOLL_CTL_ADD, _client.raw()) != -1) {
-            m_clients.emplace(_client.raw(), _client);
+        Event event;
+
+        event.data.fd = _client->raw();
+        event.events = EPOLLIN | EPOLLET;
+        if (ctl(EPOLL_CTL_ADD, _client->raw(), &event) != -1) {
+            m_clients.emplace(_client->raw(), _client);
             return true;
         }
         return false;

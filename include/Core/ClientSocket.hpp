@@ -8,7 +8,7 @@
 class ClientSocket
 {
     public:
-        ClientSocket(std::shared_ptr<net::tcp::Socket> _socket);
+        ClientSocket(std::shared_ptr<net::tcp::Socket> _socket = nullptr);
         ~ClientSocket() = default;
 
         [[nodiscard]] std::shared_ptr<net::tcp::Socket> getSocket() const;

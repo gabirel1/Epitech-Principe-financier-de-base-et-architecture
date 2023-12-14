@@ -1,19 +1,46 @@
 #pragma once
 
-#include "Thread/Queue.hpp"
-#include "Core/OrderBook.hpp"
+#include "Core/ClientSocket.hpp"
 #include "Message/Fix.hpp"
+#include "Message/Serializer.hpp"
+#include "Thread/Queue.hpp"
 
-using NetOut = int; // todo
+namespace data
+{
+    class NetToSerial
+    {
+        public:
+            NetToSerial() = default;
+            NetToSerial(NetToSerial &&_data) noexcept;
+            ~NetToSerial() = default;
+
+            ClientSocket Client{};
+            fix::Serializer::AnonMessage Message{};
+    };
+
+    struct SerialToMarket
+    {
+        ClientSocket Client{};
+        OrderBook::Data OrderData{};
+    };
+
+    struct MarketToNet
+    {
+        ClientSocket Client{};
+        fix::Message Message{};
+    };
+}
+
+using NetOut = data::NetToSerial;
 using SerialIn = NetOut;
 
-using SerialOut = OrderBook::Data;
+using SerialOut = data::SerialToMarket;
 using MarketIn = SerialOut;
 
-using MarketOut = int; // todo
+using MarketOut = data::MarketToNet;
 using NetIn = MarketOut;
 
 using NetToSerial = ts::Queue<NetOut>;
 using SerialToMarket = ts::Queue<SerialOut>;
 using MarketToNet = ts::Queue<MarketOut>;
-using RawOutput = ts::Queue<fix::Message>;
+using RawOutput = ts::Queue<NetIn>;

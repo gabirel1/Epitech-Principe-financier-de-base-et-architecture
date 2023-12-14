@@ -18,7 +18,7 @@ namespace pip
 
             using PipeType = Pipeline<InNetwork<T>>;
 
-            InNetwork(std::vector<Client> &_clients, NetToSerial &_output, uint32_t _port);
+            InNetwork(std::vector<ClientSocket> &_clients, NetToSerial &_output, uint32_t _port);
             ~InNetwork();
 
             [[nodiscard]] bool start();
@@ -30,7 +30,7 @@ namespace pip
             void process(Client _client);
 
         private:
-            std::vector<Client> &m_clients; // implement a thread safe vector
+            std::vector<ClientSocket> &m_clients; // implement a thread safe vector
             NetToSerial &m_output;
 
             net::Acceptor<T> m_acceptor;
