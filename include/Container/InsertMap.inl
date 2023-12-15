@@ -3,9 +3,16 @@
 namespace fix
 {
     template<IsKey T, class _T>
-    InsertMap<T, _T>::InsertMap(const InsertMap<T, _T> &&_map)
-        : m_mutex(), m_map(std::move(_map.m_map))
+    InsertMap<T, _T>::InsertMap(const InsertMap<T, _T> &_map)
+        : m_mutex(), m_map(_map.m_map)
     {
+    }
+
+    template<IsKey T, class _T>
+    InsertMap<T, _T> &InsertMap<T, _T>::operator=(const InsertMap<T, _T> &_map)
+    {
+        m_map = _map.m_map;
+        return *this;
     }
 
     template<IsKey T, class _T>

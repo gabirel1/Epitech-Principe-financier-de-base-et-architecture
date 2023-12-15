@@ -2,6 +2,11 @@
 
 #include "Core/Pipeline/Core.hpp"
 #include "Core/Pipeline/Naming.hpp"
+#include "Thread/Pool.hpp"
+
+#ifndef TS_SIZE_ON
+    #define TS_SIZE_ON 1
+#endif
 
 namespace pip
 {
@@ -21,5 +26,7 @@ namespace pip
 
         private:
             MarketToNet &m_input;
+
+            ThreadPool<TS_SIZE_ON> m_tp;
     };
 }

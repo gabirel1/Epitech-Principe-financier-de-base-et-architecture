@@ -12,7 +12,6 @@ namespace fix
     {
         public:
             Message() = default;
-            Message(const Message &&_msg) noexcept;
             virtual ~Message() = default;
 
             Header header;

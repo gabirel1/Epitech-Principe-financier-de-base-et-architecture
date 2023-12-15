@@ -2,13 +2,39 @@
 
 namespace data
 {
-    NetToSerial::NetToSerial(NetToSerial &&_data) noexcept
-        : Client(std::move(_data.Client)), Message(std::move(_data.Message))
+    NetToSerial::NetToSerial(const NetToSerial &_data)
+        : Client(_data.Client), Message(_data.Message)
+    {
+    }
+    
+    NetToSerial &NetToSerial::operator=(const NetToSerial &_data)
+    {
+        Client = _data.Client;
+        Message = _data.Message;
+        return *this;
+    }
+
+    SerialToMarket::SerialToMarket(const SerialToMarket &_data)
+        : Client(_data.Client), OrderData(_data.OrderData)
     {
     }
 
-    MarketToNet::MarketToNet(const MarketToNet &&_data) noexcept
-        : Client(std::move(_data.Client)), Message(std::move(_data.Message))
+    SerialToMarket &SerialToMarket::operator=(const SerialToMarket &_data)
     {
+        Client = _data.Client;
+        OrderData = _data.OrderData;
+        return *this;
+    }
+
+    MarketToNet::MarketToNet(const MarketToNet &_data)
+        : Client(_data.Client), Message(_data.Message)
+    {
+    }
+
+    MarketToNet &MarketToNet::operator=(const MarketToNet &_data)
+    {
+        Client = _data.Client;
+        Message = _data.Message;
+        return *this;
     }
 }

@@ -7,32 +7,37 @@
 
 namespace data
 {
-    class NetToSerial
+    struct NetToSerial
     {
-        public:
-            NetToSerial() = default;
-            NetToSerial(NetToSerial &&_data) noexcept;
-            ~NetToSerial() = default;
+        NetToSerial() = default;
+        NetToSerial(const NetToSerial &_data);
 
-            ClientSocket Client{};
-            fix::Serializer::AnonMessage Message{};
+        NetToSerial &operator=(const NetToSerial &_data);
+
+        ClientSocket Client{};
+        fix::Serializer::AnonMessage Message{};
     };
 
     struct SerialToMarket
     {
+        SerialToMarket() = default;
+        SerialToMarket(const SerialToMarket &_data);
+
+        SerialToMarket &operator=(const SerialToMarket &_data);
+
         ClientSocket Client{};
         OrderBook::Data OrderData{};
     };
 
-    class MarketToNet
+    struct MarketToNet
     {
-        public:
-            MarketToNet() = default;
-            MarketToNet(const MarketToNet &&_data) noexcept;
-            ~MarketToNet() = default;
+        MarketToNet() = default;
+        MarketToNet(const MarketToNet &_data);
 
-            ClientSocket Client{};
-            fix::Message Message{};
+        MarketToNet &operator=(const MarketToNet &_data);
+
+        ClientSocket Client{};
+        fix::Message Message{};
     };
 }
 

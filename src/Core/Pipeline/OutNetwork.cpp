@@ -31,15 +31,17 @@ namespace pip
         Logger::SetThreadName(THIS_THREAD_ID, "Network Output");
 
         NetIn input;
-        std::string data;
 
         while (m_running) {
             if (!m_input.empty()) {
-                NetIn input(std::move(m_input.pop_front()));
+                input = m_input.pop_front();
 
-                Logger::Log("[OutNetwork] Sending data to: "); // todo
-                data = static_cast<std::string>(input.Message); 
-                input.Client.getSocket()->send(reinterpret_cast<const uint8_t *>(data.c_str()), data.size());
+                m_tp.enqueue([_input = std::move(input)] () {
+                    std::string data = static_cast<std::string>(_input.Message);
+
+                    _input.Client.getSocket()->send(reinterpret_cast<const uint8_t *>(data.c_str()), data.size());
+                    Logger::Log("[OutNetwork] Send data to: ");
+                });
             }
         }
     }

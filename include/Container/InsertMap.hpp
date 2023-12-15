@@ -15,13 +15,15 @@ namespace fix
     class InsertMap
     {
         public:
-            InsertMap() = default;
-            InsertMap(const InsertMap &&_map);
-            ~InsertMap() = default;
-
             using Pair = std::pair<T, _T>;
             using Iterator = std::vector<Pair>::iterator;
             using ConstIterator = std::vector<Pair>::const_iterator;
+
+            InsertMap() = default;
+            InsertMap(const InsertMap<T, _T> &_map);
+            ~InsertMap() = default;
+
+            InsertMap &operator=(const InsertMap<T, _T> &_map);
 
             [[nodiscard]] bool contains(const T &_key) const;
             [[nodiscard]] Iterator find(const T &_key) const;

@@ -37,8 +37,8 @@ namespace pip
             if (!m_input.empty()) {
                 input = m_input.pop_front();
                 process(input);
-                m_tp.enqueue([this, input] () {
-                    send(input);
+                m_tp.enqueue([this, _input = std::move(input)] () {
+                    send(_input);
                 });
             }
         }
