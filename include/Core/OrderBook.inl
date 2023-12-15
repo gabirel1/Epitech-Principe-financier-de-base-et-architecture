@@ -3,7 +3,7 @@
 
 #include "Core/OrderBook.hpp"
 
-template<class T>
+template<IsBook T>
 bool OrderBook::add(T &_book, Price _price, Order &_order)
 {
     std::lock_guard<std::mutex> guard(m_mutex);
@@ -31,7 +31,7 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
     return true;
 }
 
-template<class T>
+template<IsBook T>
 void OrderBook::modify(T &_book, Price _price, Price _oprice, Order &_order)
 {
     std::lock_guard<std::mutex> guard(m_mutex);
@@ -50,7 +50,7 @@ void OrderBook::modify(T &_book, Price _price, Price _oprice, Order &_order)
     }
 }
 
-template<class T>
+template<IsBook T>
 bool OrderBook::cancel(T& _book, Price _price, UserId _userId, OrderId _orderId)
 {
     std::lock_guard<std::mutex> guard(m_mutex);
@@ -66,7 +66,7 @@ bool OrderBook::cancel(T& _book, Price _price, UserId _userId, OrderId _orderId)
     return false;
 }
 
-template<class T>
+template<IsBook T>
 std::vector<Price> OrderBook::inter_getPrice(const T &_book)
 {
     std::vector<Price> price(_book.size());

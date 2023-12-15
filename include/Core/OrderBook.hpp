@@ -1,26 +1,13 @@
 #pragma once
 
-#include <map>
 #include <mutex>
-#include <vector>
-#include <set>
+#include <map>
 
-using UserId = uint64_t;
-using OrderId = uint64_t;
-using Quantity = uint64_t;
+#include "Core/Order.hpp"
+#include "Core/meta.hpp"
 
-struct Order
-{
-    UserId userId;
-    OrderId orderId;
-    Quantity quantity;
-};
-
-using Price = double;
-using OrderList = std::vector<Order>;
 using AskBook = std::map<Price, OrderList, std::greater<Price>>;
 using BidBook = std::map<Price, OrderList, std::less<Price>>;
-using PriceSet = std::set<Price>;
 
 enum class OrderType
 {
@@ -63,14 +50,14 @@ class OrderBook
         [[nodiscard]] Quantity sumQuantity(OrderType _type, Price _price);
 
     protected:
-        template<class T>
+        template<IsBook T>
         bool add(T &_book, Price _price, Order& _order);
-        template<class T>
+        template<IsBook T>
         void modify(T &_book, Price _price, Price _oprice, Order &_order);
-        template<class T>
+        template<IsBook T>
         bool cancel(T& _book, Price _price, UserId _userId, OrderId _orderId);
 
-        template<class T>
+        template<IsBook T>
         [[nodiscard]] std::vector<Price> inter_getPrice(const T &_book);
 
     private:
