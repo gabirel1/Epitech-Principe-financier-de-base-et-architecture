@@ -19,6 +19,7 @@ add_executable(Market
 target_include_directories(Market PRIVATE include)
 
 target_compile_definitions(Market PRIVATE TS_SIZE_OB=1)             # Thread Pool size from Order Book
+target_compile_definitions(Market PRIVATE TS_SIZE_ON=1)             # Thread Pool size from Output network
 target_compile_definitions(Market PRIVATE NET_RECV_SIZE=4096)       # Package max read size
 target_compile_definitions(Market PRIVATE MAX_EVENT_EPOLL=30)       # Maximum of event handle by epoll at once
 target_compile_definitions(Market PRIVATE MAX_SOCKET=30)            # Maximum of socket handle by epoll/socket at once

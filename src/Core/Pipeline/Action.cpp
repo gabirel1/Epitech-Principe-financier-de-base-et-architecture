@@ -32,10 +32,11 @@ namespace pip
     {
         Logger::SetThreadName(THIS_THREAD_ID, "Action convertion");
 
+        SerialIn input;
 
         while (m_running) {
             if (!m_input.empty()) {
-                SerialIn input(std::move(m_input.pop_front()));
+                input = m_input.pop_front();
                 // processing of the message
             }
         }
