@@ -9,7 +9,7 @@ namespace net
 {
     template<IsSocket T>
     Acceptor<T>::Acceptor()
-        : c::Socket()
+        : c::Socket(AF_INET, SOCK_STREAM, 0) // change for TCP or UDP
     {
         Logger::Log("[Acceptor] New acceptor");
     }

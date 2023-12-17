@@ -27,11 +27,11 @@ namespace net
 
                 [[nodiscard]] static int create(int _dom, int _type, int _proto);
 
-                static void bind(int _fd, struct sockaddr *_addr);
+                static void bind(int _fd, struct sockaddr *_addr, size_t _size);
 
                 static void listen(int _fd, int _max);
 
-                [[nodiscard]] static bool connect(int _fd, struct sockaddr *_addrs);
+                [[nodiscard]] static bool connect(int _fd, struct sockaddr *_addrs, size_t _size);
                 [[nodiscard]] static int accept(int _fd);
 
                 [[nodiscard]] static size_t send(int _fd, const uint8_t *_data, size_t _size);

@@ -16,7 +16,7 @@ namespace net::c
 
     Socket::~Socket()
     {
-        close();
+        (void)close();
     }
 
     int Socket::create(int _dom, int _type, int _proto)
@@ -24,9 +24,9 @@ namespace net::c
         return socket(_dom, _type, _proto);
     }
 
-    void Socket::bind(int _fd, struct sockaddr *_addr)
+    void Socket::bind(int _fd, struct sockaddr *_addr, size_t _size)
     {
-        ::bind(_fd, _addr, sizeof(_addr));
+        ::bind(_fd, _addr, _size);
     }
 
     void Socket::listen(int _fd, int _max)
@@ -34,9 +34,9 @@ namespace net::c
         ::listen(_fd, _max);
     }
 
-    bool Socket::connect(int _fd, struct sockaddr *_addrs)
+    bool Socket::connect(int _fd, struct sockaddr *_addrs, size_t _size)
     {
-        if (::connect(_fd, _addrs, sizeof(_addrs)) < 0)
+        if (::connect(_fd, _addrs, _size) < 0)
             return false;
         return true;
     }
@@ -87,12 +87,14 @@ namespace net::c
     {
         Logger::Log("[c::Socket] Create a new socket with: domain(", m_dom, "), type(", m_type, ") protocol(", m_proto, ")");
         m_fd = create(m_dom, m_type, m_proto);
+        if (m_fd < 0)
+            Logger::Log("[c::Socket] Error will creating the socket");
     }
 
     void Socket::bind(struct sockaddr *_addr)
     {
         Logger::Log("[c::Socket] Bind socket to: "); // todo log
-        bind(m_fd, _addr);
+        bind(m_fd, _addr, sizeof(struct sockaddr_in));
     }
 
     void Socket::listen(int _max)
@@ -111,8 +113,8 @@ namespace net::c
             return false;
         }
         addr.sin_family = m_dom;
-        addr.sin_port = _port;
-        if (::connect(m_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+        addr.sin_port = htons(_port);
+        if (::connect(m_fd, (struct sockaddr *)&addr, sizeof(addr))) {
             Logger::Log("[c::Socket] Connection failed");
             return false;
         }
