@@ -48,3 +48,17 @@ target_compile_definitions(MarketServer PRIVATE TS_SIZE_ON=1)             # Thre
 target_compile_definitions(MarketServer PRIVATE NET_RECV_SIZE=4096)       # Package max read size
 
 # Client
+
+file(GLOB_RECURSE SRC_CLIENT
+    include/Client/**.hpp
+    include/Client/**.inl
+    src/Client/**.cpp
+)
+
+add_executable(MarketClient
+    ${SRC_CLIENT}
+)
+
+target_link_libraries(MarketClient PRIVATE MarketCommon)
+
+target_include_directories(MarketClient PRIVATE include)
