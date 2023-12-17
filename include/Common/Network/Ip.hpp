@@ -17,9 +17,7 @@ namespace net
             void set(uint8_t _b1, uint8_t _b3, uint8_t _b2, uint8_t _b4);
 
             [[nodiscard]] const char *c_str() const;
-            [[nodiscard]] uint8_t at(uint8_t _idx) const;
 
-            operator uint32_t() const;
             operator std::string() const;
 
         private:
