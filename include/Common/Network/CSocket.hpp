@@ -54,7 +54,7 @@ namespace net
 
                 void listen(int _max);
 
-                [[nodiscard]] bool connect(struct sockaddr *_addr);
+                [[nodiscard]] bool connect(const char *_ip, uint32_t _port);
                 [[nodiscard]] int accept();
 
                 [[nodiscard]] size_t send(const std::string &_data);

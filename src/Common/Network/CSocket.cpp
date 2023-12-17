@@ -1,5 +1,6 @@
 #include <cstddef>
 
+#include <arpa/inet.h>
 #include <fcntl.h>
 
 #include "Common/Core/Logger.hpp"
@@ -100,10 +101,18 @@ namespace net::c
         listen(m_fd, _max);
     }
 
-    bool Socket::connect(struct sockaddr *_addr)
+    bool Socket::connect(const char *_ip, uint32_t _port)
     {
-        Logger::Log("[c::Socket] Connect to: "); // todo log
-        if (::connect(m_fd, _addr, sizeof(_addr)) < 0) {
+        struct sockaddr_in addr;
+
+        Logger::Log("[c::Socket] Connect to: ", _ip, ":", _port);
+        if (inet_pton(m_dom, _ip, &addr.sin_addr) <= 0) {
+            Logger::Log("[c::Socket] Connection failed, cannot convert IP");
+            return false;
+        }
+        addr.sin_family = m_dom;
+        addr.sin_port = _port;
+        if (::connect(m_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
             Logger::Log("[c::Socket] Connection failed");
             return false;
         }

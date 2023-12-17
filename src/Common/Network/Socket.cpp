@@ -22,7 +22,7 @@ namespace net
     bool Socket::connect(const Ip &_ip, uint32_t _port)
     {
         create();
-        connect(_ip, _port);
+        c::Socket::connect(_ip.c_str(), _port);
         return true;
     }
 
