@@ -36,8 +36,8 @@ namespace pip
             if (!m_input.empty()) {
                 input = m_input.pop_front();
 
-                m_tp.enqueue([_input = std::move(input)] () {
-                    std::string data = static_cast<std::string>(_input.Message);
+                m_tp.enqueue([_input = std::move(input)] () mutable {
+                    std::string data = _input.Message.to_string();
 
                     _input.Client.getSocket()->send(reinterpret_cast<const uint8_t *>(data.c_str()), data.size());
                     Logger::Log("[OutNetwork] Send data to: ");

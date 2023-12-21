@@ -6,6 +6,8 @@
 #include "Common/Message/Header.hpp"
 #include "Common/Container/InsertMap.hpp"
 
+#define FIX_DELIMITER 1 // change to '^' for testing or 1 for production
+
 namespace fix
 {
     class Message
@@ -16,9 +18,9 @@ namespace fix
 
             Header header;
 
-            operator std::string () const;
+            operator std::string ();
 
-            [[nodiscard]] size_t sum() const;   // 10: Sum
+            std::string to_string();
 
         protected:
             friend class Serializer;

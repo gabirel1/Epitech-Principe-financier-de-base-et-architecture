@@ -33,6 +33,7 @@ namespace fix
             [[nodiscard]] const _T &at(const T &_key) const;
 
             [[nodiscard]] constexpr size_t size() const;
+            void clear();
 
             Iterator begin();
             Iterator end();
