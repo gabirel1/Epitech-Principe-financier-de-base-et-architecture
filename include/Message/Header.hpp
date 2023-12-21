@@ -15,10 +15,12 @@ namespace fix
             operator std::string() const;
             void setBodyLength(const std::size_t &_len);
             void setMsgType(const std::string &_val);
+            void setSeqNum(const std::size_t &_val);
 
         protected:
             friend class Message;
             void setSendingTime();
+            [[deprecated("Use setSeqNum() before calling operator std::string instead")]]
             void updateMsgSeqNum();
             std::string getPartialHeader() const;
         private:

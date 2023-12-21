@@ -25,7 +25,7 @@ namespace fix
             body_tmp += _key + "=" + _val + (char)FIX_DELIMITER;
 
         header.setSendingTime();
-        header.updateMsgSeqNum();
+        // header.updateMsgSeqNum();
 
         std::size_t _len = Utils::getBodyLength(
             header.getPartialHeader() + body_tmp

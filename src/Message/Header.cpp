@@ -9,17 +9,14 @@ namespace fix
 {
     Header::Header() {}
 
-    Header::Header(fix::Header &_header)
-    {
-        BeginString = _header.BeginString;
-        BodyLength = _header.BodyLength;
-        MsgType = _header.MsgType;
-        SenderCompId = _header.SenderCompId;
-        TargetCompId = _header.TargetCompId;
-        MsgSeqNum = _header.MsgSeqNum;
-        SendingTime = _header.SendingTime;
-        // *this = _header;
-    }
+    Header::Header(fix::Header &_header): BeginString(_header.BeginString),
+                                          BodyLength(_header.BodyLength),
+                                          MsgType(_header.MsgType),
+                                          SenderCompId(_header.SenderCompId),
+                                          TargetCompId(_header.TargetCompId),
+                                          MsgSeqNum(_header.MsgSeqNum),
+                                          SendingTime(_header.SendingTime)
+    {}
 
     Header::~Header() {}
 
@@ -48,6 +45,11 @@ namespace fix
     void Header::setMsgType(const std::string &_val)
     {
         MsgType = _val;
+    }
+
+    void Header::setSeqNum(const std::size_t &_val)
+    {
+        MsgSeqNum = std::to_string(_val);
     }
 
     void Header::setSendingTime()

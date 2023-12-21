@@ -6,7 +6,7 @@
 #include "Message/Header.hpp"
 #include "Container/InsertMap.hpp"
 
-#define FIX_DELIMITER '^' // change to 1 for real FIX protocol
+#define FIX_DELIMITER 1 // change to '^' for testing or 1 for production
 
 namespace fix
 {
@@ -18,7 +18,6 @@ namespace fix
 
             Header header;
 
-            // operator std::string () const;
             operator std::string ();
 
         protected:
