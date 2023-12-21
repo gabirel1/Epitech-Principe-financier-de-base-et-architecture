@@ -16,4 +16,5 @@ class Core
         bool m_running = false;
 
         net::tcp::Socket m_tcp;
+        net::udp::Socket m_udp;
 };
