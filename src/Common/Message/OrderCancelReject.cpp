@@ -1,4 +1,4 @@
-#include "Message/OrderCancelReject.hpp"
+#include "Common/Message/OrderCancelReject.hpp"
 
 namespace fix
 {

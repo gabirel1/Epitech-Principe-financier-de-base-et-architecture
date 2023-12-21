@@ -1,4 +1,4 @@
-#include "Message/OrderCancelRequest.hpp"
+#include "Common/Message/OrderCancelRequest.hpp"
 
 namespace fix
 {

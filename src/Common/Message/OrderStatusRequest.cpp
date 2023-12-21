@@ -1,4 +1,4 @@
-#include "Message/OrderStatusRequest.hpp"
+#include "Common/Message/OrderStatusRequest.hpp"
 
 namespace fix
 {

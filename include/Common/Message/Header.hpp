@@ -10,7 +10,7 @@ namespace fix
     {
         public:
             Header();
-            Header(fix::Header &_header);
+            // Header(fix::Header &_header);
             ~Header();
             operator std::string() const;
             void setBodyLength(const std::size_t &_len);

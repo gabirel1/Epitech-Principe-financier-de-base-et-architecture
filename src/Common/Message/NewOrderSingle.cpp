@@ -1,4 +1,4 @@
-#include "Message/NewOrderSingle.hpp"
+#include "Common/Message/NewOrderSingle.hpp"
 
 namespace fix
 {

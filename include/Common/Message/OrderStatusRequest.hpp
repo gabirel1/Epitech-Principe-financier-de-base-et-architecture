@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Message/Fix.hpp"
+#include "Common/Message/Fix.hpp"
 
 namespace fix
 {

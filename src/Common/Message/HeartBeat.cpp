@@ -1,4 +1,4 @@
-#include "Message/HeartBeat.hpp"
+#include "Common/Message/HeartBeat.hpp"
 
 namespace fix
 {

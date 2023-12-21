@@ -1,4 +1,4 @@
-#include "Message/Logout.hpp"
+#include "Common/Message/Logout.hpp"
 
 namespace fix
 {

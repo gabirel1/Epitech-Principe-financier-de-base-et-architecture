@@ -20,6 +20,8 @@ namespace fix
 
             operator std::string ();
 
+            std::string to_string();
+
         protected:
             friend class Serializer;
 

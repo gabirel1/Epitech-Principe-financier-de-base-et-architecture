@@ -2,21 +2,21 @@
 #include <sys/time.h>
 #include <iomanip>
 #include <iostream>
-#include "Message/Fix.hpp"
+#include "Common/Message/Fix.hpp"
 #include "Common/Message/Header.hpp"
 
 namespace fix
 {
     Header::Header() {}
 
-    Header::Header(fix::Header &_header): BeginString(_header.BeginString),
-                                          BodyLength(_header.BodyLength),
-                                          MsgType(_header.MsgType),
-                                          SenderCompId(_header.SenderCompId),
-                                          TargetCompId(_header.TargetCompId),
-                                          MsgSeqNum(_header.MsgSeqNum),
-                                          SendingTime(_header.SendingTime)
-    {}
+    // Header::Header(fix::Header &_header): BeginString(_header.BeginString),
+    //                                       BodyLength(_header.BodyLength),
+    //                                       MsgType(_header.MsgType),
+    //                                       SenderCompId(_header.SenderCompId),
+    //                                       TargetCompId(_header.TargetCompId),
+    //                                       MsgSeqNum(_header.MsgSeqNum),
+    //                                       SendingTime(_header.SendingTime)
+    // {}
 
     Header::~Header() {}
 

@@ -1,4 +1,4 @@
-#include "Message/MarketDataIncrementalRefresh.hpp"
+#include "Common/Message/MarketDataIncrementalRefresh.hpp"
 
 namespace fix
 {
