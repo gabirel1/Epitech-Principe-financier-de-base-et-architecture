@@ -30,9 +30,13 @@
 *.exe
 *.out
 *.app
+*.log
 
 # VSCode
 .vscode
 
 # Build
 build
+
+# Documentation
+docs
