@@ -16,18 +16,18 @@ namespace fix
     }
 
     template<IsKey T, class _T>
-    bool InsertMap<T, _T>::contains(const T &_key) const
+    bool InsertMap<T, _T>::contains(const T &_key)
     {
         return find(_key) == m_map.end();
     }
 
     template<IsKey T, class _T>
-    InsertMap<T, _T>::Iterator InsertMap<T, _T>::find(const T &_key) const
+    InsertMap<T, _T>::Iterator InsertMap<T, _T>::find(const T &_key)
     {
-        std::lock_guard<std::mutex> guard(m_mutex);
+        // std::lock_guard<std::mutex> guard(m_mutex);
 
-        return std::find_if(m_map.begin(), m_map.end(), [_key] (const T &_mkey) {
-            return _key == _mkey;
+        return std::find_if(m_map.begin(), m_map.end(), [_key] (const Pair &_mkey) {
+            return _key == _mkey.first;
         });
     }
 

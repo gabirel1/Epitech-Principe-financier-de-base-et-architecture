@@ -25,8 +25,8 @@ namespace fix
 
             InsertMap &operator=(const InsertMap<T, _T> &_map);
 
-            [[nodiscard]] bool contains(const T &_key) const;
-            [[nodiscard]] Iterator find(const T &_key) const;
+            [[nodiscard]] bool contains(const T &_key);
+            [[nodiscard]] Iterator find(const T &_key);
             void emplace(const Pair &&_pair);
 
             [[nodiscard]] _T &at(const T &_key);

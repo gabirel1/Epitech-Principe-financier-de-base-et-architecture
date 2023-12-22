@@ -43,5 +43,4 @@ TEST_F(TestLogon, TestLogonToString)
     std::cout << "Expected: '" << expected << "'" << std::endl;
     std::cout << "Actual: '" << m_formatedLogon << "'" << std::endl;
     EXPECT_EQ(m_formatedLogon, expected);
-
 }
