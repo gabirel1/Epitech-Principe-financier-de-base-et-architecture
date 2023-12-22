@@ -30,6 +30,6 @@ namespace fix
             std::string SenderCompId = "CLIENT";   // 49 --> Init at the beginning of the session
             std::string TargetCompId = "TARGET";   // 56 --> Init at the beginning of the session
             std::string MsgSeqNum = "0";            // 34
-            std::string SendingTime;                // 56
+            std::string SendingTime;                // 52
     };
 }
