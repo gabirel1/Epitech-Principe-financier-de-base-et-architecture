@@ -45,4 +45,3 @@ TEST_F(TestLogon, TestLogonToString)
     EXPECT_EQ(m_formatedLogon, expected);
 
 }
-
