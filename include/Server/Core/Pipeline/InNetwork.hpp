@@ -22,7 +22,7 @@ namespace pip
             ~InNetwork();
 
             [[nodiscard]] bool start();
-            void status(float _to = 1.f);
+            bool status(float _to = 1.f);
 
             void loop();
 

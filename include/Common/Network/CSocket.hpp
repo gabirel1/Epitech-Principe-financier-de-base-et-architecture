@@ -27,9 +27,9 @@ namespace net
 
                 [[nodiscard]] static int create(int _dom, int _type, int _proto);
 
-                static void bind(int _fd, struct sockaddr *_addr, size_t _size);
+                static int bind(int _fd, struct sockaddr *_addr, size_t _size);
 
-                static void listen(int _fd, int _max);
+                static int listen(int _fd, int _max);
 
                 [[nodiscard]] static bool connect(int _fd, struct sockaddr *_addrs, size_t _size);
                 [[nodiscard]] static int accept(int _fd);
@@ -50,9 +50,9 @@ namespace net
 
                 void create();
 
-                void bind(struct sockaddr *_addr);
+                int bind(struct sockaddr *_addr);
 
-                void listen(int _max);
+                int listen(int _max);
 
                 [[nodiscard]] bool connect(const char *_ip, uint32_t _port);
                 [[nodiscard]] int accept();

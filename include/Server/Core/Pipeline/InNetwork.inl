@@ -1,3 +1,5 @@
+#include <future>
+
 #include "Server/Core/Pipeline/InNetwork.hpp"
 #include "Common/Core/Logger.hpp"
 
@@ -14,7 +16,7 @@ namespace pip
     template<IsSocket T>
     InNetwork<T>::~InNetwork()
     {
-        this->template stop();
+        (void)this->template stop();
     }
 
     template<IsSocket T>
@@ -27,9 +29,9 @@ namespace pip
     }
 
     template<IsSocket T>
-    void InNetwork<T>::status(float _to)
+    bool InNetwork<T>::status(float _to)
     {
-        PipeType::tstatus(static_cast<ms>(_to * 1000));
+        return PipeType::tstatus(static_cast<ms>(_to * 1000)) != std::future_status::deferred;
     }
 
     template<IsSocket T>

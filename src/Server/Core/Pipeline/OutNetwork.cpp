@@ -1,3 +1,5 @@
+#include <future>
+
 #include "Common/Core/Logger.hpp"
 #include "Server/Core/Pipeline/OutNetwork.hpp"
 
@@ -21,9 +23,9 @@ namespace pip
         return m_running;
     }
 
-    void OutNetwork::status(float _to)
+    bool OutNetwork::status(float _to)
     {
-        PipeType::tstatus(static_cast<ms>(_to * 1000));
+        return PipeType::tstatus(static_cast<ms>(_to * 1000)) != std::future_status::deferred;
     }
 
     void OutNetwork::loop()

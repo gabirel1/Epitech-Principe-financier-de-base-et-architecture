@@ -3,6 +3,9 @@
 
 int main(int _ac, const char **_av)
 {
+    std::ignore = _ac;
+    std::ignore = _av;
+
     Logger::Init();
     Logger::SetThreadName(THIS_THREAD_ID, "Core");
 
