@@ -30,8 +30,6 @@ class OrderBook
             Action action;
             OrderType type;
             Price price;
-            UserId userId;
-            OrderId orderId;
             Price oprice;
             Order order;
         };

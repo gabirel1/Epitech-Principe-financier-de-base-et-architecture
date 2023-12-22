@@ -57,7 +57,7 @@ namespace pip
                 m_ob.modify(_data.OrderData.type, _data.OrderData.price, _data.OrderData.oprice, _data.OrderData.order);
                 break;
             case OrderBook::Data::Action::Cancel:
-                m_ob.cancel(_data.OrderData.type, _data.OrderData.price, _data.OrderData.userId, _data.OrderData.orderId);
+                m_ob.cancel(_data.OrderData.type, _data.OrderData.price, _data.OrderData.order.userId, _data.OrderData.order.orderId);
                 break;
             default:
                 // send an internal error message

@@ -1,7 +1,17 @@
+#pragma once
+
 #include <string>
-class Utils
+
+namespace utils
 {
-public:
-    static std::size_t getBodyLength(const std::string &_str);
-    static std::string getChecksum(const std::string &_str);
-};
+    std::size_t getBodyLength(const std::string &_str);
+    std::string getChecksum(const std::string &_str);
+
+    bool is_numeric(const std::string &_str);
+    bool is_double(const std::string &_str);
+
+    template<class T>
+    T to(const std::string &_str);
+}
+
+#include "Common/Message/Utils.inl"

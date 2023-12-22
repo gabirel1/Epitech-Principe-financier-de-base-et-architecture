@@ -27,15 +27,15 @@ namespace fix
         header.setSendingTime();
         // header.updateMsgSeqNum();
 
-        std::size_t _len = Utils::getBodyLength(
+        std::size_t _len = utils::getBodyLength(
             header.getPartialHeader() + body_tmp
         );
 
-        header.setBodyLength(_len);
+        header.setBodyLength(std::to_string(_len));
         header_tmp = header;
 
         msg = header_tmp + body_tmp;
-        msg += "10=" + Utils::getChecksum(msg) + (char)FIX_DELIMITER;
+        msg += "10=" + utils::getChecksum(msg) + (char)FIX_DELIMITER;
 
         return msg;
     }
@@ -52,15 +52,15 @@ namespace fix
         header.setSendingTime();
         // header.updateMsgSeqNum();
 
-        std::size_t _len = Utils::getBodyLength(
+        std::size_t _len = utils::getBodyLength(
             header.getPartialHeader() + body_tmp
         );
 
-        header.setBodyLength(_len);
+        header.setBodyLength(std::to_string(_len));
         header_tmp = header;
 
         msg = header_tmp + body_tmp;
-        msg += "10=" + Utils::getChecksum(msg) + (char)FIX_DELIMITER;
+        msg += "10=" + utils::getChecksum(msg) + (char)FIX_DELIMITER;
 
         return msg;
     }

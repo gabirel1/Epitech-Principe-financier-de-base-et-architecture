@@ -19,6 +19,11 @@ namespace pip
 
             void loop();
 
+        protected:
+            bool treatLogon(SerialIn &_input);
+            bool treatLogout(SerialIn &_input);
+            bool treatNewOrderSingle(SerialIn &_input);
+
         private:
             NetToSerial &m_input;
             SerialToMarket &m_output;

@@ -7,39 +7,19 @@
 
 namespace fix
 {
-    Header::Header() {}
-
-    // Header::Header(fix::Header &_header): BeginString(_header.BeginString),
-    //                                       BodyLength(_header.BodyLength),
-    //                                       MsgType(_header.MsgType),
-    //                                       SenderCompId(_header.SenderCompId),
-    //                                       TargetCompId(_header.TargetCompId),
-    //                                       MsgSeqNum(_header.MsgSeqNum),
-    //                                       SendingTime(_header.SendingTime)
-    // {}
-
-    Header::~Header() {}
-
-    Header::operator std::string() const
+    void Header::set49_SenderCompId(const std::string &_val)
     {
-        return "8=" + BeginString + (char)FIX_DELIMITER +
-               "9=" +
-               BodyLength + (char)FIX_DELIMITER +
-               "35=" +
-               MsgType + (char)FIX_DELIMITER +
-               "49=" +
-               SenderCompId + (char)FIX_DELIMITER +
-               "56=" +
-               TargetCompId + (char)FIX_DELIMITER +
-               "34=" +
-               MsgSeqNum + (char)FIX_DELIMITER +
-               "52=" +
-               SendingTime + (char)FIX_DELIMITER;
+        SenderCompId = _val;
     }
 
-    void Header::setBodyLength(const std::size_t &_len)
+    void Header::set56_TargetCompId(const std::string &_val)
     {
-        BodyLength = std::to_string(_len);
+        TargetCompId = _val;
+    }
+
+    void Header::setBodyLength(const std::string &_val)
+    {
+        BodyLength = _val;
     }
 
     void Header::setMsgType(const std::string &_val)
@@ -47,9 +27,20 @@ namespace fix
         MsgType = _val;
     }
 
-    void Header::setSeqNum(const std::size_t &_val)
+    void Header::setSeqNum(const std::string &_val)
     {
-        MsgSeqNum = std::to_string(_val);
+        MsgSeqNum = _val;
+    }
+
+    Header::operator std::string() const
+    {
+        return "8=" + BeginString + (char)FIX_DELIMITER +
+               "9=" + BodyLength + (char)FIX_DELIMITER +
+               "35=" + MsgType + (char)FIX_DELIMITER +
+               "49=" + SenderCompId + (char)FIX_DELIMITER +
+               "56=" + TargetCompId + (char)FIX_DELIMITER +
+               "34=" + MsgSeqNum + (char)FIX_DELIMITER +
+               "52=" + SendingTime + (char)FIX_DELIMITER;
     }
 
     void Header::setSendingTime()
