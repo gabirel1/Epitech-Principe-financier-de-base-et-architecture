@@ -42,3 +42,32 @@ TEST_F(SerializerTest, TestSerialize)
     ASSERT_EQ(m_anonMessage.at("34"), "1");
     ASSERT_EQ(m_anonMessage.at("52"), m_sendingTime);
 }
+
+TEST_F(SerializerTest, TestSerializeInvalidKey)
+{
+    std::string tmp = m_message;
+    tmp[14] = (char)FIX_DELIMITER;
+    tmp[30] = '=';
+
+    fix::Serializer::Error err = m_serializer.run(tmp, m_anonMessage);
+    ASSERT_EQ(err == fix::Serializer::Error::InvalidKey, true);
+}
+
+TEST_F(SerializerTest, TestSerializeInvalidEnd)
+{
+    std::string message = m_message.substr(0, m_message.size() - 10);
+
+    fix::Serializer::Error err = m_serializer.run(message, m_anonMessage);
+
+    ASSERT_EQ(err == fix::Serializer::Error::InvalidEnd, true);
+}
+
+TEST_F(SerializerTest, TestSerializeNoEqual)
+{
+    std::string message = "8=FIX.4.2" + std::string(1, FIX_DELIMITER) +
+                          "9-72" + std::string(1, FIX_DELIMITER);
+
+    fix::Serializer::Error err = m_serializer.run(message, m_anonMessage);
+
+    ASSERT_EQ(err == fix::Serializer::Error::NoEqual, true);
+}
