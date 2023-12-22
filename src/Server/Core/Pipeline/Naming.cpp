@@ -36,6 +36,12 @@ namespace data
     {
     }
 
+    MarketToNet::MarketToNet(const ClientSocket &_client, const fix::Message &_msg)
+        : Client(_client), Message(_msg)
+    {
+    }
+
+
     MarketToNet &MarketToNet::operator=(const MarketToNet &_data)
     {
         Client = _data.Client;

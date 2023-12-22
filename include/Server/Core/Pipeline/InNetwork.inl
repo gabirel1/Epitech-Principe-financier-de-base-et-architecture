@@ -5,8 +5,8 @@
 namespace pip
 {
     template<IsSocket T>
-    InNetwork<T>::InNetwork(std::vector<ClientSocket> &_clients, NetToSerial &_output, uint32_t _port)
-        : m_clients(_clients), m_output(_output), m_acceptor(), m_selector()
+    InNetwork<T>::InNetwork(std::vector<ClientSocket> &_clients, NetToSerial &_output, RawOutput &_error, uint32_t _port)
+        : m_clients(_clients), m_output(_output), m_error(_error), m_acceptor(), m_selector()
     {
         m_acceptor.listen(_port);
         Logger::Log("[InNetwork] listening to port: ", _port);
@@ -40,6 +40,7 @@ namespace pip
 
         Client accept = nullptr;
         std::vector<Client> clients;
+        int error = 0;
 
         while (this->m_running) {
             accept = m_acceptor.accept();
@@ -55,9 +56,11 @@ namespace pip
                 });
                 if (client == m_clients.end()) {
                     fix::Reject reject;
-                    
+
+                    (void)_client->close();
                     Logger::Log("[InNetwork] Unable to find the client's information: "); // todo log
-                    // send reject
+                    // build reject
+                    m_error.push(ErrorMsg(ClientSocket(_client), reject));
                     continue;
                 }
                 process(*client);
@@ -88,7 +91,8 @@ namespace pip
         }
         if (fix::Serializer::run(data, msg) != fix::Serializer::Error::None) {
             Logger::Log("[InNetwork] Error: will parsing the client message: "); // todo log
-            // send reject message
+            // build reject
+            m_error.push(ErrorMsg(_client, reject));
             return;
         }
         Logger::Log("[InNetwork] Porcessing request from the client: "); // todo log

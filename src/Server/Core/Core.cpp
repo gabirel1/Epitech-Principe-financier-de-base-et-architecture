@@ -4,7 +4,7 @@
 #include "Server/Core/Core.hpp"
 
 Core::Core(uint32_t _tcp_port, uint32_t _udp_port)
-    : m_ob(), m_innet(m_client, m_nt_to_sr, _tcp_port),
+    : m_ob(), m_innet(m_client, m_nt_to_sr, m_mk_to_nt, _tcp_port),
         m_action(m_nt_to_sr, m_sr_to_mk, m_mk_to_nt),
         m_market(m_ob, m_sr_to_mk, m_mk_to_nt),
         m_outnet(m_mk_to_nt)

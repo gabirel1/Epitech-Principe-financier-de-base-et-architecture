@@ -34,6 +34,7 @@ namespace data
     {
         MarketToNet() = default;
         MarketToNet(const MarketToNet &_data);
+        MarketToNet(const ClientSocket &_client, const fix::Message &_msg);
 
         MarketToNet &operator=(const MarketToNet &_data);
 
@@ -50,6 +51,7 @@ using MarketIn = SerialOut;
 
 using MarketOut = data::MarketToNet;
 using NetIn = MarketOut;
+using ErrorMsg = NetIn;
 
 using NetToSerial = ts::Queue<NetOut>;
 using SerialToMarket = ts::Queue<SerialOut>;
