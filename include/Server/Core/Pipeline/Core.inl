@@ -10,7 +10,7 @@ Pipeline<T>::Pipeline()
 template<class T>
 Pipeline<T>::~Pipeline()
 {
-    stop();
+    (void)stop();
 }
 
 template<class T>

@@ -16,9 +16,10 @@ namespace net
 
 
     template<IsSocket T>
-    int Acceptor<T>::listen(uint32_t _port)
+    bool Acceptor<T>::listen(uint32_t _port)
     {
         struct sockaddr_in addr;
+        int error = 0;
 
         Logger::Log("[Acceptor] Initialisation of new listner");
         std::memset(&addr, 0, sizeof(addr));
@@ -29,10 +30,21 @@ namespace net
         Logger::Log("[Acceptor] Create new listner socket");
         create();
         Logger::Log("[Acceptor] Bind new listner socket");
-        bind((struct sockaddr *)&addr);
+        error = bind((struct sockaddr *)&addr);
+        if (error != 0) {
+            Logger::Log("[Acceptor] Bind failed: ", strerror(error));
+            (void)close();
+            return false;
+        }
         Logger::Log("[Acceptor] Initialisation of the listner on port: ", _port);
         c::Socket::listen(MAX_SOCKET);
+        if (error != 0) {
+            Logger::Log("[Acceptor] Listening failed: ", strerror(error));
+            (void)close();
+            return false;
+        }
         Logger::Log("[Acceptor] New listener on port: ", _port);
+        return true;
     }
 
     template<IsSocket T>

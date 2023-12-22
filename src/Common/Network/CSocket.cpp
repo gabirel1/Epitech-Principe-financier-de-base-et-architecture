@@ -24,14 +24,14 @@ namespace net::c
         return socket(_dom, _type, _proto);
     }
 
-    void Socket::bind(int _fd, struct sockaddr *_addr, size_t _size)
+    int Socket::bind(int _fd, struct sockaddr *_addr, size_t _size)
     {
-        ::bind(_fd, _addr, _size);
+        return ::bind(_fd, _addr, _size);
     }
 
-    void Socket::listen(int _fd, int _max)
+    int Socket::listen(int _fd, int _max)
     {
-        ::listen(_fd, _max);
+        return ::listen(_fd, _max);
     }
 
     bool Socket::connect(int _fd, struct sockaddr *_addrs, size_t _size)
@@ -91,16 +91,16 @@ namespace net::c
             Logger::Log("[c::Socket] Error will creating the socket");
     }
 
-    void Socket::bind(struct sockaddr *_addr)
+    int Socket::bind(struct sockaddr *_addr)
     {
         Logger::Log("[c::Socket] Bind socket to: "); // todo log
-        bind(m_fd, _addr, sizeof(struct sockaddr_in));
+        return bind(m_fd, _addr, sizeof(struct sockaddr_in));
     }
 
-    void Socket::listen(int _max)
+    int Socket::listen(int _max)
     {
         Logger::Log("[c::Socket] Initialisation of listening, with the maximum socket handling: ", _max);
-        listen(m_fd, _max);
+        return listen(m_fd, _max);
     }
 
     bool Socket::connect(const char *_ip, uint32_t _port)

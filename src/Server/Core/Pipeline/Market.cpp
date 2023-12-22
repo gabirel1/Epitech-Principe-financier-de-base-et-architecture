@@ -1,3 +1,5 @@
+#include <future>
+
 #include "Common/Core/Logger.hpp"
 #include "Server/Core/Pipeline/Market.hpp"
 #include "Server/Core/meta.hpp"
@@ -23,9 +25,9 @@ namespace pip
         return m_running;
     }
 
-    void Market::status(float _to)
+    bool Market::status(float _to)
     {
-        tstatus(static_cast<ms>(_to * 1000));
+        return tstatus(static_cast<ms>(_to * 1000)) != std::future_status::deferred;
     }
 
     void Market::loop()

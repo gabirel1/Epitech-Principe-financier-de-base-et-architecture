@@ -1,3 +1,5 @@
+#include <future>
+
 #include "Common/Core/Logger.hpp"
 #include "Server/Core/Pipeline/Action.hpp"
 #include "Server/Core/meta.hpp"
@@ -11,7 +13,7 @@ namespace pip
 
     Action::~Action()
     {
-        stop();
+        (void)stop();
     }
 
     bool Action::start()
@@ -22,9 +24,9 @@ namespace pip
         return m_running;
     }
 
-    void Action::status(float _to)
+    bool Action::status(float _to)
     {
-        PipeType::tstatus(static_cast<ms>(_to * 1000));
+        return PipeType::tstatus(static_cast<ms>(_to * 1000)) != std::future_status::deferred;
     }
 
     /// @brief Process all incoming raw message to make action
