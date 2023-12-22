@@ -18,7 +18,7 @@ namespace fix
     template<IsKey T, class _T>
     bool InsertMap<T, _T>::contains(const T &_key)
     {
-        return find(_key) == m_map.end();
+        return find(_key) != m_map.end();
     }
 
     template<IsKey T, class _T>

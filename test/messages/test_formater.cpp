@@ -17,10 +17,7 @@ protected:
         std::string formatedLogon = m_logon.to_string();
         std::string sendingTime = formatedLogon.substr(formatedLogon.find("52=") + 3, 21);
 
-        std::cout << "SendingTime: '" << sendingTime << "'" << std::endl;
-
         m_sendingTime = sendingTime;
-
         m_message = formatedLogon;
     }
 
@@ -33,13 +30,7 @@ protected:
 
 TEST_F(SerializerTest, TestSerialize)
 {
-    // std::cout << "Message: '" << m_message << "'" << std::endl;
     fix::Serializer::Error err = m_serializer.run(m_message, m_anonMessage);
-
-    std::string isErrMsg = err != fix::Serializer::Error::None ? "err" : "None";
-    std::cout << "Error? " << isErrMsg << std::endl;
-
-    std::cout << "AnonMessage: "<< m_anonMessage.at("35") << std::endl;
 
     ASSERT_EQ(err, fix::Serializer::Error::None);
     ASSERT_EQ(m_anonMessage.contains("35"), true);
