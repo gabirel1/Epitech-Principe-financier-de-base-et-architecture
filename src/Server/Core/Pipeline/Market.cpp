@@ -17,19 +17,6 @@ namespace pip
         stop();
     }
 
-    bool Market::start()
-    {
-        if (!m_running)
-            tstart(this);
-        Logger::Log("[Market] Running: ", m_running);
-        return m_running;
-    }
-
-    bool Market::status(float _to)
-    {
-        return tstatus(static_cast<ms>(_to * 1000)) != std::future_status::deferred;
-    }
-
     void Market::loop()
     {
         Logger::SetThreadName(THIS_THREAD_ID, "Market");
