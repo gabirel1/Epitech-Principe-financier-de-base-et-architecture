@@ -16,6 +16,9 @@ class ClientSocket
         bool Logged = false;
         UserId User = 0;
 
+        bool operator==(const ClientSocket &_client) const;
+        operator bool() const;
+
     protected:
         std::shared_ptr<net::tcp::Socket> m_socket;
 };

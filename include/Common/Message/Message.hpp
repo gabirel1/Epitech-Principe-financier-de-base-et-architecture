@@ -1,0 +1,18 @@
+#pragma once
+
+#include "Common/Message/ExecutionReport.hpp"
+#include "Common/Message/HeartBeat.hpp"
+#include "Common/Message/Logon.hpp"
+#include "Common/Message/Logout.hpp"
+#include "Common/Message/MarketDataIncrementalRefresh.hpp"
+#include "Common/Message/MarketDataRequest.hpp"
+#include "Common/Message/MarketDataSnapshotFullRefresh.hpp"
+#include "Common/Message/NewOrderList.hpp"
+#include "Common/Message/NewOrderSingle.hpp"
+#include "Common/Message/NewOrderList.hpp"
+#include "Common/Message/OrderCancelReject.hpp"
+#include "Common/Message/OrderCancelReplaceRequest.hpp"
+#include "Common/Message/OrderCancelRequest.hpp"
+#include "Common/Message/OrderStatusRequest.hpp"
+#include "Common/Message/Reject.hpp"
+#include "Common/Message/Serializer.hpp"

@@ -27,7 +27,7 @@ namespace pip
             void loop();
 
         protected:
-            void process(Client _client);
+            void process(ClientSocket _client);
 
         private:
             std::vector<ClientSocket> &m_clients; // implement a thread safe vector

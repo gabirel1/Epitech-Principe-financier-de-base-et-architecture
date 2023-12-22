@@ -25,9 +25,12 @@ namespace net
             size_t send(const std::string &_data);
             size_t send(const uint8_t *_data, size_t _size);
 
-            [[nodiscard]] inline std::string receive(size_t _size, int &_error);
+            [[nodiscard]] std::string receive(size_t _size, int &_error);
 
+            [[nodiscrad]] bool is_open() const;
             bool close();
+
+            operator bool() const;
 
         protected:
             Socket(int _type);

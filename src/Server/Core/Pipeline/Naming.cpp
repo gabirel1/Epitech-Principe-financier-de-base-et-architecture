@@ -6,6 +6,11 @@ namespace data
         : Client(_data.Client), Message(_data.Message)
     {
     }
+
+    NetToSerial::NetToSerial(const ClientSocket &_client, const fix::Serializer::AnonMessage &_msg)
+        : Client(_client), Message(_msg)
+    {
+    }
     
     NetToSerial &NetToSerial::operator=(const NetToSerial &_data)
     {

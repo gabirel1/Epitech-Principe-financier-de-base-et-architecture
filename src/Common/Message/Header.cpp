@@ -2,8 +2,8 @@
 #include <sys/time.h>
 #include <iomanip>
 #include <iostream>
-#include "Common/Message/Fix.hpp"
 #include "Common/Message/Header.hpp"
+#include "Common/Message/Fix.hpp"
 
 namespace fix
 {

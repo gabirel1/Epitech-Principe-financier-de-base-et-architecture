@@ -1,5 +1,6 @@
 #include "Server/Core/Pipeline/InNetwork.hpp"
 #include "Common/Core/Logger.hpp"
+#include "Common/Message/Message.hpp"
 
 namespace pip
 {
@@ -48,14 +49,49 @@ namespace pip
                 Logger::Log("[InNetwork] Accepted new client: "); // todo log
             }
             clients = m_selector.pull();
-            for (Client &_client : clients)
-                process(_client);
+            for (Client &_client : clients) {
+                auto client = std::find_if(m_clients.begin(), m_clients.end(), [_client] (const ClientSocket _lclient) {
+                    return _client == _lclient;
+                });
+                if (client == m_clients.end()) {
+                    fix::Reject reject;
+                    
+                    Logger::Log("[InNetwork] Unable to find the client's information: "); // todo log
+                    // send reject
+                    continue;
+                }
+                process(*client);
+            }
         }
     }
 
     template<IsSocket T>
-    void InNetwork<T>::process(typename InNetwork<T>::Client _client)
+    void InNetwork<T>::process(ClientSocket _client)
     {
+        int error = 0;
+        fix::Serializer::AnonMessage msg;
+        fix::Reject reject; 
+
+        if (!_client) {
+            m_selector.erase(_client.getSocket());
+            std::erase_if(m_clients, [_client] (const ClientSocket &_lclient) {
+                return _client == _lclient;
+            });
+            Logger::Log("[InNetwork] Client disconnected: "); // todo log
+            return;
+        }
+        std::string data(_client.getSocket()->receive(MAX_RECV_SIZE, error));
+
+        if (error == 0) {
+            Logger::Log("[InNetwork] Error: no data receive from the client: "); // todo log
+            return;
+        }
+        if (fix::Serializer::run(data, msg) != fix::Serializer::Error::None) {
+            Logger::Log("[InNetwork] Error: will parsing the client message: "); // todo log
+            // send reject message
+            return;
+        }
         Logger::Log("[InNetwork] Porcessing request from the client: "); // todo log
+        m_output.push(NetOut(_client, msg));
     }
 }

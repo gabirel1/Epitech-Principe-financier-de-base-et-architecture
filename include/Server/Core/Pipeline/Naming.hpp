@@ -11,6 +11,7 @@ namespace data
     {
         NetToSerial() = default;
         NetToSerial(const NetToSerial &_data);
+        NetToSerial(const ClientSocket &_client, const fix::Serializer::AnonMessage &_message);
 
         NetToSerial &operator=(const NetToSerial &_data);
 
