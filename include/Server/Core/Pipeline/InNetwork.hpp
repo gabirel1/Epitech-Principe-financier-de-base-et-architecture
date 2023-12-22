@@ -10,31 +10,40 @@
 
 namespace pip
 {
+    /// @brief Pipeline managing the Network input.
+    /// @tparam T is the socket type managed.
     template<IsSocket T>
     class InNetwork : public Pipeline<InNetwork<T>>
     {
         public:
+            /// @brief Socket format used
             using Client = net::Acceptor<T>::Client;
 
+            /// @brief Core pipeline type
             using PipeType = Pipeline<InNetwork<T>>;
 
+            /// @brief Setup the network input and start listening on _port
+            /// @param _clients List of clients connected in to this network
+            /// @param _output Output data queue of the pipeline.
+            /// @param _port Port on which the network will listen to, for connection and receive message.
             InNetwork(std::vector<ClientSocket> &_clients, NetToSerial &_output, uint32_t _port);
+            /// @brief Disconnect from listening, stop the pipeline and the destroy it. 
             ~InNetwork();
 
-            [[nodiscard]] bool start();
-            bool status(float _to = 1.f);
-
+            /// @brief Core function of the pipeline determining it's behavior
             void loop();
 
         protected:
+            /// @brief Function to process an action on a Socket.
+            /// @param _client socket with a pending action required.
             void process(Client _client);
 
         private:
-            std::vector<ClientSocket> &m_clients; // implement a thread safe vector
-            NetToSerial &m_output;
+            std::vector<ClientSocket> &m_clients;   ///< Client list
+            NetToSerial &m_output;                  ///< Ouput data queue
 
-            net::Acceptor<T> m_acceptor;
-            net::Selector<T> m_selector;
+            net::Acceptor<T> m_acceptor;            ///< Acceptor listening the the port passed as parameter.
+            net::Selector<T> m_selector;            ///< Selector managing the client list action.
     };
 }
 

@@ -12,20 +12,7 @@ namespace pip
 
     OutNetwork::~OutNetwork()
     {
-        stop();
-    }
-
-    bool OutNetwork::start()
-    {
-        if (!m_running)
-            tstart(this);
-        Logger::Log("[OutNetwork] Running: ", m_running);
-        return m_running;
-    }
-
-    bool OutNetwork::status(float _to)
-    {
-        return PipeType::tstatus(static_cast<ms>(_to * 1000)) != std::future_status::deferred;
+        (void)stop();
     }
 
     void OutNetwork::loop()

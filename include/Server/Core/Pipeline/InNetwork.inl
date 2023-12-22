@@ -20,21 +20,6 @@ namespace pip
     }
 
     template<IsSocket T>
-    bool InNetwork<T>::start()
-    {
-        if (!this->m_running)
-            this->template tstart(this);
-        Logger::Log("[InNetwork] Running: ", this->m_running);
-        return this->m_running;
-    }
-
-    template<IsSocket T>
-    bool InNetwork<T>::status(float _to)
-    {
-        return PipeType::tstatus(static_cast<ms>(_to * 1000)) != std::future_status::deferred;
-    }
-
-    template<IsSocket T>
     void InNetwork<T>::loop()
     {
         Logger::SetThreadName(THIS_THREAD_ID, "Network Input");
