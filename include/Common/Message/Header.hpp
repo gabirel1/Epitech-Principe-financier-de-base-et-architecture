@@ -16,8 +16,10 @@ namespace fix
             void set56_TargetCompId(const std::string &_val);
 
             void setBodyLength(const std::string &_len);
+            void setBodyLength(const size_t &_len);
             void setMsgType(const std::string &_val);
             void setSeqNum(const std::string &_val);
+            void setSeqNum(const size_t &_val);
 
             operator std::string() const;
 
@@ -33,10 +35,10 @@ namespace fix
         private:
             std::string BeginString = "FIX.4.2";    // 8 --> Init at the beginning of the session
             std::string BodyLength = "0";           // 9
-            std::string MsgType{};                    // 35
-            std::string SenderCompId{};   // 49 --> Init at the beginning of the session
-            std::string TargetCompId{};   // 56 --> Init at the beginning of the session
+            std::string MsgType{};                  // 35
+            std::string SenderCompId{};             // 49 --> Init at the beginning of the session
+            std::string TargetCompId{};             // 56 --> Init at the beginning of the session
             std::string MsgSeqNum = "0";            // 34
-            std::string SendingTime{};                // 56
+            std::string SendingTime{};              // 56
     };
 }

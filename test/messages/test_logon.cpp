@@ -26,13 +26,12 @@ class TestLogon : public ::testing::Test
 TEST_F(TestLogon, TestLogonToString)
 {
     std::string expected = "8=FIX.4.2" + std::string(1, FIX_DELIMITER) +
-                           "9=72" + std::string(1, FIX_DELIMITER) +
+                           "9=67" + std::string(1, FIX_DELIMITER) +
                            "35=A" + std::string(1, FIX_DELIMITER) +
                            "49=CLIENT" + std::string(1, FIX_DELIMITER) +
                            "56=TARGET" + std::string(1, FIX_DELIMITER) +
                            "34=1" + std::string(1, FIX_DELIMITER) +
                            "52=" + sendingTime + std::string(1, FIX_DELIMITER) +
-                           "49=0" + std::string(1, FIX_DELIMITER) +
                            "98=0" + std::string(1, FIX_DELIMITER) +
                            "108=30" + std::string(1, FIX_DELIMITER);
 

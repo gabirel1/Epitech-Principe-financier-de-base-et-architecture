@@ -22,6 +22,11 @@ namespace fix
         BodyLength = _val;
     }
 
+    void Header::setBodyLength(const size_t &_val)
+    {
+        BodyLength = std::to_string(_val);
+    }
+
     void Header::setMsgType(const std::string &_val)
     {
         MsgType = _val;
@@ -30,6 +35,11 @@ namespace fix
     void Header::setSeqNum(const std::string &_val)
     {
         MsgSeqNum = _val;
+    }
+
+    void Header::setSeqNum(const size_t &_val)
+    {
+        MsgSeqNum = std::to_string(_val);
     }
 
     Header::operator std::string() const
