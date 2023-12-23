@@ -1,3 +1,5 @@
+#include <future>
+
 #include "Common/Core/Logger.hpp"
 #include "Server/Core/Pipeline/OutNetwork.hpp"
 
@@ -10,7 +12,7 @@ namespace pip
 
     OutNetwork::~OutNetwork()
     {
-        stop();
+        (void)stop();
     }
 
     bool OutNetwork::start()
@@ -19,11 +21,6 @@ namespace pip
             tstart(this);
         Logger::Log("[OutNetwork] Running: ", m_running);
         return m_running;
-    }
-
-    void OutNetwork::status(float _to)
-    {
-        PipeType::tstatus(static_cast<ms>(_to * 1000));
     }
 
     void OutNetwork::loop()

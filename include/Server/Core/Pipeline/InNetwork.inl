@@ -1,3 +1,5 @@
+#include <future>
+
 #include "Server/Core/Pipeline/InNetwork.hpp"
 #include "Common/Core/Logger.hpp"
 #include "Common/Message/Message.hpp"
@@ -15,22 +17,16 @@ namespace pip
     template<IsSocket T>
     InNetwork<T>::~InNetwork()
     {
-        this->template stop();
+        (void)this->template stop();
     }
 
-    template<IsSocket T>
+    template<class T>
     bool InNetwork<T>::start()
     {
         if (!this->m_running)
             this->template tstart(this);
         Logger::Log("[InNetwork] Running: ", this->m_running);
         return this->m_running;
-    }
-
-    template<IsSocket T>
-    void InNetwork<T>::status(float _to)
-    {
-        PipeType::tstatus(static_cast<ms>(_to * 1000));
     }
 
     template<IsSocket T>
@@ -69,7 +65,7 @@ namespace pip
     }
 
     template<IsSocket T>
-    void InNetwork<T>::process(ClientSocket _client)
+    void InNetwork<T>::process(ClientSocket &_client)
     {
         int error = 0;
         fix::Serializer::AnonMessage msg;

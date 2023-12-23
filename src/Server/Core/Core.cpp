@@ -20,7 +20,8 @@ void Core::start()
 {
     Logger::Log("[Core] Starting...");
     m_running = true;
-    internal_start();
+    if (!internal_start())
+        return;
     while (m_running)
     {
         try {
@@ -41,20 +42,36 @@ void Core::stop()
     if (m_running) {
         m_running = false;
         Logger::Log("[Core] Stoping...");
-        m_innet.stop();
-        m_action.stop();
-        m_market.stop();
-        m_outnet.stop();
+        while (m_innet.stop() != std::future_status::deferred)
+        Logger::Log("[Core] Input network exited");
+        while (m_action.stop() != std::future_status::deferred)
+        Logger::Log("[Core] Action pipeline exited");
+        while (m_market.stop() != std::future_status::deferred)
+        Logger::Log("[Core] Market exited");
+        while (m_outnet.stop() != std::future_status::deferred)
+        Logger::Log("[Core] Output network exited");
         Logger::Log("[Core] All pipeline are stoped");
     }
 }
 
-void Core::internal_start()
+bool Core::internal_start()
 {
     Logger::Log("[Core] Starting pipeline...");
-    m_outnet.start();
-    m_market.start();
-    m_action.start();
-    m_innet.start();
-    Logger::Log("[Core] All pipeline are running");
+    if (!m_outnet.start()) {
+        Logger::Log("[Core] Failed to start output network");
+        stop();
+    } else if (!m_market.start()) {
+        Logger::Log("[Core] Failed to start market");
+        stop();
+    } else if (!m_action.start()) {
+        Logger::Log("[Core] Failed to start action pipeline");
+        stop();
+    } else if (!m_innet.start()) {
+        Logger::Log("[Core] Failed to start input network");
+        stop();
+    } else {
+        Logger::Log("[Core] All pipeline are running");
+        return true;
+    }
+    return false;
 }

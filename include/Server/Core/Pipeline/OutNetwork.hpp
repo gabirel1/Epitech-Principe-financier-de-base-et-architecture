@@ -10,23 +10,29 @@
 
 namespace pip
 {
+    /// @brief Pipeline to send reply to a client over TCP network.
     class OutNetwork : public Pipeline<OutNetwork>
     {
         public:
-
+            /// @brief Core pipeline type.
             using PipeType = Pipeline<OutNetwork>;
 
+            /// @brief Construct the pipeline.
+            /// @param _input Input data queue.
             OutNetwork(MarketToNet &_input);
+            /// @brief Stop and then destroy the pipeline.
             ~OutNetwork();
 
+            /// @brief Run the pipeline
+            /// @return Return true if the pipeline as correctly started else false.
             [[nodiscard]] bool start();
-            void status(float _to = 1.f);
 
+            /// @brief Core function of the pipeline determining it's behavior
             void loop();
 
         private:
-            MarketToNet &m_input;
+            MarketToNet &m_input;           ///< Intput data queue.
 
-            ThreadPool<TS_SIZE_ON> m_tp;
+            ThreadPool<TS_SIZE_ON> m_tp;    ///< Thread pool used to send data to the target client in async.
     };
 }

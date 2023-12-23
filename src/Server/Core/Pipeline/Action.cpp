@@ -1,3 +1,5 @@
+#include <future>
+
 #include "Common/Core/Logger.hpp"
 #include "Common/Message/Message.hpp"
 #include "Common/Message/Utils.hpp"
@@ -13,7 +15,7 @@ namespace pip
 
     Action::~Action()
     {
-        stop();
+        (void)stop();
     }
 
     bool Action::start()
@@ -22,11 +24,6 @@ namespace pip
             tstart(this);
         Logger::Log("[Action] Running: ", m_running);
         return m_running;
-    }
-
-    void Action::status(float _to)
-    {
-        PipeType::tstatus(static_cast<ms>(_to * 1000));
     }
 
     /// @brief Process all incoming raw message to make action

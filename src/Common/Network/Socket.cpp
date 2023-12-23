@@ -22,8 +22,7 @@ namespace net
     bool Socket::connect(const Ip &_ip, uint32_t _port)
     {
         create();
-        c::Socket::connect(_ip.c_str(), _port);
-        return true;
+        return c::Socket::connect(_ip.c_str(), _port);
     }
 
     size_t Socket::send(const std::string &_data)
@@ -63,7 +62,6 @@ namespace net
     {
         return is_open();
     }
-
 
     Socket::Socket(int _type)
         : c::Socket(AF_INET, _type, 0)

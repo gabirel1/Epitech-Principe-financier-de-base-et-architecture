@@ -23,10 +23,13 @@ namespace fix
 
         protected:
             friend class Message;
+
             void setSendingTime();
             [[deprecated("Use setSeqNum() before calling operator std::string instead")]]
             void updateMsgSeqNum();
+
             std::string getPartialHeader() const;
+
         private:
             std::string BeginString = "FIX.4.2";    // 8 --> Init at the beginning of the session
             std::string BodyLength = "0";           // 9

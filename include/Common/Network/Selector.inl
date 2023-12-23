@@ -48,7 +48,7 @@ namespace net
     template<IsSocket T>
     std::vector<typename Selector<T>::Client> Selector<T>::pull()
     {
-        Event *events;
+        Event *events = nullptr;
         size_t set = wait(events, m_to);
         std::vector<Client> clients{set};
 

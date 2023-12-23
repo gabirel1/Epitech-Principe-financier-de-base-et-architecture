@@ -1,6 +1,7 @@
 #include <algorithm>
 
 #include "Common/Message/Serializer.hpp"
+#include <iostream>
 
 namespace fix
 {
@@ -11,8 +12,7 @@ namespace fix
         _map.clear();
         while (!_msg.empty()) {
             Error err = token(_msg, pair);
-
-            if (err == Error::None)
+            if (err != Error::None)
                 return err;
             _map.emplace(std::move(pair));
         }
@@ -27,14 +27,14 @@ namespace fix
             return Error::InvalidEnd;
         size_t split = _msg.find("=");
 
-        if (split < size)
+        if (split >= size)
             return Error::NoEqual;
         std::string key = _msg.substr(0, split);
 
         if (key.empty() && std::all_of(key.begin(), key.end(), ::isdigit))
             return Error::InvalidKey;
-        _pair = { std::move(key), std::move(_msg.substr(split + 1, size)) };
-        _msg.erase(0, size);
+        _pair = { std::move(key), std::move(_msg.substr(split + 1, size - (key.size() + 1))) };
+        _msg.erase(0, size + 1);
         return Error::None;
     }
 

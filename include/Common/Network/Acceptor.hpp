@@ -13,7 +13,7 @@ namespace net
             Acceptor();
             ~Acceptor() = default;
 
-            int listen(uint32_t _port);
+            bool listen(uint32_t _port);
 
             Client accept();
     };

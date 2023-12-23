@@ -27,7 +27,7 @@ namespace net
 
             [[nodiscard]] std::string receive(size_t _size, int &_error);
 
-            [[nodiscrad]] bool is_open() const;
+            [[nodiscard]] bool is_open() const;
             bool close();
 
             operator bool() const;

@@ -16,7 +16,7 @@ class Core
         void stop();
 
     protected:
-        void internal_start();
+        bool internal_start();
 
     private:
         bool m_running = false;
