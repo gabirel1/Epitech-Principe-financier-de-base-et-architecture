@@ -32,7 +32,7 @@ namespace net
 
     size_t Socket::send(const uint8_t *_data, size_t _size)
     {
-        return send(_data, _size);
+        return c::Socket::send(_data, _size);
     }
 
     std::string Socket::receive(size_t _size, int &_error)
@@ -47,7 +47,7 @@ namespace net
 
     bool Socket::close()
     {
-        return close();
+        return c::Socket::close();
     }
 
     Socket::Socket(int _type)

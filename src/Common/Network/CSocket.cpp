@@ -21,7 +21,7 @@ namespace net::c
 
     int Socket::create(int _dom, int _type, int _proto)
     {
-        return socket(_dom, _type, _proto);
+        return ::socket(_dom, _type, _proto);
     }
 
     int Socket::bind(int _fd, struct sockaddr *_addr, size_t _size)
@@ -43,12 +43,12 @@ namespace net::c
 
     int Socket::accept(int _fd)
     {
-        return accept(_fd);
+        return ::accept(_fd, NULL, NULL);
     }
 
     size_t Socket::send(int _fd, const uint8_t *_data, size_t _size)
     {
-        return send(_fd, _data, _size);
+        return ::send(_fd, _data, _size, 0);
     }
 
     const uint8_t *Socket::receive(int _fd, size_t _size, int &_error)
