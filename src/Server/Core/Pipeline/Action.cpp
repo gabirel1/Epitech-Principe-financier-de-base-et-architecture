@@ -16,6 +16,14 @@ namespace pip
         (void)stop();
     }
 
+    bool Action::start()
+    {
+        if (!m_running)
+            tstart(this);
+        Logger::Log("[Action] Running: ", m_running);
+        return m_running;
+    }
+
     /// @brief Process all incoming raw message to make action
     void Action::loop()
     {

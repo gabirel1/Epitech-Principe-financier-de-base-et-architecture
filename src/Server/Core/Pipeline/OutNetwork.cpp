@@ -15,6 +15,14 @@ namespace pip
         (void)stop();
     }
 
+    bool OutNetwork::start()
+    {
+        if (!m_running)
+            tstart(this);
+        Logger::Log("[OutNetwork] Running: ", m_running);
+        return m_running;
+    }
+
     void OutNetwork::loop()
     {
         Logger::SetThreadName(THIS_THREAD_ID, "Network Output");

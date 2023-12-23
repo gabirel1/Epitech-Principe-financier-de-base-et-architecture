@@ -17,6 +17,14 @@ namespace pip
         stop();
     }
 
+    bool Market::start()
+    {
+        if (!m_running)
+            tstart(this);
+        Logger::Log("[Market] Running: ", m_running);
+        return m_running;
+    }
+
     void Market::loop()
     {
         Logger::SetThreadName(THIS_THREAD_ID, "Market");

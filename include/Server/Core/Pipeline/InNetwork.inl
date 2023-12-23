@@ -19,6 +19,15 @@ namespace pip
         (void)this->template stop();
     }
 
+    template<class T>
+    bool InNetwork<T>::start()
+    {
+        if (!this->m_running)
+            this->template tstart(this);
+        Logger::Log("[InNetwork] Running: ", this->m_running);
+        return this->m_running;
+    }
+
     template<IsSocket T>
     void InNetwork<T>::loop()
     {

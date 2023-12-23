@@ -30,6 +30,10 @@ namespace pip
             /// @brief Disconnect from listening, stop the pipeline and the destroy it. 
             ~InNetwork();
 
+            /// @brief Run the pipeline
+            /// @return Return true if the pipeline as correctly started else false.
+            [[nodiscard]] bool start();
+
             /// @brief Core function of the pipeline determining it's behavior
             void loop();
 

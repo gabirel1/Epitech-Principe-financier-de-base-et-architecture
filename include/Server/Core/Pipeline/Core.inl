@@ -14,15 +14,6 @@ Pipeline<T>::~Pipeline()
 }
 
 template<class T>
-bool Pipeline<T>::start()
-{
-    if (!m_running)
-        tstart(this);
-    Logger::Log("[Pipeline] Running: ", m_running);
-    return m_running;
-}
-
-template<class T>
 bool Pipeline<T>::status(float _to)
 {
     return tstatus(static_cast<ms>(_to * 1000)) != std::future_status::deferred;

@@ -14,10 +14,6 @@ class Pipeline
         Pipeline();
         virtual ~Pipeline();
 
-        /// @brief Run the pipeline
-        /// @return Return true if the pipeline as correctly started else false.
-        [[nodiscard]] bool start();
-
         /// @brief Get the status of the pipeline
         /// @param _to Timeout of the request on the status
         /// @return Return true if the pipeline is running otherwise false.

@@ -20,6 +20,10 @@ namespace pip
             /// @brief Stop and then destroy the pipeline.
             ~Action();
 
+            /// @brief Run the pipeline
+            /// @return Return true if the pipeline as correctly started else false.
+            [[nodiscard]] bool start();
+
             /// @brief Core function of the pipeline determining it's behavior
             void loop();
 
