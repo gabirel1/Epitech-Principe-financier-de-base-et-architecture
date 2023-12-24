@@ -1,4 +1,5 @@
 #include "Common/Message/Logout.hpp"
+#include "Common/Message/Reject.hpp"
 
 namespace fix
 {
@@ -9,11 +10,8 @@ namespace fix
 
     std::pair<bool, Reject> Logout::Verify(Serializer::AnonMessage &_msg)
     {
-        return { false, {} };
-    }
+        std::ignore = _msg;
 
-    void Logout::set58_Text(const std::string &_val)
-    {
-        m_params.emplace({ "58", _val });
+        return { false, Reject{} };
     }
 }

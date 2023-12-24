@@ -9,7 +9,6 @@ namespace pip
     Market::Market(OrderBook &_ob, SerialToMarket &_input, MarketToNet &_output)
         : m_input(_input), m_output(_output), m_ob(_ob)
     {
-        
     }
 
     Market::~Market()
