@@ -4,7 +4,7 @@ namespace fix
 {
     NewOrderSingle::NewOrderSingle()
     {
-        header.setMsgType(m_msgType);
+        header.set35_MsgType(m_msgType);
     }
 
     void NewOrderSingle::set11_ClOrdID(const std::string &_val)

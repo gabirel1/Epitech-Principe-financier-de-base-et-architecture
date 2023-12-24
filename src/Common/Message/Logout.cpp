@@ -4,7 +4,7 @@ namespace fix
 {
     Logout::Logout()
     {
-        header.setMsgType(m_msgType);
+        header.set35_MsgType(m_msgType);
     }
 
     Logout::~Logout() {}

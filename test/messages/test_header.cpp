@@ -11,7 +11,7 @@ class HeaderTest : public ::testing::Test
             m_header.set49_SenderCompId("CLIENT");
             m_header.set56_TargetCompId("TARGET");
             m_header.setBodyLength("123");
-            m_header.setMsgType("A");
+            m_header.set35_MsgType("A");
             m_header.setSeqNum("32");
         }
 

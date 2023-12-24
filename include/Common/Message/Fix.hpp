@@ -4,9 +4,9 @@
 #include <string>
 
 #include "Common/Message/Header.hpp"
-#include "Common/Container/InsertMap.hpp"
 
-#define FIX_DELIMITER 1 // change to '^' for testing or 1 for production
+ // change to '^' for testing or 1 for production
+#define FIX_DELIMITER 1
 
 namespace fix
 {

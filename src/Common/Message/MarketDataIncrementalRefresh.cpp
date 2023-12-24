@@ -4,7 +4,7 @@ namespace fix
 {
     MarketDataIncrementalRefresh::MarketDataIncrementalRefresh()
     {
-        header.setMsgType(m_msgType);
+        header.set35_MsgType(m_msgType);
     }
 
     MarketDataIncrementalRefresh::~MarketDataIncrementalRefresh()

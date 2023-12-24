@@ -1,23 +1,31 @@
 #pragma once
 
 #include <string>
-
-// https://www.onixs.biz/fix-dictionary/4.2/tagNum_10.html
+#include "Common/Message/Serializer.hpp"
 
 namespace fix
 {
+    class Reject;
+
+    /// @brief Fix [Header](https://www.onixs.biz/fix-dictionary/4.2/compBlock_StandardHeader.html) class.
     class Header
     {
         public:
             Header() = default;
             ~Header() = default;
 
+            static std::pair<bool, Reject> Verify(Serializer::AnonMessage &_msg);
+
             void set49_SenderCompId(const std::string &_val);
             void set56_TargetCompId(const std::string &_val);
 
             void setBodyLength(const std::string &_len);
             void setBodyLength(const size_t &_len);
-            void setMsgType(const std::string &_val);
+
+            /// @brief Set the type of message send [35](https://www.onixs.biz/fix-dictionary/4.2/tagNum_35.html).
+            /// @param _val Value assigned to it: char.
+            void set35_MsgType(const std::string &_val);
+
             void setSeqNum(const std::string &_val);
             void setSeqNum(const size_t &_val);
 

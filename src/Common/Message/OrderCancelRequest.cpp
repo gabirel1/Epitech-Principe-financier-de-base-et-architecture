@@ -4,7 +4,7 @@ namespace fix
 {
     OrderCancelRequest::OrderCancelRequest()
     {
-        header.setMsgType(m_msgType);
+        header.set35_MsgType(m_msgType);
     }
 
     OrderCancelRequest::~OrderCancelRequest() {}

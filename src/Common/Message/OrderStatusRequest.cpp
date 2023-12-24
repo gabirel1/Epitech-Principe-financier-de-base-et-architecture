@@ -4,7 +4,7 @@ namespace fix
 {
     OrderStatusRequest::OrderStatusRequest()
     {
-        header.setMsgType(m_msgType);
+        header.set35_MsgType(m_msgType);
     }
 
     OrderStatusRequest::~OrderStatusRequest() {}

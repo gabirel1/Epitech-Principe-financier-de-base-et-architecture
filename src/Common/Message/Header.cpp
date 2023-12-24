@@ -1,12 +1,50 @@
-#include <ctime>
-#include <sys/time.h>
 #include <iomanip>
+#include <ctime>
 #include <iostream>
+
+#include <sys/time.h>
+
 #include "Common/Message/Header.hpp"
 #include "Common/Message/Fix.hpp"
+#include "Common/Message/Reject.hpp"
 
 namespace fix
 {
+    std::pair<bool, Reject> Header::Verify(Serializer::AnonMessage &_msg)
+    {
+        // need to verify body length, sender, target, sequence number, sending time
+        std::pair<bool, Reject> reject{ true, {} };
+
+        if (!_msg.contains("8") || !_msg.contains("9") || !_msg.contains("35")
+            || !_msg.contains("49") || !_msg.contains("56") || !_msg.contains("52")) {
+            if (!_msg.contains("8"))
+                reject.second.set371_refTagId("8");
+            else if (!_msg.contains("9"))
+                reject.second.set371_refTagId("9");
+            else if (!_msg.contains("35"))
+                reject.second.set371_refTagId("35");
+            else if (!_msg.contains("49"))
+                reject.second.set371_refTagId("49");
+            else if (!_msg.contains("56"))
+                reject.second.set371_refTagId("56");
+            else if (!_msg.contains("52"))
+                reject.second.set371_refTagId("52");
+            reject.second.set373_sessionRejectReason("1");
+            reject.second.set58_Text("Unable to find required field");
+        } else if (_msg.at("8") != "FIX.4.2") {
+            reject.second.set371_refTagId("8");
+            reject.second.set373_sessionRejectReason("5");
+            reject.second.set58_Text("Fix protocl version not supported");
+        } else if (_msg.at("35").size() != 1) {
+            reject.second.set371_refTagId("35");
+            reject.second.set373_sessionRejectReason("6");
+            reject.second.set58_Text("Wrong message type format");
+        } else {
+            reject.first = false;
+        }
+        return reject;
+    }
+
     void Header::set49_SenderCompId(const std::string &_val)
     {
         SenderCompId = _val;
@@ -27,7 +65,7 @@ namespace fix
         BodyLength = std::to_string(_val);
     }
 
-    void Header::setMsgType(const std::string &_val)
+    void Header::set35_MsgType(const std::string &_val)
     {
         MsgType = _val;
     }

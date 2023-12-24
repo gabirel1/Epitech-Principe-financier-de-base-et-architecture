@@ -26,11 +26,10 @@ namespace pip
         return m_running;
     }
 
-    /// @brief Process all incoming raw message to make action
     void Action::loop()
     {
         Logger::SetThreadName(THIS_THREAD_ID, "Action convertion");
-
+        std::pair<bool, fix::Reject> reject;
         SerialIn input;
 
         while (m_running)
@@ -38,34 +37,27 @@ namespace pip
             if (!m_input.empty())
             {
                 input = m_input.pop_front();
-
-                // if message doesn't contain 35 tag, we don't process it
-                // if (!input.Message.contains("35") || input.Message.at("35").size() != 1) {
-                //     // send error to the error pipeline
-                //     continue;
-                // }
-                // checking sum and header
+                // need more checking, more info inside the function
+                reject = fix::Header::Verify(input.Message);
+                if (reject.first) {
+                    reject.second.header.set49_SenderCompId(std::to_string(input.Client.User));
+                    reject.second.header.set56_TargetCompId(input.Message.at("49"));
+                    m_raw.push({ input.Client, reject.second });
+                    continue;
+                }
                 switch (input.Message.at("35")[0])
                 {
                     case 'A': (void)treatLogon(input);
                         break;
                     case '0': (void)treatHeartbeat(input);
-                        // Received --> Heartbeat (35=0) --> Heartbeat (user is still connected)
-                        // Reply --> Heartbeat (35=0)
                         break;
                     case 'D': (void)treatNewOrderSingle(input);
                         break;
                     case 'E': (void)treatNewOrderList(input);
-                        // Received --> New Order List (35=E) --> New Order List (user sent a list of orders)
-                        // Reply --> Execution Report (35=8) or Order Cancel Reject (35=9)
                         break;
                     case 'F': (void)treatOrderCancelRequest(input);
-                        // Received --> Order Cancel Request (35=F) --> Order Cancel Request (user sent an order cancel, the order should be fully canceled)
-                        // Reply --> Execution Report (35=8) or Order Cancel Reject (35=9)
                         break;
                     case 'G': (void)treatOrderCancelReplaceRequest(input);
-                        // Received --> Order Cancel/Replace Request (35=G) -> Order Cancel/Replace Request (user sent an order cancel, the order should be partially canceled, [meaning that the order quantity should be updated or the price should be changed])
-                        // Reply --> Execution Report (35=8)
                         break;
                     case '5': (void)treatLogout(input);
                         break;
@@ -74,8 +66,6 @@ namespace pip
                         // Reply --> Market Data Request Reject (35=Y) or Market Data Snapshot/Full Refresh (35=W)
                         break;
                     default: (void)treatUnknown(input);
-                        // Unknown message type
-                        // send error to the error pipeline
                         break;
                 }
             }
@@ -85,31 +75,18 @@ namespace pip
     bool Action::treatLogon(SerialIn &_input)
     {
         fix::Logon logon;
-        fix::Reject reject;
+        std::pair<bool, fix::Reject> verif = fix::Logon::Verify(_input.Message);
 
-        reject.set45_RefSeqNum(_input.Message.at("34"));
-
-        if (!_input.Message.contains("98") && !_input.Message.contains("108")) {
-            // reject
-            m_raw.push({ _input.Client, reject });
+        if (verif.first) {
+            verif.second.set45_RefSeqNum(_input.Message.at("34"));
+            m_raw.push({ _input.Client, verif.second });
             return false;
-        } else if (_input.Message.at("98") != "0") {
-            // reject
-            m_raw.push({ _input.Client, reject });
-            return false;
-        }else if (!utils::is_numeric(_input.Message.at("108"))) {
-            // reject
-            m_raw.push({ _input.Client, reject });
-            return false;
-        } /*else if (!utils::to<UserId>(_input.Message.at("108")) != ) {
-            // reject
-            return false;
-        }*/
+        }
         _input.Client.Logged = true;
         _input.Client.User = utils::to<UserId>(_input.Message.at("49"));
         _input.Client.SeqNumber = utils::to<size_t>(_input.Message.at("108"));
-        logon.header.set49_SenderCompId(_input.Message.at("56")); // add to header
-        logon.header.set56_TargetCompId(_input.Message.at("49")); // add to header
+        logon.header.set49_SenderCompId(_input.Message.at("56"));
+        logon.header.set56_TargetCompId(_input.Message.at("49"));
         logon.header.setSeqNum(_input.Message.at("34"));
         logon.set98_EncryptMethod("0");
         logon.set108_HeartBtInt(_input.Message.at("108"));
@@ -132,8 +109,8 @@ namespace pip
         _input.Client.Logged = false;
         _input.Client.Disconnect = true;
         _input.Client.User = 0;
-        logout.header.set49_SenderCompId(_input.Message.at("56")); // add to header
-        logout.header.set56_TargetCompId(_input.Message.at("49")); // add to header
+        logout.header.set49_SenderCompId(_input.Message.at("56"));
+        logout.header.set56_TargetCompId(_input.Message.at("49"));
         logout.header.setSeqNum(std::to_string(_input.Client.SeqNumber));
         m_raw.push({ _input.Client, logout });
         return true;
@@ -282,8 +259,8 @@ namespace pip
     {
         fix::HeartBeat heartbeat;
 
-        heartbeat.header.set49_SenderCompId(_input.Message.at("56")); // add to header
-        heartbeat.header.set56_TargetCompId(_input.Message.at("49")); // add to header
+        heartbeat.header.set49_SenderCompId(_input.Message.at("56"));
+        heartbeat.header.set56_TargetCompId(_input.Message.at("49"));
         heartbeat.header.setSeqNum(_input.Message.at("34"));
         m_raw.push({ _input.Client, heartbeat });
         return true;

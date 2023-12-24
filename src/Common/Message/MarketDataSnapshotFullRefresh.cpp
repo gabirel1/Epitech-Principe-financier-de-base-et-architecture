@@ -4,7 +4,7 @@ namespace fix
 {
     MarketDataSnapshotFullRefresh::MarketDataSnapshotFullRefresh()
     {
-        header.setMsgType(m_msgType);
+        header.set35_MsgType(m_msgType);
     }
 
     MarketDataSnapshotFullRefresh::~MarketDataSnapshotFullRefresh()

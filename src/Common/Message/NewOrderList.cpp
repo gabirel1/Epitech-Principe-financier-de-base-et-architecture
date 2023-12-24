@@ -4,7 +4,7 @@ namespace fix
 {
     NewOrderList::NewOrderList()
     {
-        header.setMsgType(m_msgType);
+        header.set35_MsgType(m_msgType);
     }
 
     NewOrderList::~NewOrderList() {}

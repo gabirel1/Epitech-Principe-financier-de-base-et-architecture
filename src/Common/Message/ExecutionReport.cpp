@@ -4,7 +4,7 @@ namespace fix
 {
     ExecutionReport::ExecutionReport()
     {
-        header.setMsgType(m_msgType);
+        header.set35_MsgType(m_msgType);
     }
 
     ExecutionReport::~ExecutionReport() {}

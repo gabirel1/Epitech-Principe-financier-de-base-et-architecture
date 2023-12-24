@@ -4,7 +4,7 @@ namespace fix
 {
     HeartBeat::HeartBeat()
     {
-        header.setMsgType(m_msgType);
+        header.set35_MsgType(m_msgType);
     }
 
     HeartBeat::~HeartBeat() {}
