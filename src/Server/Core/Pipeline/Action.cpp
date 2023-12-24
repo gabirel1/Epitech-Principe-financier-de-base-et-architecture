@@ -191,8 +191,8 @@ namespace pip
         data.OrderData.type = (_input.Message.at("54") == "3") ? OrderType::Bid : OrderType::Ask;
         data.OrderData.price = utils::to<Price>(_input.Message.at("44"));
         data.OrderData.order.userId = _input.Client.User;
-        data.OrderData.order.orderId = utils::to<Quantity>(_input.Message.at("11"));
-        data.OrderData.order.quantity = utils::to<OrderId>(_input.Message.at("38"));
+        data.OrderData.order.orderId = utils::to<OrderId>(_input.Message.at("11"));
+        data.OrderData.order.quantity = utils::to<Quantity>(_input.Message.at("38"));
         data.Time = _input.Time;
         m_output.push(data);
         return true;
@@ -208,6 +208,25 @@ namespace pip
         // NOT IMPLEMENTED YET
         m_raw.push({ _input.Client, reject });
         return false;
+
+        if (!_input.Message.contains("11") || !_input.Message.contains("41")) {
+            // reject
+            m_raw.push({ _input.Client, reject });
+            return false;
+        } else if (_input.Message.at("54") != "3" && _input.Message.at("54") != "4") {
+            // reject
+            m_raw.push({ _input.Client, reject });
+            return false;
+        }
+
+        data.Client = _input.Client;
+        data.OrderData.action = OrderBook::Data::Action::Cancel;
+        data.OrderData.order.orderId = utils::to<OrderId>(_input.Message.at("41"));
+        data.OrderData.type = (_input.Message.at("54") == "3") ? OrderType::Bid : OrderType::Ask;
+
+        data.Time = _input.Time;
+        m_output.push(data);
+        return true;
     }
 
     bool Action::treatOrderCancelReplaceRequest(SerialIn &_input)
@@ -220,6 +239,32 @@ namespace pip
         // NOT IMPLEMENTED YET
         m_raw.push({ _input.Client, reject });
         return false;
+
+        if (!_input.Message.contains("11") || !_input.Message.contains("41")
+            || !_input.Message.contains("38") || !_input.Message.contains("44")
+            || !_input.Message.contains("54") || !_input.Message.contains("40")) {
+            // reject
+            m_raw.push({ _input.Client, reject });
+            return false;
+        } else if ((_input.Message.at("54") != "3" && _input.Message.at("54") != "4")
+            || _input.Message.at("40") != "2") {
+            // reject
+            m_raw.push({ _input.Client, reject });
+            return false;
+        } else if (!utils::is_double(_input.Message.at("38")) || !utils::is_double(_input.Message.at("44"))) {
+            // reject
+            m_raw.push({ _input.Client, reject });
+            return false;
+        }
+
+        data.Client = _input.Client;
+        data.OrderData.action = OrderBook::Data::Action::Modify;
+        data.OrderData.order.orderId = utils::to<OrderId>(_input.Message.at("41"));
+        data.OrderData.order.quantity = utils::to<Quantity>(_input.Message.at("38"));
+        data.OrderData.price = utils::to<Price>(_input.Message.at("44"));
+        data.OrderData.type = (_input.Message.at("54") == "3") ? OrderType::Bid : OrderType::Ask;
+        data.Time = _input.Time;
+        return true;
     }
 
     bool Action::treatUnknown(SerialIn &_input)

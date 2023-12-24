@@ -95,6 +95,20 @@ namespace fix
          */
         void set40_OrdType(const std::string &_val);
 
+        /**
+         * Quantity ordered. This represents the number of shares for equities or par, face or nominal value for FI instruments.
+         * @param _val
+         * Quantity ordered
+         */
+        void set38_OrderQty(const std::string &_val);
+
+        /**
+         * Price per unit of quantity (e.g. per share)
+         * @param _val
+         * Price per unit of quantity (e.g. per share)
+         */
+        void set44_Price(const std::string &_val);
+
     protected:
         static constexpr const char *m_msgType = "G";
     };

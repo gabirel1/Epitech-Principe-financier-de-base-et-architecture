@@ -15,8 +15,7 @@ namespace fix
         ~OrderCancelRequest();
 
         /**
-         * ClOrdID <11> of the previous order (NOT the initial order of the day) when canceling or replacing an order.
-         * Used to identify the previous order in cancel and cancel/replace requests.
+         * Unique identifier of the order to cancel.
          * @param _val
          * Unique identifier of the order
          */

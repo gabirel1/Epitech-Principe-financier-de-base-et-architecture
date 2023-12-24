@@ -44,4 +44,13 @@ namespace fix
         m_params.emplace({ "40", _val });
     }
 
+    void OrderCancelReplaceRequest::set38_OrderQty(const std::string &_val)
+    {
+        m_params.emplace({ "38", _val });
+    }
+
+    void OrderCancelReplaceRequest::set44_Price(const std::string &_val)
+    {
+        m_params.emplace({ "44", _val });
+    }
 }
