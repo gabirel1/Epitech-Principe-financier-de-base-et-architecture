@@ -38,9 +38,13 @@ namespace net
 
         if (_error == -1) {
             Logger::Log("[Socket] Error will trying to receive data: ", strerror(errno));
+            if (data != nullptr)
+                delete[] data;
             return str;
         }
-        return str.assign(data, data + _error);
+        str.assign(data, data + _error);
+        delete[] data;
+        return str;
     }
 
     bool Socket::close()

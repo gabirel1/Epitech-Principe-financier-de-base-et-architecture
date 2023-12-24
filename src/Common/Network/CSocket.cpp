@@ -37,10 +37,10 @@ namespace net::c
 
     const uint8_t *Socket::receive(int _fd, size_t _size, int &_error)
     {
-        uint8_t *data = nullptr;
+        std::unique_ptr<uint8_t []> data(new uint8_t[_size]);
 
-        _error = ::recv(_fd, data, _size, 0);
-        return data;
+        _error = ::recv(_fd, data.get(), _size, 0);
+        return data.release();
     }
 
     bool Socket::blocking(int _fd, bool _block)
