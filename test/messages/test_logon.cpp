@@ -13,8 +13,7 @@ class TestLogon : public ::testing::Test
             logon.header.set56_TargetCompId("TARGET");
             logon.set98_EncryptMethod("0");
             logon.set108_HeartBtInt("30");
-            logon.header.setSeqNum("1");
-
+            logon.header.set34_msgSeqNum("1");
             formatedLogon = logon.to_string();
             sendingTime = formatedLogon.substr(formatedLogon.find("52=") + 3, 21);
         }

@@ -13,9 +13,9 @@ namespace fix
             Logon();
             ~Logon() = default;
 
-            /// @brief Verify if the logon message receive is correctly formated
+            /// @brief Verify if the logon message receive is correctly formated.
             /// @param _msg Message to check.
-            /// @return If the first element is true then second is step, otherwise it rigly formated.
+            /// @return If the first element is true then second is set, otherwise it rigly formated.
             static std::pair<bool, Reject> Verify(Serializer::AnonMessage &_msg);
 
             /// @brief Set the encryption method [98](https://www.onixs.biz/fix-dictionary/4.2/tagNum_98.html).

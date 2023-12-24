@@ -5,16 +5,6 @@
 
 namespace fix
 {
-    // Message::operator std::string () const
-    // {
-    //     std::string str = header;
-
-    //     for (const auto &[_key, _val] : m_params)
-    //         str += _key + "=" + _val + "^";
-    //     str += "10" + checkSum(str) + "^";
-    //     return str;
-    // }
-
     Message::operator std::string ()
     {
         std::string body_tmp = "";
@@ -31,7 +21,7 @@ namespace fix
             header.getPartialHeader() + body_tmp
         );
 
-        header.setBodyLength(std::to_string(_len));
+        header.set9_bodyLength(std::to_string(_len));
         header_tmp = header;
 
         msg = header_tmp + body_tmp;
@@ -56,7 +46,7 @@ namespace fix
             header.getPartialHeader() + body_tmp
         );
 
-        header.setBodyLength(std::to_string(_len));
+        header.set9_bodyLength(std::to_string(_len));
         header_tmp = header;
 
         msg = header_tmp + body_tmp;

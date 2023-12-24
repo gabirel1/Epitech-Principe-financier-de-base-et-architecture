@@ -87,7 +87,7 @@ namespace pip
         _input.Client.SeqNumber = utils::to<size_t>(_input.Message.at("108"));
         logon.header.set49_SenderCompId(_input.Message.at("56"));
         logon.header.set56_TargetCompId(_input.Message.at("49"));
-        logon.header.setSeqNum(_input.Message.at("34"));
+        logon.header.set34_msgSeqNum(_input.Message.at("34"));
         logon.set98_EncryptMethod("0");
         logon.set108_HeartBtInt(_input.Message.at("108"));
         m_raw.push({ _input.Client, logon });
@@ -97,13 +97,12 @@ namespace pip
     bool Action::treatLogout(SerialIn &_input)
     {
         fix::Logout logout;
-        fix::Reject reject;
-
-        reject.set45_RefSeqNum(_input.Message.at("34"));
+        std::pair<bool, fix::Reject> reject = fix::Logout::Verify(_input.Message);
 
         if (_input.Client.Logged) {
-            // reject
-            m_raw.push({ _input.Client, reject });
+            reject.second.set45_RefSeqNum(_input.Message.at("34"));
+            reject.second.set58_Text("Client not connected");
+            m_raw.push({ _input.Client, reject.second });
             return false;
         }
         _input.Client.Logged = false;
@@ -111,7 +110,7 @@ namespace pip
         _input.Client.User = 0;
         logout.header.set49_SenderCompId(_input.Message.at("56"));
         logout.header.set56_TargetCompId(_input.Message.at("49"));
-        logout.header.setSeqNum(std::to_string(_input.Client.SeqNumber));
+        logout.header.set34_msgSeqNum(std::to_string(_input.Client.SeqNumber));
         m_raw.push({ _input.Client, logout });
         return true;
     }
@@ -261,7 +260,7 @@ namespace pip
 
         heartbeat.header.set49_SenderCompId(_input.Message.at("56"));
         heartbeat.header.set56_TargetCompId(_input.Message.at("49"));
-        heartbeat.header.setSeqNum(_input.Message.at("34"));
+        heartbeat.header.set34_msgSeqNum(_input.Message.at("34"));
         m_raw.push({ _input.Client, heartbeat });
         return true;
     }

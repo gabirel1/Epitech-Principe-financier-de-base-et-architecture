@@ -10,12 +10,12 @@ class HeaderTest : public ::testing::Test
         {
             m_header.set49_SenderCompId("CLIENT");
             m_header.set56_TargetCompId("TARGET");
-            m_header.setBodyLength("123");
+            m_header.set9_bodyLength("123");
             m_header.set35_MsgType("A");
-            m_header.setSeqNum("32");
+            m_header.set34_msgSeqNum("32");
         }
 
-    fix::Header m_header{};
+        fix::Header m_header{};
 };
 
 TEST_F(HeaderTest, TestHeaderToString)

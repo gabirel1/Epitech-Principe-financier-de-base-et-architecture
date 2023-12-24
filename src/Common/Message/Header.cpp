@@ -45,22 +45,12 @@ namespace fix
         return reject;
     }
 
-    void Header::set49_SenderCompId(const std::string &_val)
-    {
-        SenderCompId = _val;
-    }
-
-    void Header::set56_TargetCompId(const std::string &_val)
-    {
-        TargetCompId = _val;
-    }
-
-    void Header::setBodyLength(const std::string &_val)
+    void Header::set9_bodyLength(const std::string &_val)
     {
         BodyLength = _val;
     }
 
-    void Header::setBodyLength(const size_t &_val)
+    void Header::set9_bodyLength(const size_t &_val)
     {
         BodyLength = std::to_string(_val);
     }
@@ -70,14 +60,24 @@ namespace fix
         MsgType = _val;
     }
 
-    void Header::setSeqNum(const std::string &_val)
+    void Header::set34_msgSeqNum(const std::string &_val)
     {
         MsgSeqNum = _val;
     }
 
-    void Header::setSeqNum(const size_t &_val)
+    void Header::set34_msgSeqNum(const size_t &_val)
     {
         MsgSeqNum = std::to_string(_val);
+    }
+
+    void Header::set49_SenderCompId(const std::string &_val)
+    {
+        SenderCompId = _val;
+    }
+
+    void Header::set56_TargetCompId(const std::string &_val)
+    {
+        TargetCompId = _val;
     }
 
     Header::operator std::string() const
