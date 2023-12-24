@@ -5,16 +5,16 @@
 #include "Common/Network/Socket.hpp"
 #include "Common/Network/Acceptor.hpp"
 
-#define TEST_PORT_TCP 8000
 #define TEST_IP_TCP "127.0.0.1"
 
-class tcpSocketConnection : public testing::Test
+class tcp_Socket_ConnectClose : public testing::Test
 {
     protected:
         void SetUp() override
         {
-            Logger::SetThreadName(THIS_THREAD_ID, "test::tcp::Socket::connect");
-            acceptor.listen((uint32_t)TEST_PORT_TCP);
+            Logger::SetThreadName(THIS_THREAD_ID, "test::tcp_Socket_ConnectClose");
+            acceptor.listen(0);
+            port = acceptor.getPort();
         }
 
         void TearDown() override
@@ -23,12 +23,13 @@ class tcpSocketConnection : public testing::Test
         }
 
         net::Acceptor<net::tcp::Socket> acceptor;
+        uint32_t port = 0;
 };
 
-TEST_F(tcpSocketConnection, connect_close_server) {
+TEST_F(tcp_Socket_ConnectClose, connect_close_server) {
     net::tcp::Socket socket;
 
-    ASSERT_TRUE(socket.connect(TEST_IP_TCP, TEST_PORT_TCP));
+    ASSERT_TRUE(socket.connect(TEST_IP_TCP, port));
 
     net::Acceptor<net::tcp::Socket>::Client client = acceptor.accept();
 
@@ -38,14 +39,13 @@ TEST_F(tcpSocketConnection, connect_close_server) {
     EXPECT_FALSE(socket.is_open());
 }
 
-TEST_F(tcpSocketConnection, connect_close_client) {
+TEST_F(tcp_Socket_ConnectClose, connect_close_client) {
     net::tcp::Socket socket;
 
-    ASSERT_TRUE(socket.connect(TEST_IP_TCP, TEST_PORT_TCP));
+    ASSERT_TRUE(socket.connect(TEST_IP_TCP, port));
 
     net::Acceptor<net::tcp::Socket>::Client client = acceptor.accept();
 
-    std::cout << "test" << std::endl;
     ASSERT_NE(client, nullptr);
 
     ASSERT_TRUE(client->close());
@@ -53,21 +53,18 @@ TEST_F(tcpSocketConnection, connect_close_client) {
     ASSERT_FALSE(client->is_open());
 }
 
-class tcpSocketSend : public testing::Test
+class tcp_Socket_SendRecv : public testing::Test
 {
     protected:
-        tcpSocketSend()
+        void SetUp() override
         {
-            Logger::SetThreadName(THIS_THREAD_ID, "test::tcp::Socket::receive");
-            acceptor.listen((uint32_t)TEST_PORT_TCP);
-            std::cout << "connect" << std::endl;
-            socket.connect(TEST_IP_TCP, TEST_PORT_TCP);
-            std::cout << "accept" << std::endl;
+            Logger::SetThreadName(THIS_THREAD_ID, "test::tcp_Socket_SendRecv");
+            acceptor.listen(0);
+            socket.connect(TEST_IP_TCP, acceptor.getPort());
             client = acceptor.accept();
-            std::cout << "done" << std::endl;
         }
 
-        ~tcpSocketSend() override
+        void TearDown() override
         {
             (void)acceptor.close();
             (void)socket.close();
@@ -79,7 +76,7 @@ class tcpSocketSend : public testing::Test
         net::Acceptor<net::tcp::Socket>::Client client;
 };
 
-TEST_F(tcpSocketSend, single_send)
+TEST_F(tcp_Socket_SendRecv, single_send)
 {
     const std::string send1 = "this is a test";
     int error = 0;
@@ -94,7 +91,7 @@ TEST_F(tcpSocketSend, single_send)
     ASSERT_EQ(recv, "this is a test");
 }
 
-TEST_F(tcpSocketSend, multiple_send_single_recv)
+TEST_F(tcp_Socket_SendRecv, multiple_send_single_recv)
 {
     const std::string send1 = "this is ";
     const std::string send2 = "a test";
