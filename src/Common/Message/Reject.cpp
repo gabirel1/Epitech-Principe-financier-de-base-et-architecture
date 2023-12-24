@@ -16,4 +16,9 @@ namespace fix
     {
         m_params.emplace({ "58", _val });
     }
+
+    void Reject::set45_RefSeqNum(const std::string &_val)
+    {
+        m_params.emplace({ "45", _val });
+    }
 }

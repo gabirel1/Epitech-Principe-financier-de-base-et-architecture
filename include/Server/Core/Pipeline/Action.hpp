@@ -31,6 +31,11 @@ namespace pip
             bool treatLogon(SerialIn &_input);
             bool treatLogout(SerialIn &_input);
             bool treatNewOrderSingle(SerialIn &_input);
+            bool treatNewOrderList(SerialIn &_input);
+            bool treatOrderCancelRequest(SerialIn &_input);
+            bool treatOrderCancelReplaceRequest(SerialIn &_input);
+            bool treatUnknown(SerialIn &_input);
+            bool treatHeartbeat(SerialIn &_input);
 
         private:
             NetToSerial &m_input;       ///< Intput data queue.

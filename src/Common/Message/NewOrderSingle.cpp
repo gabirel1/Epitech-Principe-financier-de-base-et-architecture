@@ -36,4 +36,14 @@ namespace fix
     {
         m_params.emplace({ "40", _val });
     }
+
+    void NewOrderSingle::set38_OrderQty(const std::string &_val)
+    {
+        m_params.emplace({ "38", _val });
+    }
+
+    void NewOrderSingle::set44_Price(const std::string &_val)
+    {
+        m_params.emplace({ "44", _val });
+    }
 }

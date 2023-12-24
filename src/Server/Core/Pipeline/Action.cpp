@@ -49,17 +49,21 @@ namespace pip
                 {
                     case 'A': (void)treatLogon(input);
                         break;
-                    case '0':
+                    case '0': (void)treatHeartbeat(input);
                         // Received --> Heartbeat (35=0) --> Heartbeat (user is still connected)
                         // Reply --> Heartbeat (35=0)
                         break;
                     case 'D': (void)treatNewOrderSingle(input);
                         break;
-                    case 'F':
+                    case 'E': (void)treatNewOrderList(input);
+                        // Received --> New Order List (35=E) --> New Order List (user sent a list of orders)
+                        // Reply --> Execution Report (35=8) or Order Cancel Reject (35=9)
+                        break;
+                    case 'F': (void)treatOrderCancelRequest(input);
                         // Received --> Order Cancel Request (35=F) --> Order Cancel Request (user sent an order cancel, the order should be fully canceled)
                         // Reply --> Execution Report (35=8) or Order Cancel Reject (35=9)
                         break;
-                    case 'G':
+                    case 'G': (void)treatOrderCancelReplaceRequest(input);
                         // Received --> Order Cancel/Replace Request (35=G) -> Order Cancel/Replace Request (user sent an order cancel, the order should be partially canceled, [meaning that the order quantity should be updated or the price should be changed])
                         // Reply --> Execution Report (35=8)
                         break;
@@ -69,7 +73,7 @@ namespace pip
                         // Received --> Market Data Request (35=V)
                         // Reply --> Market Data Request Reject (35=Y) or Market Data Snapshot/Full Refresh (35=W)
                         break;
-                    default:
+                    default: (void)treatUnknown(input);
                         // Unknown message type
                         // send error to the error pipeline
                         break;
@@ -82,6 +86,8 @@ namespace pip
     {
         fix::Logon logon;
         fix::Reject reject;
+
+        reject.set45_RefSeqNum(_input.Message.at("34"));
 
         if (!_input.Message.contains("98") && !_input.Message.contains("108")) {
             // reject
@@ -116,6 +122,8 @@ namespace pip
         fix::Logout logout;
         fix::Reject reject;
 
+        reject.set45_RefSeqNum(_input.Message.at("34"));
+
         if (_input.Client.Logged) {
             // reject
             m_raw.push({ _input.Client, reject });
@@ -131,23 +139,48 @@ namespace pip
         return true;
     }
 
+    bool Action::treatNewOrderList(SerialIn &_input)
+    {
+        SerialOut data;
+        fix::Reject reject;
+
+        reject.set45_RefSeqNum(_input.Message.at("34"));
+        reject.set58_Text("Not implemented yet");
+        // NOT IMPLEMENTED YET
+        m_raw.push({ _input.Client, reject });
+        return false;
+
+        // if (!_input.Message.contains("66") || !_input.Message.contains("68")
+        //     || !_input.Message.contains("73") || !_input.Message.contains("66")
+        //     || !_input.Message.contains("11") || !_input.Message.contains("67")
+        //     || !_input.Message.contains("54")) {
+        //     // reject
+        //     m_raw.push({ _input.Client, reject });
+        // }
+        // data.Client = _input.Client;
+
+    }
+
     bool Action::treatNewOrderSingle(SerialIn &_input)
     {
         SerialOut data;
         fix::Reject reject;
 
+        reject.set45_RefSeqNum(_input.Message.at("34"));
+
         if (!_input.Message.contains("11") || !_input.Message.contains("21")
             || !_input.Message.contains("55") || !_input.Message.contains("38")
-            || !_input.Message.contains("44")) {
+            || !_input.Message.contains("44") || !_input.Message.contains("40")
+            || !_input.Message.contains("54") || !_input.Message.contains("60")) {
             // reject
             m_raw.push({ _input.Client, reject });
             return false;
-        } else if (_input.Message.at("21") != "3" || (_input.Message.at("21") != "3"
-            && _input.Message.at("21") != "4")) {
+        } else if (_input.Message.at("21") != "3" || (_input.Message.at("54") != "3"
+            && _input.Message.at("54") != "4") || _input.Message.at("40") != "2") {
             // reject
             m_raw.push({ _input.Client, reject });
             return false;
-        } else if (!utils::is_double(_input.Message.at("21")) || utils::is_double(_input.Message.at("48"))) {
+        } else if (!utils::is_double(_input.Message.at("38")) || !utils::is_double(_input.Message.at("44"))) {
             // reject
             m_raw.push({ _input.Client, reject });
             return false;
@@ -155,12 +188,60 @@ namespace pip
 
         data.Client = _input.Client;
         data.OrderData.action = OrderBook::Data::Action::Add;
-        data.OrderData.type = (_input.Message.at("21") == "3") ? OrderType::Ask : OrderType::Bid;
-        data.OrderData.price = utils::to<Price>(_input.Message.at("48"));
+        data.OrderData.type = (_input.Message.at("54") == "3") ? OrderType::Bid : OrderType::Ask;
+        data.OrderData.price = utils::to<Price>(_input.Message.at("44"));
         data.OrderData.order.userId = _input.Client.User;
         data.OrderData.order.orderId = utils::to<Quantity>(_input.Message.at("11"));
-        data.OrderData.order.quantity = utils::to<OrderId>(_input.Message.at("11"));
+        data.OrderData.order.quantity = utils::to<OrderId>(_input.Message.at("38"));
+        data.Time = _input.Time;
         m_output.push(data);
         return true;
     }
+
+    bool Action::treatOrderCancelRequest(SerialIn &_input)
+    {
+        SerialOut data;
+        fix::Reject reject;
+
+        reject.set45_RefSeqNum(_input.Message.at("34"));
+        reject.set58_Text("Not implemented yet");
+        // NOT IMPLEMENTED YET
+        m_raw.push({ _input.Client, reject });
+        return false;
+    }
+
+    bool Action::treatOrderCancelReplaceRequest(SerialIn &_input)
+    {
+        SerialOut data;
+        fix::Reject reject;
+
+        reject.set45_RefSeqNum(_input.Message.at("34"));
+        reject.set58_Text("Not implemented yet");
+        // NOT IMPLEMENTED YET
+        m_raw.push({ _input.Client, reject });
+        return false;
+    }
+
+    bool Action::treatUnknown(SerialIn &_input)
+    {
+        fix::Reject reject;
+
+        reject.set45_RefSeqNum(_input.Message.at("34"));
+        reject.set58_Text("Unknown message type");
+
+        m_raw.push({ _input.Client, reject });
+        return false;
+    }
+
+    bool Action::treatHeartbeat(SerialIn &_input)
+    {
+        fix::HeartBeat heartbeat;
+
+        heartbeat.header.set49_SenderCompId(_input.Message.at("56")); // add to header
+        heartbeat.header.set56_TargetCompId(_input.Message.at("49")); // add to header
+        heartbeat.header.setSeqNum(_input.Message.at("34"));
+        m_raw.push({ _input.Client, heartbeat });
+        return true;
+    }
+
 }

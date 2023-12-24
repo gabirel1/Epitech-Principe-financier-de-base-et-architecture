@@ -10,5 +10,6 @@ namespace fix
             void set372_refMsgType(const std::string &_val);
             void set373_sessionRejectReason(const std::string &_val);
             void set58_Text(const std::string &_val);
+            void set45_RefSeqNum(const std::string &_val);
     };
 }

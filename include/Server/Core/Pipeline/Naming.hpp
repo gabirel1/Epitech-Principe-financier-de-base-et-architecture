@@ -16,8 +16,9 @@ namespace data
 
         NetToSerial &operator=(const NetToSerial &_data);
 
-        ClientSocket Client{};                  ///< Sender client information.
-        fix::Serializer::AnonMessage Message{}; ///< Undefined message data.
+        ClientSocket Client{};                      ///< Sender client information.
+        fix::Serializer::AnonMessage Message{};     ///< Undefined message data.
+        std::chrono::_V2::system_clock::time_point Time{};  ///< Time of the action.
     };
 
     /// @brief Data transfered from the pip::Action pipeline to the pip::Market pipeline
@@ -28,8 +29,9 @@ namespace data
 
         SerialToMarket &operator=(const SerialToMarket &_data);
 
-        ClientSocket Client{};          ///< Sender client information.
-        OrderBook::Data OrderData{};    ///< Action to apply to the OrderBook.
+        ClientSocket Client{};                              ///< Sender client information.
+        OrderBook::Data OrderData{};                        ///< Action to apply to the OrderBook.
+        std::chrono::_V2::system_clock::time_point Time{};  ///< Time of the action.
     };
 
     /// @brief Data transfered from the pip::Market pipeline to the pip::OutNetwork pipeline
@@ -41,8 +43,9 @@ namespace data
 
         MarketToNet &operator=(const MarketToNet &_data);
 
-        ClientSocket Client{};  ///< Sender client information.
-        fix::Message Message{}; ///< Final message send to the client.
+        ClientSocket Client{};                      ///< Sender client information.
+        fix::Message Message{};                     ///< Final message send to the client.
+        std::chrono::_V2::system_clock::time_point Time{};  ///< Time of the action.
     };
 }
 
