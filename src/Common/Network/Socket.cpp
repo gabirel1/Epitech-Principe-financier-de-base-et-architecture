@@ -14,11 +14,6 @@ namespace net
         (void)c_blocking(_block);
     }
 
-    bool Socket::blocking() const
-    {
-        return c_blocking();
-    }
-
     bool Socket::connect(const Ip &_ip, uint32_t _port)
     {
         if (!c_create())
@@ -28,7 +23,7 @@ namespace net
 
     size_t Socket::send(const std::string &_data)
     {
-        return send(reinterpret_cast<const uint8_t *>(_data.c_str()), _data.size());
+        return c_send(reinterpret_cast<const uint8_t *>(_data.c_str()), _data.size());
     }
 
     size_t Socket::send(const uint8_t *_data, size_t _size)
@@ -41,9 +36,11 @@ namespace net
         const uint8_t *data = c_receive(_size, _error);
         std::string str = "";
 
-        if (_error != -1)
-            str.assign(data, data + _error);
-        return str;
+        if (_error == -1) {
+            Logger::Log("[Socket] Error will trying to receive data: ", strerror(errno));
+            return str;
+        }
+        return str.assign(data, data + _error);
     }
 
     bool Socket::close()

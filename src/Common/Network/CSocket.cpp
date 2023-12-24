@@ -57,6 +57,11 @@ namespace net::c
         return fcntl(_fd, F_GETFL, 0) & O_NONBLOCK;
     }
 
+    bool Socket::blocking() const
+    {
+        return blocking(m_fd);
+    }
+
     bool Socket::close(int _fd)
     {
         if (::close(_fd) != 0) {
@@ -66,13 +71,21 @@ namespace net::c
         return true;
     }
 
-    bool Socket::is_open()
+    uint32_t Socket::getPort() const
     {
-        bool block = c_blocking();
+        return getPort(m_fd);
+    }
 
-        if (!c_blocking(false) || !is_open(m_fd))
-            return false;
-        return c_blocking(block);
+    uint32_t Socket::getPort(int _fd)
+    {
+        struct sockaddr_in sin;
+        socklen_t len = sizeof(sin);
+
+        if (getsockname(_fd, (struct sockaddr *)&sin, &len) == -1) {
+            Logger::Log("[c::Socket] failed to retrevei the port: ", strerror(errno));
+            return 0;
+        }
+        return ntohs(sin.sin_port);
     }
 
     bool Socket::is_open(int _fd)
@@ -88,11 +101,19 @@ namespace net::c
         return false;
     }
 
+    bool Socket::is_open()
+    {
+        bool block = blocking();
+
+        if (!c_blocking(false) || !is_open(m_fd))
+            return false;
+        return c_blocking(block);
+    }
+
     // non static function:
 
     bool Socket::c_create()
     {
-        Logger::Log("[c::Socket] Create a new socket with: domain(", m_dom, "), type(", m_type, ") protocol(", m_proto, ")");
         m_fd = create(m_dom, m_type, m_proto);
         if (m_fd < 0) {
             Logger::Log("[c::Socket] Error will creating the socket: ", strerror(errno));
@@ -105,7 +126,6 @@ namespace net::c
     {
         int reuse = 1;
 
-        Logger::Log("[c::Socket] Bind socket to: "); // todo log
         if (setsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, &reuse, sizeof(int)) != 0) {
             Logger::Log("[c::Socket] Bind: error when setting the reuse address flag: ", strerror(errno));
             return false;
@@ -119,7 +139,6 @@ namespace net::c
 
     bool Socket::c_listen(int _max)
     {
-        Logger::Log("[c::Socket] Initialisation of listening, with the maximum socket handling: ", _max);
         if (listen(m_fd, _max) != 0) {
             Logger::Log("[c::Socket] Failed initialisation of listening: ", strerror(errno));
             return false;
@@ -133,7 +152,6 @@ namespace net::c
 
         addr.sin_family = m_dom;
         addr.sin_port = htons(_port);
-        Logger::Log("[c::Socket] Connect to: ", _ip, ":", _port);
         if (inet_pton(m_dom, _ip, &addr.sin_addr) <= 0) {
             Logger::Log("[c::Socket] Connection failed: ", strerror(errno), ", when converting Ip");
             return false;
@@ -142,13 +160,17 @@ namespace net::c
             Logger::Log("[c::Socket] Connection failed: ", strerror(errno));
             return false;
         }
-        Logger::Log("[c::Socket] Connection succed");
         return true;
     }
 
     int Socket::c_accept()
     {
         return accept(m_fd);
+    }
+
+    size_t Socket::c_send(const std::string &_data)
+    {
+        return c_send(reinterpret_cast<const uint8_t *>(_data.c_str()), _data.size());
     }
 
     size_t Socket::c_send(const uint8_t *_data, size_t _size)
@@ -164,11 +186,6 @@ namespace net::c
     bool Socket::c_blocking(bool _block)
     {
         return blocking(m_fd, _block);
-    }
-
-    bool Socket::c_blocking() const
-    {
-        return blocking(m_fd);
     }
 
     bool Socket::c_close()
