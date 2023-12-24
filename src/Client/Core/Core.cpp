@@ -13,7 +13,8 @@ Core::~Core()
 
 void Core::start()
 {
-    while (m_running) {}
+    m_running = true;
+    //while (m_running) {}
 }
 
 void Core::stop()

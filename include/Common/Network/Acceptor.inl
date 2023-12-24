@@ -1,5 +1,6 @@
 #include <cstring>
 
+#include <string.h>
 #include <netinet/in.h>
 
 #include "Common/Core/Logger.hpp"
@@ -14,12 +15,17 @@ namespace net
         Logger::Log("[Acceptor] New acceptor");
     }
 
+    template<IsSocket T>
+    Acceptor<T>::~Acceptor()
+    {
+        Logger::Log("[Acceptor] Closing acceptor");
+        (void)close();
+    }
 
     template<IsSocket T>
     bool Acceptor<T>::listen(uint32_t _port)
     {
         struct sockaddr_in addr;
-        int error = 0;
 
         Logger::Log("[Acceptor] Initialisation of new listner");
         std::memset(&addr, 0, sizeof(addr));
@@ -28,19 +34,20 @@ namespace net
         addr.sin_port = htons(_port);
 
         Logger::Log("[Acceptor] Create new listner socket");
-        create();
+        if (!c_create()) {
+            Logger::Log("[Acceptor] Failed to create socket: ", strerror(errno));
+            return false;
+        }
         Logger::Log("[Acceptor] Bind new listner socket");
-        error = bind((struct sockaddr *)&addr);
-        if (error != 0) {
-            Logger::Log("[Acceptor] Bind failed: ", strerror(error));
-            (void)close();
+        if (!c_bind((struct sockaddr *)&addr)) {
+            Logger::Log("[Acceptor] Bind failed: ", strerror(errno));
+            (void)c_close();
             return false;
         }
         Logger::Log("[Acceptor] Initialisation of the listner on port: ", _port);
-        c::Socket::listen(MAX_SOCKET);
-        if (error != 0) {
-            Logger::Log("[Acceptor] Listening failed: ", strerror(error));
-            (void)close();
+        if (!c_listen(MAX_SOCKET)) {
+            Logger::Log("[Acceptor] Listening failed: ", strerror(errno));
+            (void)c_close();
             return false;
         }
         Logger::Log("[Acceptor] New listener on port: ", _port);
@@ -50,7 +57,7 @@ namespace net
     template<IsSocket T>
     Acceptor<T>::Client Acceptor<T>::accept()
     {
-        int fd = c::Socket::accept();
+        int fd = c_accept();
         Client socket = nullptr;
 
         if (fd == -1)
@@ -58,5 +65,11 @@ namespace net
         socket = std::make_shared<T>();
         socket->raw(fd);
         return socket;
+    }
+
+    template<IsSocket T>
+    bool Acceptor<T>::close()
+    {
+        return c_close();
     }
 }

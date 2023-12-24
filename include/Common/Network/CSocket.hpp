@@ -27,11 +27,6 @@ namespace net
 
                 [[nodiscard]] static int create(int _dom, int _type, int _proto);
 
-                static int bind(int _fd, struct sockaddr *_addr, size_t _size);
-
-                static int listen(int _fd, int _max);
-
-                [[nodiscard]] static bool connect(int _fd, struct sockaddr *_addrs, size_t _size);
                 [[nodiscard]] static int accept(int _fd);
 
                 [[nodiscard]] static size_t send(int _fd, const uint8_t *_data, size_t _size);
@@ -42,29 +37,48 @@ namespace net
 
                 [[nodiscard]] static bool close(int _fd);
 
+                [[nodiscard]] bool is_open();
+                [[nodiscard]] static bool is_open(int _fd);
+
+
             protected:
                 template<IsSocket T>
                 friend class ::net::Selector;
                 template<IsSocket T>
                 friend class ::net::Acceptor;
 
-                void create();
+                /// @brief Create a new socket using m_dom, m_type and m_proto and set it to m_fd.
+                /// @return True if the socket is succefully created otherwise false.
+                [[nodiscard]] bool c_create();
 
-                int bind(struct sockaddr *_addr);
+                /// @brief Bind m_fd to the address from _addr.
+                /// @param _addr C formated addres to bind to.
+                /// @return True if the socket is succefully bind otherwise false.
+                [[nodiscard]] bool c_bind(struct sockaddr *_addr);
 
-                int listen(int _max);
+                /// @brief Set the socket to listening/
+                /// @param _max The maximum handled socket at once.
+                /// @return True if the initialisation of listen is succefully otherwise false.
+                [[nodiscard]] bool c_listen(int _max);
 
-                [[nodiscard]] bool connect(const char *_ip, uint32_t _port);
-                [[nodiscard]] int accept();
+                /// @brief Connect the socket to an endpoint.
+                /// @param _ip Ip of the endpoint.
+                /// @param _port Port of the endpoint.
+                /// @return True if the connection is succesfull otherwise false.
+                [[nodiscard]] bool c_connect(const char *_ip, uint32_t _port);
 
-                [[nodiscard]] size_t send(const std::string &_data);
-                [[nodiscard]] size_t send(const uint8_t *_data, size_t _size);
-                [[nodiscard]] const uint8_t *receive(size_t _size, int &_error);
+                /// @brief Accept an incoming connection.
+                /// @return The file description of the incoming connection or -1 if it's fail.
+                [[nodiscard]] int c_accept();
 
-                [[nodiscard]] bool blocking(bool _block);
-                [[nodiscard]] bool blocking() const;
+                [[nodiscard]] size_t c_send(const std::string &_data);
+                [[nodiscard]] size_t c_send(const uint8_t *_data, size_t _size);
+                [[nodiscard]] const uint8_t *c_receive(size_t _size, int &_error);
 
-                [[nodiscard]] bool close();
+                [[nodiscard]] bool c_blocking(bool _block);
+                [[nodiscard]] bool c_blocking() const;
+
+                [[nodiscard]] bool c_close();
 
                 void raw(int _fd);
                 [[nodiscard]] int raw() const;

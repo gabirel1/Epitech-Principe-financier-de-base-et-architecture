@@ -11,18 +11,19 @@ namespace net
 {
     void Socket::blocking(bool _block)
     {
-        blocking(_block);
+        (void)c_blocking(_block);
     }
 
     bool Socket::blocking() const
     {
-        return blocking();
+        return c_blocking();
     }
 
     bool Socket::connect(const Ip &_ip, uint32_t _port)
     {
-        create();
-        return c::Socket::connect(_ip.c_str(), _port);
+        if (!c_create())
+            return false;
+        return c_connect(_ip.c_str(), _port);
     }
 
     size_t Socket::send(const std::string &_data)
@@ -32,12 +33,12 @@ namespace net
 
     size_t Socket::send(const uint8_t *_data, size_t _size)
     {
-        return send(_data, _size);
+        return c_send(_data, _size);
     }
 
     std::string Socket::receive(size_t _size, int &_error)
     {
-        const uint8_t *data = c::Socket::receive(_size, _error);
+        const uint8_t *data = c_receive(_size, _error);
         std::string str = "";
 
         if (_error != -1)
@@ -47,7 +48,7 @@ namespace net
 
     bool Socket::close()
     {
-        return close();
+        return c_close();
     }
 
     Socket::Socket(int _type)
