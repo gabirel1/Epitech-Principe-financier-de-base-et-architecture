@@ -4,10 +4,8 @@ namespace fix
 {
     OrderCancelReject::OrderCancelReject()
     {
-        header.set35_MsgType(m_msgType);
+        header.set35_MsgType(MsgType);
     }
-
-    OrderCancelReject::~OrderCancelReject() {}
 
     void OrderCancelReject::set37_OrderID(const std::string &_val)
     {

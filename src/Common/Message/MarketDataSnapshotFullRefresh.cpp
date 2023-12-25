@@ -4,11 +4,7 @@ namespace fix
 {
     MarketDataSnapshotFullRefresh::MarketDataSnapshotFullRefresh()
     {
-        header.set35_MsgType(m_msgType);
-    }
-
-    MarketDataSnapshotFullRefresh::~MarketDataSnapshotFullRefresh()
-    {
+        header.set35_MsgType(MsgType);
     }
 
     void MarketDataSnapshotFullRefresh::set55_Symbol(const std::string &_val)

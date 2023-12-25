@@ -1,8 +1,8 @@
 #include <future>
 
 #include "Common/Core/Logger.hpp"
+#include "Common/Core/Utils.hpp"
 #include "Common/Message/Message.hpp"
-#include "Common/Message/Utils.hpp"
 #include "Server/Core/Pipeline/Action.hpp"
 #include "Server/Core/meta.hpp"
 
@@ -40,26 +40,24 @@ namespace pip
                 // need more checking, more info inside the function
                 reject = fix::Header::Verify(input.Message);
                 if (reject.first) {
-                    reject.second.header.set49_SenderCompId(std::to_string(input.Client.User));
-                    reject.second.header.set56_TargetCompId(input.Message.at("49"));
+                    reject.second.header.set56_TargetCompId(std::to_string(input.Client.User));
+                    reject.second.header.set49_SenderCompId(input.Message.at(fix::Tag::TargetCompId));  // WARN: if the tag is missing?
                     m_raw.push({ input.Client, reject.second });
                     continue;
                 }
                 switch (input.Message.at("35")[0])
                 {
-                    case 'A': (void)treatLogon(input);
+                    case fix::Logon::cMsgType: (void)treatLogon(input);
                         break;
-                    case '0': (void)treatHeartbeat(input);
+                    case fix::HeartBeat::cMsgType: (void)treatHeartbeat(input);
                         break;
-                    case 'D': (void)treatNewOrderSingle(input);
+                    case fix::NewOrderSingle::cMsgType: (void)treatNewOrderSingle(input);
                         break;
-                    case 'E': (void)treatNewOrderList(input);
+                    /*case 'F': (void)treatOrderCancelRequest(input);
+                        break;*/
+                    case fix::OrderCancelReplaceRequest::cMsgType: (void)treatOrderCancelReplaceRequest(input);
                         break;
-                    case 'F': (void)treatOrderCancelRequest(input);
-                        break;
-                    case 'G': (void)treatOrderCancelReplaceRequest(input);
-                        break;
-                    case '5': (void)treatLogout(input);
+                    case fix::Logout::cMsgType: (void)treatLogout(input);
                         break;
                     case 'V': // Maybe not here (should be used in UDP server) --> Ask for market data
                         // Received --> Market Data Request (35=V)
@@ -78,18 +76,18 @@ namespace pip
         std::pair<bool, fix::Reject> verif = fix::Logon::Verify(_input.Message);
 
         if (verif.first) {
-            verif.second.set45_RefSeqNum(_input.Message.at("34"));
+            verif.second.set45_refSeqNum(_input.Message.at(fix::Tag::MsqSeqNum));
             m_raw.push({ _input.Client, verif.second });
             return false;
         }
         _input.Client.Logged = true;
-        _input.Client.User = utils::to<UserId>(_input.Message.at("49"));
-        _input.Client.SeqNumber = utils::to<size_t>(_input.Message.at("108"));
-        logon.header.set49_SenderCompId(_input.Message.at("56"));
-        logon.header.set56_TargetCompId(_input.Message.at("49"));
-        logon.header.set34_msgSeqNum(_input.Message.at("34"));
+        _input.Client.User = utils::to<UserId>(_input.Message.at(fix::Tag::SenderCompId));
+        _input.Client.SeqNumber = utils::to<size_t>(_input.Message.at(fix::Tag::MsqSeqNum));
+        logon.header.set49_SenderCompId(_input.Message.at(fix::Tag::TargetCompId));
+        logon.header.set56_TargetCompId(_input.Message.at(fix::Tag::SenderCompId));
+        logon.header.set34_msgSeqNum(_input.Message.at(fix::Tag::MsqSeqNum));
         logon.set98_EncryptMethod("0");
-        logon.set108_HeartBtInt(_input.Message.at("108"));
+        logon.set108_HeartBtInt(_input.Message.at(fix::Tag::HearBtInt));
         m_raw.push({ _input.Client, logon });
         return true;
     }
@@ -100,96 +98,58 @@ namespace pip
         std::pair<bool, fix::Reject> reject = fix::Logout::Verify(_input.Message);
 
         if (_input.Client.Logged) {
-            reject.second.set45_RefSeqNum(_input.Message.at("34"));
-            reject.second.set58_Text("Client not connected");
+            reject.second.set45_refSeqNum(_input.Message.at(fix::Tag::MsqSeqNum));
+            reject.second.set58_text("Client not connected");
             m_raw.push({ _input.Client, reject.second });
             return false;
         }
         _input.Client.Logged = false;
         _input.Client.Disconnect = true;
         _input.Client.User = 0;
-        logout.header.set49_SenderCompId(_input.Message.at("56"));
-        logout.header.set56_TargetCompId(_input.Message.at("49"));
+        logout.header.set49_SenderCompId(_input.Message.at(fix::Tag::TargetCompId));
+        logout.header.set56_TargetCompId(_input.Message.at(fix::Tag::SenderCompId));
         logout.header.set34_msgSeqNum(std::to_string(_input.Client.SeqNumber));
         m_raw.push({ _input.Client, logout });
         return true;
     }
 
-    bool Action::treatNewOrderList(SerialIn &_input)
-    {
-        SerialOut data;
-        fix::Reject reject;
-
-        reject.set45_RefSeqNum(_input.Message.at("34"));
-        reject.set58_Text("Not implemented yet");
-        // NOT IMPLEMENTED YET
-        m_raw.push({ _input.Client, reject });
-        return false;
-
-        // if (!_input.Message.contains("66") || !_input.Message.contains("68")
-        //     || !_input.Message.contains("73") || !_input.Message.contains("66")
-        //     || !_input.Message.contains("11") || !_input.Message.contains("67")
-        //     || !_input.Message.contains("54")) {
-        //     // reject
-        //     m_raw.push({ _input.Client, reject });
-        // }
-        // data.Client = _input.Client;
-
-    }
-
     bool Action::treatNewOrderSingle(SerialIn &_input)
     {
         SerialOut data;
-        fix::Reject reject;
+        std::pair<bool, fix::Reject> verif = fix::NewOrderSingle::Verify(_input.Message);
 
-        reject.set45_RefSeqNum(_input.Message.at("34"));
-
-        if (!_input.Message.contains("11") || !_input.Message.contains("21")
-            || !_input.Message.contains("55") || !_input.Message.contains("38")
-            || !_input.Message.contains("44") || !_input.Message.contains("40")
-            || !_input.Message.contains("54") || !_input.Message.contains("60")) {
-            // reject
-            m_raw.push({ _input.Client, reject });
-            return false;
-        } else if (_input.Message.at("21") != "3" || (_input.Message.at("54") != "3"
-            && _input.Message.at("54") != "4") || _input.Message.at("40") != "2") {
-            // reject
-            m_raw.push({ _input.Client, reject });
-            return false;
-        } else if (!utils::is_double(_input.Message.at("38")) || !utils::is_double(_input.Message.at("44"))) {
-            // reject
-            m_raw.push({ _input.Client, reject });
+        if (verif.first) {
+            m_raw.push({ _input.Client, verif.second });
             return false;
         }
-
         data.Client = _input.Client;
         data.OrderData.action = OrderBook::Data::Action::Add;
-        data.OrderData.type = (_input.Message.at("54") == "3") ? OrderType::Bid : OrderType::Ask;
-        data.OrderData.price = utils::to<Price>(_input.Message.at("44"));
+        data.OrderData.type = (_input.Message.at(fix::Tag::Side) == "3") ? OrderType::Bid : OrderType::Ask;
+        data.OrderData.price = utils::to<Price>(_input.Message.at(fix::Tag::Price));
         data.OrderData.order.userId = _input.Client.User;
-        data.OrderData.order.orderId = utils::to<OrderId>(_input.Message.at("11"));
-        data.OrderData.order.quantity = utils::to<Quantity>(_input.Message.at("38"));
+        data.OrderData.order.orderId = utils::to<OrderId>(_input.Message.at(fix::Tag::ClOrdID));
+        data.OrderData.order.quantity = utils::to<Quantity>(_input.Message.at(fix::Tag::OrderQty));
         data.Time = _input.Time;
         m_output.push(data);
         return true;
     }
 
-    bool Action::treatOrderCancelRequest(SerialIn &_input)
+    /*bool Action::treatOrderCancelRequest(SerialIn &_input)
     {
         SerialOut data;
         fix::Reject reject;
 
-        reject.set45_RefSeqNum(_input.Message.at("34"));
-        reject.set58_Text("Not implemented yet");
+        reject.set45_refSeqNum(_input.Message.at(fix::Tag::MsqSeqNum));
+        reject.set58_text("Not implemented yet");
         // NOT IMPLEMENTED YET
         m_raw.push({ _input.Client, reject });
         return false;
 
-        if (!_input.Message.contains("11") || !_input.Message.contains("41")) {
+        if (!_input.Message.contains(fix::Tag::ClOrdID) || !_input.Message.contains(fix::Tag::OrigClOrdID)) {
             // reject
             m_raw.push({ _input.Client, reject });
             return false;
-        } else if (_input.Message.at("54") != "3" && _input.Message.at("54") != "4") {
+        } else if (_input.Message.at(fix::Tag::Side) != "3" && _input.Message.at(fix::Tag::Side) != "4") {
             // reject
             m_raw.push({ _input.Client, reject });
             return false;
@@ -197,48 +157,28 @@ namespace pip
 
         data.Client = _input.Client;
         data.OrderData.action = OrderBook::Data::Action::Cancel;
-        data.OrderData.order.orderId = utils::to<OrderId>(_input.Message.at("41"));
-        data.OrderData.type = (_input.Message.at("54") == "3") ? OrderType::Bid : OrderType::Ask;
-
+        data.OrderData.order.orderId = utils::to<OrderId>(_input.Message.at(fix::Tag::OrigClOrdID));
+        data.OrderData.type = (_input.Message.at(fix::Tag::Side) == "3") ? OrderType::Bid : OrderType::Ask;
         data.Time = _input.Time;
         m_output.push(data);
         return true;
-    }
+    }*/
 
     bool Action::treatOrderCancelReplaceRequest(SerialIn &_input)
     {
         SerialOut data;
-        fix::Reject reject;
+        std::pair<bool, fix::Reject> verif = fix::OrderCancelReplaceRequest::Verify(_input.Message);
 
-        reject.set45_RefSeqNum(_input.Message.at("34"));
-        reject.set58_Text("Not implemented yet");
-        // NOT IMPLEMENTED YET
-        m_raw.push({ _input.Client, reject });
-        return false;
-
-        if (!_input.Message.contains("11") || !_input.Message.contains("41")
-            || !_input.Message.contains("38") || !_input.Message.contains("44")
-            || !_input.Message.contains("54") || !_input.Message.contains("40")) {
-            // reject
-            m_raw.push({ _input.Client, reject });
-            return false;
-        } else if ((_input.Message.at("54") != "3" && _input.Message.at("54") != "4")
-            || _input.Message.at("40") != "2") {
-            // reject
-            m_raw.push({ _input.Client, reject });
-            return false;
-        } else if (!utils::is_double(_input.Message.at("38")) || !utils::is_double(_input.Message.at("44"))) {
-            // reject
-            m_raw.push({ _input.Client, reject });
+        if (verif.first) {
+            m_raw.push({ _input.Client, verif.second });
             return false;
         }
-
         data.Client = _input.Client;
         data.OrderData.action = OrderBook::Data::Action::Modify;
-        data.OrderData.order.orderId = utils::to<OrderId>(_input.Message.at("41"));
-        data.OrderData.order.quantity = utils::to<Quantity>(_input.Message.at("38"));
-        data.OrderData.price = utils::to<Price>(_input.Message.at("44"));
-        data.OrderData.type = (_input.Message.at("54") == "3") ? OrderType::Bid : OrderType::Ask;
+        data.OrderData.order.orderId = utils::to<OrderId>(_input.Message.at(fix::Tag::OrigClOrdID));
+        data.OrderData.order.quantity = utils::to<Quantity>(_input.Message.at(fix::Tag::OrderQty));
+        data.OrderData.price = utils::to<Price>(_input.Message.at(fix::Tag::Price));
+        data.OrderData.type = (_input.Message.at(fix::Tag::Side) == "3") ? OrderType::Bid : OrderType::Ask;
         data.Time = _input.Time;
         return true;
     }
@@ -247,20 +187,25 @@ namespace pip
     {
         fix::Reject reject;
 
-        reject.set45_RefSeqNum(_input.Message.at("34"));
-        reject.set58_Text("Unknown message type");
-
+        reject.set45_refSeqNum(_input.Message.at(fix::Tag::MsqSeqNum));
+        reject.set58_text("Unknown message type");
         m_raw.push({ _input.Client, reject });
-        return false;
+        return true;
     }
 
     bool Action::treatHeartbeat(SerialIn &_input)
     {
         fix::HeartBeat heartbeat;
+        std::pair<bool, fix::Reject> verif = fix::HeartBeat::Verify(_input.Message);
 
-        heartbeat.header.set49_SenderCompId(_input.Message.at("56"));
-        heartbeat.header.set56_TargetCompId(_input.Message.at("49"));
-        heartbeat.header.set34_msgSeqNum(_input.Message.at("34"));
+        // need to modify user info
+        if (verif.first) {
+            m_raw.push({ _input.Client, verif.second });
+            return false;
+        }
+        heartbeat.header.set49_SenderCompId(_input.Message.at(fix::Tag::TargetCompId));
+        heartbeat.header.set56_TargetCompId(_input.Message.at(fix::Tag::SenderCompId));
+        heartbeat.header.set34_msgSeqNum(_input.Message.at(fix::Tag::MsqSeqNum));
         m_raw.push({ _input.Client, heartbeat });
         return true;
     }

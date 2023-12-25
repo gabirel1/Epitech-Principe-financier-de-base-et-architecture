@@ -4,11 +4,7 @@ namespace fix
 {
     MarketDataIncrementalRefresh::MarketDataIncrementalRefresh()
     {
-        header.set35_MsgType(m_msgType);
-    }
-
-    MarketDataIncrementalRefresh::~MarketDataIncrementalRefresh()
-    {
+        header.set35_MsgType(MsgType);
     }
 
     void MarketDataIncrementalRefresh::set268_NoMDEntries(const std::string &_val)

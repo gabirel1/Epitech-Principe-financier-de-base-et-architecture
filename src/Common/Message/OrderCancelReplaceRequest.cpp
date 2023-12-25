@@ -1,103 +1,99 @@
+#include "Common/Core/Utils.hpp"
 #include "Common/Message/OrderCancelReplaceRequest.hpp"
-#include "Common/Message/Utils.hpp"
+#include "Common/Message/Reject.hpp"
+#include "Common/Message/Tag.hpp"
 
 namespace fix
 {
     OrderCancelReplaceRequest::OrderCancelReplaceRequest()
     {
-        header.set35_MsgType(m_msgType);
+        header.set35_MsgType(MsgType);
     }
 
     std::pair<bool, Reject> OrderCancelReplaceRequest::Verify(Serializer::AnonMessage &_msg)
     {
-        std::pair<bool, Reject> reject{ true, {} };
-        std::vector<std::string> requiredFields = { "41", "11", "21", "55", "54", "60", "40", "38", "44" };
+        std::pair<bool, Reject> reject = Message::Has<Tag::ClOrdID, Tag::HandlInst,
+            Tag::OrderQty, Tag::OrdType, Tag::OrigClOrdID, Tag::Price, Tag::Side, Tag::Symbol, Tag::TransactTime>(_msg);
 
-        reject.second.set372_refMsgType(m_msgType);
-        reject.first = false;
-
-        for (auto &field : requiredFields) {
-            if (!_msg.contains(field)) {
-                reject.first = true;
-                reject.second.set371_refTagId(field);
-                reject.second.set373_sessionRejectReason("1");
-                reject.second.set58_Text("Unable to find required field");
-                return reject;
-            }
-        }
-        if (_msg.at("21") != "3") {
-            reject.first = true;
-            reject.second.set371_refTagId("21");
-            reject.second.set373_sessionRejectReason("5");
-            reject.second.set58_Text("Value not supported");
-        } else if (_msg.at("54") != "3" && _msg.at("54") != "4") {
-            reject.first = true;
-            reject.second.set371_refTagId("54");
-            reject.second.set373_sessionRejectReason("5");
-            reject.second.set58_Text("Value not supported (only 3 or 4 are allowed)");
-        } else if (_msg.at("40") != "2") {
-            reject.first = true;
-            reject.second.set371_refTagId("40");
-            reject.second.set373_sessionRejectReason("5");
-            reject.second.set58_Text("Value not supported (only 2 is allowed)");
-        } else if (!utils::is_double(_msg.at("38"))) {
-            reject.first = true;
-            reject.second.set371_refTagId("38");
-            reject.second.set373_sessionRejectReason("6");
-            reject.second.set58_Text("Value not supported (only double is allowed)");
-        } else if (!utils::is_double(_msg.at("44"))) {
-            reject.first = true;
-            reject.second.set371_refTagId("44");
-            reject.second.set373_sessionRejectReason("6");
-            reject.second.set58_Text("Value not supported (only double is allowed)");
+        reject.second.set45_refSeqNum(OrderCancelReplaceRequest::MsgType);
+        if (reject.first) {
+            return reject;
+        } else if (!utils::is_numeric(_msg.at(Tag::ClOrdID))) {
+            reject.second.set371_refTagId(Tag::ClOrdID);
+            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
+            reject.second.set58_text("Not supported order Id");
+        } else if (_msg.at(Tag::HandlInst) != "3") {
+            reject.second.set371_refTagId(Tag::HandlInst);
+            reject.second.set373_sessionRejectReason(Reject::ValueOORange);
+            reject.second.set58_text("Not supported order Id");
+        } else if (!utils::is_double(_msg.at(Tag::OrderQty))) {
+            reject.second.set371_refTagId(Tag::OrderQty);
+            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
+            reject.second.set58_text("Quantity should be a double");
+        } else if (_msg.at(Tag::OrdType) != "2") {
+            reject.second.set371_refTagId(Tag::OrdType);
+            reject.second.set373_sessionRejectReason(Reject::ValueOORange);
+            reject.second.set58_text("Order type not supported");
+        } else if (!utils::is_numeric(_msg.at(Tag::OrigClOrdID))) {
+            reject.second.set371_refTagId(Tag::OrigClOrdID);
+            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
+            reject.second.set58_text("Price should be a double");
+        } else if (!utils::is_double(_msg.at(Tag::Price))) {
+            reject.second.set371_refTagId(Tag::Price);
+            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
+            reject.second.set58_text("Price should be a double");
+        } else if (_msg.at(Tag::Side) != "3" && _msg.at(Tag::Side) != "4") {
+            reject.second.set371_refTagId(Tag::Side);
+            reject.second.set373_sessionRejectReason(Reject::ValueOORange);
+            reject.second.set58_text("Trading side not supported");
+        } else {
+            reject.first = false;
         }
         return reject;
     }
 
-    OrderCancelReplaceRequest::~OrderCancelReplaceRequest() {}
-
-    void OrderCancelReplaceRequest::set41_OrigClOrdID(const std::string &_val)
+    void OrderCancelReplaceRequest::set11_clOrdID(const std::string &_val)
     {
-        m_params.emplace({ "41", _val });
+        m_params.emplace({ Tag::ClOrdID, _val });
     }
 
-    void OrderCancelReplaceRequest::set11_ClOrdID(const std::string &_val)
+    void OrderCancelReplaceRequest::set21_handlInst(const std::string &_val)
     {
-        m_params.emplace({ "11", _val });
+        m_params.emplace({ Tag::HandlInst, _val });
     }
 
-    void OrderCancelReplaceRequest::set21_HandlInst(const std::string &_val)
+    void OrderCancelReplaceRequest::set38_orderQty(const std::string &_val)
     {
-        m_params.emplace({ "21", _val });
+        m_params.emplace({ Tag::OrderQty, _val });
     }
 
-    void OrderCancelReplaceRequest::set55_Symbol(const std::string &_val)
+    void OrderCancelReplaceRequest::set40_ordType(const std::string &_val)
     {
-        m_params.emplace({ "55", _val });
+        m_params.emplace({ Tag::OrdType, _val });
     }
 
-    void OrderCancelReplaceRequest::set54_Side(const std::string &_val)
+    void OrderCancelReplaceRequest::set41_origClOrdID(const std::string &_val)
     {
-        m_params.emplace({ "54", _val });
+        m_params.emplace({ Tag::OrigClOrdID, _val });
     }
 
-    void OrderCancelReplaceRequest::set60_TransactTime(const std::string &_val)
+    void OrderCancelReplaceRequest::set44_price(const std::string &_val)
     {
-        m_params.emplace({ "60", _val });
+        m_params.emplace({ Tag::Price, _val });
     }
 
-    void OrderCancelReplaceRequest::set40_OrdType(const std::string &_val)
+    void OrderCancelReplaceRequest::set54_side(const std::string &_val)
     {
-        m_params.emplace({ "40", _val });
+        m_params.emplace({ Tag::Side, _val });
     }
 
-    void OrderCancelReplaceRequest::set38_OrderQty(const std::string &_val)
+    void OrderCancelReplaceRequest::set55_symbol(const std::string &_val)
     {
-        m_params.emplace({ "38", _val });
+        m_params.emplace({ Tag::Symbol, _val });
     }
 
-    void OrderCancelReplaceRequest::set44_Price(const std::string &_val)
+    void OrderCancelReplaceRequest::set60_transactTime(const std::string &_val)
     {
-        m_params.emplace({ "44", _val });
+        m_params.emplace({ Tag::TransactTime, _val });
     }
 }

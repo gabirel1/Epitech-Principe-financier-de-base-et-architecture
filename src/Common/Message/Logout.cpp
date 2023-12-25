@@ -5,7 +5,7 @@ namespace fix
 {
     Logout::Logout()
     {
-        header.set35_MsgType(m_msgType);
+        header.set35_MsgType(MsgType);
     }
 
     std::pair<bool, Reject> Logout::Verify(Serializer::AnonMessage &_msg)

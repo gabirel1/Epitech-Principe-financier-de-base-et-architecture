@@ -1,16 +1,32 @@
+#include "Common/Core/Utils.hpp"
 #include "Common/Message/HeartBeat.hpp"
+#include "Common/Message/Reject.hpp"
+#include "Common/Message/Tag.hpp"
 
 namespace fix
 {
     HeartBeat::HeartBeat()
     {
-        header.set35_MsgType(m_msgType);
+        header.set35_MsgType(MsgType);
     }
 
-    HeartBeat::~HeartBeat() {}
-
-    void HeartBeat::set112_TestReqID(const std::string &_val)
+    std::pair<bool, Reject> HeartBeat::Verify(Serializer::AnonMessage &_msg)
     {
-        m_params.emplace({ "112", _val });
+        std::pair<bool, Reject> reject = { true, {} };
+
+        reject.second.set371_refTagId(HeartBeat::MsgType);
+        if (_msg.contains(Tag::TestReqId) && !utils::is_numeric(_msg.at(Tag::TestReqId))) {
+            reject.second.set371_refTagId(Tag::TestReqId);
+            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
+            reject.second.set58_text("Not supported test Id");
+        } else {
+            reject.first = false;
+        }
+        return reject;
+    }
+
+    void HeartBeat::set112_testReqID(const std::string &_val)
+    {
+        m_params.emplace({ Tag::TestReqId, _val });
     }
 }

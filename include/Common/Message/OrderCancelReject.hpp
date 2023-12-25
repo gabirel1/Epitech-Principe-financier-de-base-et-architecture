@@ -8,7 +8,7 @@ namespace fix
     {
     public:
         OrderCancelReject();
-        ~OrderCancelReject();
+        ~OrderCancelReject() = default;
 
         /**
          * If CxlRejReason <102>='Unknown order', specify 'NONE'.
@@ -42,7 +42,7 @@ namespace fix
          */
         void set434_CxlRejReason(const std::string &_val);
 
-    protected:
-        static constexpr const char *m_msgType = "9";
+        static constexpr const char *MsgType = "9";         ///< Message type value as string.
+        static constexpr const char cMsgType = MsgType[0];  ///< Message type value as char.
     };
 }

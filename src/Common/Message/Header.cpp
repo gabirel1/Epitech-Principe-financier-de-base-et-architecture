@@ -4,41 +4,44 @@
 
 #include <sys/time.h>
 
+#include "Common/Core/Utils.hpp"
 #include "Common/Message/Header.hpp"
-#include "Common/Message/Fix.hpp"
 #include "Common/Message/Reject.hpp"
+#include "Common/Message/Tag.hpp"
 
 namespace fix
 {
     std::pair<bool, Reject> Header::Verify(Serializer::AnonMessage &_msg)
     {
-        // need to verify body length, sender, target, sequence number, sending time
-        std::pair<bool, Reject> reject{ true, {} };
+        // need to verify sending time
+        std::pair<bool, Reject> reject = Message::Has<Tag::BeginString, Tag::BodyLength, Tag::MsqSeqNum, Tag::MsgType, Tag::SenderCompId, Tag::SendingTime, Tag::TargetCompId>(_msg);
 
-        if (!_msg.contains("8") || !_msg.contains("9") || !_msg.contains("35")
-            || !_msg.contains("49") || !_msg.contains("56") || !_msg.contains("52")) {
-            if (!_msg.contains("8"))
-                reject.second.set371_refTagId("8");
-            else if (!_msg.contains("9"))
-                reject.second.set371_refTagId("9");
-            else if (!_msg.contains("35"))
-                reject.second.set371_refTagId("35");
-            else if (!_msg.contains("49"))
-                reject.second.set371_refTagId("49");
-            else if (!_msg.contains("56"))
-                reject.second.set371_refTagId("56");
-            else if (!_msg.contains("52"))
-                reject.second.set371_refTagId("52");
-            reject.second.set373_sessionRejectReason("1");
-            reject.second.set58_Text("Unable to find required field");
-        } else if (_msg.at("8") != "FIX.4.2") {
-            reject.second.set371_refTagId("8");
-            reject.second.set373_sessionRejectReason("5");
-            reject.second.set58_Text("Fix protocl version not supported");
-        } else if (_msg.at("35").size() != 1) {
-            reject.second.set371_refTagId("35");
-            reject.second.set373_sessionRejectReason("6");
-            reject.second.set58_Text("Wrong message type format");
+        if (reject.first) {
+            return reject;
+        } else if (_msg.at(Tag::BeginString) != "FIX.4.2") {
+            reject.second.set371_refTagId(Tag::BeginString);
+            reject.second.set373_sessionRejectReason(Reject::ValueOORange);
+            reject.second.set58_text("Fix protocl version not supported");
+        } else if (!utils::is_numeric(_msg.at(Tag::BodyLength))) {                  // Need more test on Body Length: correspond?
+            reject.second.set371_refTagId(Tag::BodyLength);
+            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
+            reject.second.set58_text("Body length isn't a number");
+        } else if (!utils::is_numeric(_msg.at(Tag::MsqSeqNum))) {                   // Need more test on Msg sequence number: correspond?
+            reject.second.set371_refTagId(Tag::MsqSeqNum);
+            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
+            reject.second.set58_text("Sequence number isn't a number");
+        } else if (_msg.at(Tag::MsgType).size() != 1) {
+            reject.second.set371_refTagId(Tag::MsgType);
+            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
+            reject.second.set58_text("Wrong message type format");
+        } else if (!utils::is_numeric(_msg.at(Tag::SenderCompId))) {                // Need more test on Sender comp Id: correspond?
+            reject.second.set371_refTagId(Tag::SenderCompId);
+            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
+            reject.second.set58_text("Sender Id should be numerical");
+        } else if (!utils::is_numeric(_msg.at(Tag::TargetCompId))) {                // Need more test on Target comp Id: correspond?
+            reject.second.set371_refTagId(Tag::TargetCompId);
+            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
+            reject.second.set58_text("Target Id should be numerical");
         } else {
             reject.first = false;
         }
@@ -111,13 +114,10 @@ namespace fix
         // Prepend two zeros to the microsecond value
         std::string microsecondsString = std::to_string(microseconds);
         if (microsecondsString.length() < 3)
-        {
             microsecondsString = "00" + microsecondsString;
-        }
 
         // Combine the formatted time string with the microsecond value
         formattedTime = formattedTime + "." + microsecondsString.substr(0, 3);
-
         // std::string formattedTime(timeBuffer);
         SendingTime = formattedTime;
     }
@@ -130,13 +130,9 @@ namespace fix
     std::string Header::getPartialHeader() const
     {
         return "35=" + MsgType + (char)FIX_DELIMITER +
-               "49=" +
-               SenderCompId + (char)FIX_DELIMITER +
-               "56=" +
-               TargetCompId + (char)FIX_DELIMITER +
-               "34=" +
-               MsgSeqNum + (char)FIX_DELIMITER +
-               "52=" +
-               SendingTime + (char)FIX_DELIMITER;
+               "49=" + SenderCompId + (char)FIX_DELIMITER +
+               "56=" + TargetCompId + (char)FIX_DELIMITER +
+               "34=" + MsgSeqNum + (char)FIX_DELIMITER +
+               "52=" + SendingTime + (char)FIX_DELIMITER;
     }
 }

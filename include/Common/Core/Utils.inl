@@ -1,6 +1,6 @@
 #include <sstream>
 
-#include "Common/Message/Utils.hpp"
+#include "Common/Core/Utils.hpp"
 
 namespace utils
 {

@@ -13,7 +13,7 @@ namespace fix
             Logon();
             ~Logon() = default;
 
-            /// @brief Verify if the logon message receive is correctly formated.
+            /// @brief Verify if the fix::Logon message receive is correctly formated.
             /// @param _msg Message to check.
             /// @return If the first element is true then second is set, otherwise it rigly formated.
             static std::pair<bool, Reject> Verify(Serializer::AnonMessage &_msg);
@@ -26,7 +26,7 @@ namespace fix
             /// @param _val Value assigned to it: int.
             void set108_HeartBtInt(const std::string &_val);
 
-        protected:
-            static constexpr const char *m_msgType = "A";   ///< Message type value.
+            static constexpr const char *MsgType = "A";         ///< Message type value as string.
+            static constexpr const char cMsgType = MsgType[0];  ///< Message type value as char.
     };
 }

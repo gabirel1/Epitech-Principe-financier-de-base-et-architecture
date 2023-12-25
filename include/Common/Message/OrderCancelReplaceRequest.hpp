@@ -1,122 +1,58 @@
 #pragma once
 
 #include "Common/Message/Fix.hpp"
-#include "Common/Message/Reject.hpp"
 
 namespace fix
 {
-    /**
-     * @brief Order Cancel Replace Request (G)
-     * Do not use this message to cancel the remaining quantity of an outstanding order, use the Cancel Request <F> message for this purpose.
-     */
+    /// @brief Fix [Order Cancel Replace](https://www.onixs.biz/fix-dictionary/4.2/msgType_G_71.html) message class.
     class OrderCancelReplaceRequest : public Message
     {
-    public:
-        OrderCancelReplaceRequest();
-        ~OrderCancelReplaceRequest();
+        public:
+            OrderCancelReplaceRequest();
+            ~OrderCancelReplaceRequest() = default;
 
-        /// @brief Verify if the logon message receive is correctly formated.
-        /// @param _msg Message to check.
-        /// @return If the first element is true then second is set, otherwise it rigly formated.
-        static std::pair<bool, Reject> Verify(Serializer::AnonMessage &_msg);
+            /// @brief Verify if the fix::OrderCancelReplaceRequest message receive is correctly formated.
+            /// @param _msg Message to check.
+            /// @return If the first element is true then second is set, otherwise it rigly formated.
+            static std::pair<bool, Reject> Verify(Serializer::AnonMessage &_msg);
 
-        /**
-         * ClOrdID <11> of the previous order (NOT the initial order of the day) when canceling or replacing an order.
-         * Used to identify the previous order in cancel and cancel/replace requests.
-         * @param _val
-         * Unique identifier of the order
-         * @brief ClOrdID <11> of the order to be canceled or replaced.
-         */
-        void set41_OrigClOrdID(const std::string &_val);
+            /// @brief Set the order Id [11](https://www.onixs.biz/fix-dictionary/4.2/tagNum_11.html).
+            /// @param _val Value assigned to it: int.
+            void set11_clOrdID(const std::string &_val);
 
-        /**
-         * Unique identifier of replacement order as assigned by institution.
-         * Note that this identifier will be used in ClOrdID <11> field of the Cancel Reject <9> message if the replacement request is rejected.
-         * @param _val
-         * Unique identifier of replacement order
-         */
-        void set11_ClOrdID(const std::string &_val);
+            /// @brief Set the trading strategy of the order [21](https://www.onixs.biz/fix-dictionary/4.2/tagNum_21.html).
+            /// @param _val Value assigned to it: (3).
+            void set21_handlInst(const std::string &_val);
 
-        /**
-         * Instructions for order handling on Broker trading floor
-         * Valid values:
-         * 1 = Automated execution order, private, no Broker intervention
-         * 2 = Automated execution order, public, Broker intervention OK
-         * 3 = Manual order, best execution
-         */
-        void set21_HandlInst(const std::string &_val);
+            /// @brief Set the quantity trad [38](https://www.onixs.biz/fix-dictionary/4.2/tagNum_38.html).
+            /// @param _val Value assigned to it: double.
+            void set38_orderQty(const std::string &_val);
 
-        /**
-         * Ticker symbol - Must match original order
-         * @param _val
-         * Ticker symbol
-         */
-        void set55_Symbol(const std::string &_val);
+            /// @brief Set the type of the order [40](https://www.onixs.biz/fix-dictionary/4.2/tagNum_40.html).
+            /// @param _val Value assigned to it: (2).
+            void set40_ordType(const std::string &_val);
 
-        /**
-         * Must match original side, however, Buy and Buy Minus can be interchanged as well as Sell and Sell Plus
-         * @param _val
-         * Valid values:
-         * 1 = Buy
-         * 2 = Sell
-         * 3 = Buy minus
-         * 4 = Sell plus
-         * 5 = Sell short
-         * 6 = Sell short exempt
-         * 7 = Undisclosed (valid for IOI and List Order messages only)
-         * 8 = Cross (orders where counterparty is an exchange, valid for all messages except IOIs)
-         * 9 = Cross short
-         */
-        void set54_Side(const std::string &_val);
+            /// @brief Set the targeted order Id [41](https://www.onixs.biz/fix-dictionary/4.2/tagNum_41.html).
+            /// @param _val Value assigned to it: int.
+            void set41_origClOrdID(const std::string &_val);
 
-        /**
-         * Time this order request was initiated/released by the trader or trading system.
-         * @param _val
-         * Time this order request was initiated/released by the trader or trading system.
-         */
-        void set60_TransactTime(const std::string &_val);
+            /// @brief Set the price of the trad [44](https://www.onixs.biz/fix-dictionary/4.2/tagNum_44.html).
+            /// @param _val Value assigned to it: double.
+            void set44_price(const std::string &_val);
 
-        /**
-         * Order type.
-         * @param _val
-         * Valid values:
-         * 1 = Market
-         * 2 = Limit
-         * 3 = Stop
-         * 4 = Stop limit
-         * 5 = Market on close (No longer used)
-         * 6 = With or without
-         * 7 = Limit or better
-         * 8 = Limit with or without
-         * 9 = On basis
-         * A = On close (No longer used)
-         * B = Limit on close (No longer used)
-         * C = Forex - Market (No longer used)
-         * D = Previously quoted
-         * E = Previously indicated
-         * F = Forex - Limit (No longer used)
-         * G = Forex - Swap
-         * H = Forex - Previously Quoted (No longer used)
-         * I = Funari (Limit Day Order with unexecuted portion handled as Market On Close. E.g. Japan)
-         * P = Pegged
-         */
-        void set40_OrdType(const std::string &_val);
+            /// @brief Set the strategy of buying/selling [54](https://www.onixs.biz/fix-dictionary/4.2/tagNum_54.html).
+            /// @param _val Value assigned ot it: (3 or 4).
+            void set54_side(const std::string &_val);
 
-        /**
-         * Quantity ordered. This represents the number of shares for equities or par, face or nominal value for FI instruments.
-         * @param _val
-         * Quantity ordered
-         */
-        void set38_OrderQty(const std::string &_val);
+            /// @brief Set the symbol of the target market to trad on [55](https://www.onixs.biz/fix-dictionary/4.2/tagNum_21.html).
+            /// @param _val Value assigned to it: string.
+            void set55_symbol(const std::string &_val);
 
-        /**
-         * Price per unit of quantity (e.g. per share)
-         * @param _val
-         * Price per unit of quantity (e.g. per share)
-         */
-        void set44_Price(const std::string &_val);
+            /// @brief Set the time of the transaction [60](https://www.onixs.biz/fix-dictionary/4.2/tagNum_60.html).
+            /// @param _val Value assigned to it: UTC timestamp.
+            void set60_transactTime(const std::string &_val);
 
-    protected:
-        static constexpr const char *m_msgType = "G";
+            static constexpr const char *MsgType = "G";         ///< Message type value as string.
+            static constexpr const char cMsgType = MsgType[0];  ///< Message type value as char.
     };
 }
