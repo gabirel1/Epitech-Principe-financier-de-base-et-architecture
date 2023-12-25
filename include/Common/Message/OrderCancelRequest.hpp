@@ -1,5 +1,6 @@
 #pragma once
 #include "Common/Message/Fix.hpp"
+#include "Common/Message/Reject.hpp"
 
 namespace fix
 {
@@ -13,6 +14,11 @@ namespace fix
         public:
             OrderCancelRequest();
             ~OrderCancelRequest();
+
+            /// @brief Verify if the logon message receive is correctly formated.
+            /// @param _msg Message to check.
+            /// @return If the first element is true then second is set, otherwise it rigly formated.
+            static std::pair<bool, Reject> Verify(Serializer::AnonMessage &_msg);
 
             /**
              * Unique identifier of the order to cancel.

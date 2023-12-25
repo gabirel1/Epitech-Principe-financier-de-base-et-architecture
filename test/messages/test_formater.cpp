@@ -15,10 +15,12 @@ class SerializerTest : public ::testing::Test
             logon.set108_HeartBtInt("30");
             logon.header.set34_msgSeqNum("1");
             message = logon.to_string();
+            message2 = logon.to_string();
             sendingTime = message.substr(message.find("52=") + 3, 21);
         }
 
         std::string message{};
+        std::string message2{};
         std::string sendingTime{};
 };
 
@@ -75,4 +77,13 @@ TEST_F(SerializerTest, TestSerializeNoEqual)
     fix::Serializer::Error err = fix::Serializer::run(message, anonMessage);
 
     ASSERT_EQ(err == fix::Serializer::Error::NoEqual, true);
+}
+
+TEST_F(SerializerTest, TestLogonVerify)
+{
+    fix::Serializer::AnonMessage anonMessage{};
+    fix::Serializer::Error err = fix::Serializer::run(message2, anonMessage);
+    std::pair<bool, fix::Reject> reject = fix::Logon::Verify(anonMessage);
+
+    EXPECT_FALSE(reject.first);
 }
