@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Common/Message/Fix.hpp"
+#include "Common/Message/Reject.hpp"
 
 namespace fix
 {
@@ -14,11 +15,17 @@ namespace fix
         OrderCancelReplaceRequest();
         ~OrderCancelReplaceRequest();
 
+        /// @brief Verify if the logon message receive is correctly formated.
+        /// @param _msg Message to check.
+        /// @return If the first element is true then second is set, otherwise it rigly formated.
+        static std::pair<bool, Reject> Verify(Serializer::AnonMessage &_msg);
+
         /**
          * ClOrdID <11> of the previous order (NOT the initial order of the day) when canceling or replacing an order.
          * Used to identify the previous order in cancel and cancel/replace requests.
          * @param _val
          * Unique identifier of the order
+         * @brief ClOrdID <11> of the order to be canceled or replaced.
          */
         void set41_OrigClOrdID(const std::string &_val);
 

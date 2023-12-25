@@ -18,6 +18,7 @@ namespace fix
          * Unique identifier of the order to cancel.
          * @param _val
          * Unique identifier of the order
+         * @brief ClOrdID <11> of the order to be canceled.
          */
         void set41_OrigClOrdID(const std::string &_val);
 
