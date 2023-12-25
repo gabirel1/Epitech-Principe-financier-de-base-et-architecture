@@ -25,30 +25,11 @@ namespace fix
         void set21_HandlInst(const std::string &_val);
 
         /**
-         * Ticker symbol
-         */
-        void set55_Symbol(const std::string &_val);
-
-        /**
-         * Side of order
-         * @param _val
-         * Valid values:
-         * 1 = Buy
-         * 2 = Sell
-         * 3 = Buy minus
-         * 4 = Sell plus
-         * 5 = Sell short
-         * 6 = Sell short exempt
-         * 7 = Undisclosed (valid for IOI and List Order messages only)
-         * 8 = Cross (orders where counterparty is an exchange, valid for all messages except IOIs)
-         * 9 = Cross short
-         */
-        void set54_Side(const std::string &_val);
-
-        /**
-         * Time this order request was initiated/released by the trader or trading system.
-         */
-        void set60_TransactTime(const std::string &_val);
+         * Number of shares ordered. This represents the number of shares
+         * for equities or based on normal convention the number of contracts
+         * for options, futures, convertible bonds, etc.
+        */
+        void set38_OrderQty(const std::string &_val);
 
         /**
          * Order type.
@@ -75,6 +56,37 @@ namespace fix
          * P = Pegged
          */
         void set40_OrdType(const std::string &_val);
+
+        /**
+         * Price per share
+        */
+        void set44_Price(const std::string &_val);
+
+        /**
+         * Ticker symbol
+         */
+        void set55_Symbol(const std::string &_val);
+
+        /**
+         * Side of order
+         * @param _val
+         * Valid values:
+         * 1 = Buy
+         * 2 = Sell
+         * 3 = Buy minus
+         * 4 = Sell plus
+         * 5 = Sell short
+         * 6 = Sell short exempt
+         * 7 = Undisclosed (valid for IOI and List Order messages only)
+         * 8 = Cross (orders where counterparty is an exchange, valid for all messages except IOIs)
+         * 9 = Cross short
+         */
+        void set54_Side(const std::string &_val);
+
+        /**
+         * Time this order request was initiated/released by the trader or trading system.
+         */
+        void set60_TransactTime(const std::string &_val);
 
     protected:
         static constexpr const char *m_msgType = "D";

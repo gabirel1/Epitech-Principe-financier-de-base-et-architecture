@@ -15,8 +15,8 @@ void ThreadSocket::run()
     int error = 0;
 
     while (m_running) {
-        sleep(1);
-        std::cout << "Test running" << std::endl;
+        // sleep(1);
+        // std::cout << "Test running" << std::endl;
     }
 }
 

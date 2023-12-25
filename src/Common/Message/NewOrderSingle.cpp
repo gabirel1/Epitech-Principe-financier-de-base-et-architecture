@@ -19,6 +19,21 @@ namespace fix
         m_params.emplace({ "21", _val });
     }
 
+    void NewOrderSingle::set38_OrderQty(const std::string &_val)
+    {
+        m_params.emplace({ "38", _val });
+    }
+
+    void NewOrderSingle::set40_OrdType(const std::string &_val)
+    {
+        m_params.emplace({ "40", _val });
+    }
+
+    void NewOrderSingle::set44_Price(const std::string &_val)
+    {
+        m_params.emplace({ "44", _val });
+    }
+
     void NewOrderSingle::set55_Symbol(const std::string &_val)
     {
         m_params.emplace({ "55", _val });
@@ -34,8 +49,4 @@ namespace fix
         m_params.emplace({ "60", _val });
     }
 
-    void NewOrderSingle::set40_OrdType(const std::string &_val)
-    {
-        m_params.emplace({ "40", _val });
-    }
 }
