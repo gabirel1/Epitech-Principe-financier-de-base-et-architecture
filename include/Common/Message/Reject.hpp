@@ -4,7 +4,7 @@
 
 namespace fix
 {
-    /// @brief Fix [Rject](https://www.onixs.biz/fix-dictionary/4.2/msgType_3_3.html) message class.
+    /// @brief Fix [Reject](https://www.onixs.biz/fix-dictionary/4.2/msgType_3_3.html) message class.
     class Reject : public Message
     {
         public:

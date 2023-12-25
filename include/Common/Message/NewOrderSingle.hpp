@@ -48,7 +48,7 @@ namespace fix
             /// @param _val Value assigned to it: UTC timestamp.
             void set60_transactTime(const std::string &_val);
 
-            static constexpr const char *MsgType = "D";         ///< Message type value as string.
+            static constexpr const char MsgType[] = "D";         ///< Message type value as string.
             static constexpr const char cMsgType = MsgType[0];  ///< Message type value as char.
     };
 }

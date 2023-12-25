@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
+#include "Common/Core/Utils.hpp"
 #include "Common/Message/Logon.hpp"
-#include "Common/Message/Utils.hpp"
 
 class TestLogon : public ::testing::Test
 {
@@ -34,6 +34,6 @@ TEST_F(TestLogon, TestLogonToString)
                            "98=0" + std::string(1, FIX_DELIMITER) +
                            "108=30" + std::string(1, FIX_DELIMITER);
 
-    expected += "10=" + utils::getChecksum(expected) + std::string(1, FIX_DELIMITER);
+    expected += "10=" + fix::Message::getChecksum(expected) + std::string(1, FIX_DELIMITER);
     EXPECT_EQ(formatedLogon, expected);
 }

@@ -13,4 +13,27 @@ namespace utils
         stream >> val;
         return val;
     }
+
+    template<const char *T, const char *...Ts>
+    std::pair<bool, fix::Reject> Has(fix::Serializer::AnonMessage &_msg)
+    {
+        std::pair<bool, fix::Reject> reject = { false, {} };
+
+        if (!_msg.contains(T)) {
+            reject.first = true;
+            reject.second.set373_sessionRejectReason("1"/*Reject::ReqTagMissing*/);
+            reject.second.set58_text("Unable to find required field");
+        } else if (_msg.at(T).empty()) {
+            reject.first = true;
+            reject.second.set371_refTagId(T);
+            reject.second.set373_sessionRejectReason("4"/*Reject::EmptyValue*/);
+            reject.second.set58_text("Waiting a value");
+        } else {
+            if constexpr (sizeof...(Ts) == 0)
+                return { false, fix::Reject{} };
+            else
+                return utils::Has<Ts...>(_msg);
+        }
+        return reject;
+    }
 }

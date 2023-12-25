@@ -20,7 +20,7 @@ namespace fix
             /// @param _val Value assigned to it: int.
             void set112_testReqID(const std::string &_val);
 
-            static constexpr const char *MsgType = "0";         ///< Message type value as string.
+            static constexpr const char MsgType[] = "0";         ///< Message type value as string.
             static constexpr const char cMsgType = MsgType[0];  ///< Message type value as char.
     };
 }

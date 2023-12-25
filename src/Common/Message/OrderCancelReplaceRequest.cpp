@@ -1,6 +1,5 @@
 #include "Common/Core/Utils.hpp"
 #include "Common/Message/OrderCancelReplaceRequest.hpp"
-#include "Common/Message/Reject.hpp"
 #include "Common/Message/Tag.hpp"
 
 namespace fix
@@ -12,7 +11,8 @@ namespace fix
 
     std::pair<bool, Reject> OrderCancelReplaceRequest::Verify(Serializer::AnonMessage &_msg)
     {
-        std::pair<bool, Reject> reject = Message::Has<Tag::ClOrdID, Tag::HandlInst,
+        // need to verify transaction time, symbol
+        std::pair<bool, Reject> reject = utils::Has<Tag::ClOrdID, Tag::HandlInst,
             Tag::OrderQty, Tag::OrdType, Tag::OrigClOrdID, Tag::Price, Tag::Side, Tag::Symbol, Tag::TransactTime>(_msg);
 
         reject.second.set45_refSeqNum(OrderCancelReplaceRequest::MsgType);

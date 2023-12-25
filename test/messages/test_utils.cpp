@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "Common/Message/Utils.hpp"
+#include "Common/Core/Utils.hpp"
 #include "Common/Message/Fix.hpp"
 
 class ChecksumTest : public ::testing::Test
@@ -16,7 +16,7 @@ class ChecksumTest : public ::testing::Test
 
 TEST_F(ChecksumTest, TestChecksum)
 {
-    EXPECT_EQ(utils::getChecksum(message), "038");
+    EXPECT_EQ(fix::Message::getChecksum(message), "038");
 }
 
 class BodyLengthTest : public ::testing::Test
@@ -32,5 +32,5 @@ class BodyLengthTest : public ::testing::Test
 
 TEST_F(BodyLengthTest, TestBodyLength)
 {
-    EXPECT_EQ(utils::getBodyLength(message), 29);
+    EXPECT_EQ(fix::Message::getBodyLength(message), 29);
 }

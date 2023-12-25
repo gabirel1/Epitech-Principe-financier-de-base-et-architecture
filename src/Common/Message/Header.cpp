@@ -6,7 +6,6 @@
 
 #include "Common/Core/Utils.hpp"
 #include "Common/Message/Header.hpp"
-#include "Common/Message/Reject.hpp"
 #include "Common/Message/Tag.hpp"
 
 namespace fix
@@ -14,7 +13,7 @@ namespace fix
     std::pair<bool, Reject> Header::Verify(Serializer::AnonMessage &_msg)
     {
         // need to verify sending time
-        std::pair<bool, Reject> reject = Message::Has<Tag::BeginString, Tag::BodyLength, Tag::MsqSeqNum, Tag::MsgType, Tag::SenderCompId, Tag::SendingTime, Tag::TargetCompId>(_msg);
+        std::pair<bool, Reject> reject = utils::Has<Tag::BeginString, Tag::BodyLength, Tag::MsqSeqNum, Tag::MsgType, Tag::SenderCompId, Tag::SendingTime, Tag::TargetCompId>(_msg);
 
         if (reject.first) {
             return reject;

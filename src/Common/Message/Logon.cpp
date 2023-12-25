@@ -1,6 +1,5 @@
 #include "Common/Core/Utils.hpp"
 #include "Common/Message/Logon.hpp"
-#include "Common/Message/Reject.hpp"
 #include "Common/Message/Tag.hpp"
 
 namespace fix
@@ -12,7 +11,7 @@ namespace fix
 
     std::pair<bool, Reject> Logon::Verify(Serializer::AnonMessage &_msg)
     {
-        std::pair<bool, Reject> reject = Message::Has<Tag::EncryptMethod, Tag::HearBtInt>(_msg);
+        std::pair<bool, Reject> reject = utils::Has<Tag::EncryptMethod, Tag::HearBtInt>(_msg);
 
         reject.second.set372_refMsgType(Logon::MsgType);
         if (reject.first) {

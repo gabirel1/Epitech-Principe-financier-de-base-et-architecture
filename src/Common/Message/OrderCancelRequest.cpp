@@ -1,5 +1,7 @@
+#include "Common/Core/Utils.hpp"
 #include "Common/Message/OrderCancelRequest.hpp"
-#include "Common/Message/Utils.hpp"
+#include "Common/Message/Reject.hpp"
+#include "Common/Message/Tag.hpp"
 
 namespace fix
 {
@@ -12,26 +14,26 @@ namespace fix
 
     std::pair<bool, Reject> OrderCancelRequest::Verify(Serializer::AnonMessage &_msg)
     {
-        std::pair<bool, Reject> reject{ true, {} };
-        std::vector<std::string> requiredFields = { "41", "11", "55", "54", "60" };
+        // need to verify transaction time, symbol
+        std::pair<bool, Reject> reject = utils::Has<Tag::ClOrdID, Tag::OrigClOrdID, Tag::Side, Tag::Symbol, Tag::TransactTime>(_msg);
 
-        reject.second.set372_refMsgType(m_msgType);
-        reject.first = false;
-
-        for (auto &field : requiredFields) {
-            if (!_msg.contains(field)) {
-                reject.first = true;
-                reject.second.set371_refTagId(field);
-                reject.second.set373_sessionRejectReason("1");
-                reject.second.set58_Text("Unable to find required field");
-                return reject;
-            }
-        }
-        if (_msg.at("54") != "3" && _msg.at("54") != "4") {
+        if (reject.first) {
+            return reject;
+        } else if (!utils::is_numeric(_msg.at(Tag::ClOrdID))) {
+            reject.second.set371_refTagId(Tag::ClOrdID);
+            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
+            reject.second.set58_text("Not supported order Id");
+        } else if (!utils::is_numeric(_msg.at(Tag::OrigClOrdID))) {
+            reject.second.set371_refTagId(Tag::OrigClOrdID);
+            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
+            reject.second.set58_text("Not supported origin order Id");
+        } else if (_msg.at(Tag::Side) != "3" && _msg.at(Tag::Side) != "4") {
             reject.first = true;
-            reject.second.set371_refTagId("54");
-            reject.second.set373_sessionRejectReason("5");
-            reject.second.set58_Text("Value not supported (only 3 or 4 are allowed)");
+            reject.second.set371_refTagId(Tag::Side);
+            reject.second.set373_sessionRejectReason(Reject::ValueOORange);
+            reject.second.set58_text("Value not supported (only 3 or 4 are allowed)");
+        } else {
+            reject.first = false;
         }
         return reject;
     }
