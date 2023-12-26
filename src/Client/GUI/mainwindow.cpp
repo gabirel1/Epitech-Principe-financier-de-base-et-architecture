@@ -21,7 +21,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : m_gestionnaireSocket(nullptr)
     , QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+    , m_ui(new Ui::MainWindow)
 {
     m_ui->setupUi(this);
 
@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     setupValidator();
 
-    m_gestionnaireSocket = new m_gestionnaireSocket("127.0.0.1", 8080, 8081);
+    m_gestionnaireSocket = new GestionnaireSocket("127.0.0.1", 8080, 8081);
     m_gestionnaireSocket->startThread();
 
     connect(m_ui->messageType, SIGNAL(currentIndexChanged(int)), this, SLOT(slot_messageTypeLayout(int)));
