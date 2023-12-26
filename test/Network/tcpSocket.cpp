@@ -108,8 +108,7 @@ TEST_F(Socket_SendRecv, single_send_multi_recv)
 {
     int error = 0;
     const std::string send1 = "this is a test";
-
-    static_assert(send1.size() % 2 == 0, "The sample data to send should have an odd length");
+    // The sample data to send should have an odd length
 
     ASSERT_EQ(socket.send(send1), send1.size());
 
