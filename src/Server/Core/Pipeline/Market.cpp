@@ -14,7 +14,7 @@ namespace pip
 
     Market::~Market()
     {
-        stop();
+        (void)stop();
     }
 
     bool Market::start()

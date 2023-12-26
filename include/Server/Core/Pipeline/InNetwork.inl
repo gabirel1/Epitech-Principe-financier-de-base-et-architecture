@@ -10,6 +10,7 @@ namespace pip
         : m_clients(_clients), m_output(_output), m_acceptor(), m_selector()
     {
         m_acceptor.listen(_port);
+        m_acceptor.blocking(false);
         Logger::Log("[InNetwork] listening to port: ", _port);
     }
 

@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <iostream>
 
 #include "Common/Network/Selector.hpp"
 
@@ -40,12 +41,26 @@ namespace net
     template<IsSocket T>
     std::vector<typename Selector<T>::Client> Selector<T>::pull()
     {
-        Event *events = nullptr;
-        size_t set = wait(events, m_to);
-        std::vector<Client> clients{set};
+        Event events[MAX_EVENT_EPOLL];
+        int set = wait(events, m_to);
+        std::vector<Client> clients;
 
-        for (size_t it = 0; it < std::min(set, (size_t)MAX_SOCKET); it++)
+        if (set == -1) {
+            Logger::Log("[Selector] Error when waiting event from epoll: ", strerror(errno));
+            return clients;
+        }
+        for (int it = 0; it < std::min(set, MAX_SOCKET); it++) {
             clients.emplace_back(m_clients.at(events[it].data.fd));
+            std::cout << "add" << std::endl;
+        }
         return clients;
     }
+
+
+    template<IsSocket T>
+    size_t Selector<T>::size() const
+    {
+        return m_clients.size();
+    }
+
 }
