@@ -24,11 +24,6 @@ namespace pip
         return m_running;
     }
 
-    bool Action::status(float _to)
-    {
-        return PipeType::tstatus(static_cast<ms>(_to * 1000)) != std::future_status::deferred;
-    }
-
     /// @brief Process all incoming raw message to make action
     void Action::loop()
     {

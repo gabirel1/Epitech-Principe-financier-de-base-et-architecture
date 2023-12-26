@@ -14,6 +14,12 @@ Pipeline<T>::~Pipeline()
 }
 
 template<class T>
+bool Pipeline<T>::status(float _to)
+{
+    return tstatus(static_cast<ms>(_to * 1000)) != std::future_status::deferred;
+}
+
+template<class T>
 std::future_status Pipeline<T>::stop()
 {
     std::future_status ret = std::future_status::ready;

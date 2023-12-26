@@ -25,11 +25,6 @@ namespace pip
         return m_running;
     }
 
-    bool Market::status(float _to)
-    {
-        return tstatus(static_cast<ms>(_to * 1000)) != std::future_status::deferred;
-    }
-
     void Market::loop()
     {
         Logger::SetThreadName(THIS_THREAD_ID, "Market");
