@@ -4,6 +4,7 @@
 #include "Server/Core/Pipeline/InNetwork.hpp"
 #include "Server/Core/Pipeline/Market.hpp"
 #include "Server/Core/Pipeline/OutNetwork.hpp"
+#include "Server/Network/Processor.hpp"
 
 class Core
 {
@@ -28,7 +29,8 @@ class Core
         SerialToMarket m_sr_to_mk;
         MarketToNet m_mk_to_nt;
 
-        pip::InNetwork<net::tcp::Socket> m_innet;
+        pip::InNetwork<net::tcp::Socket, net::tcp::processor, ClientSocket> m_tcp_innet;
+        pip::InNetwork<net::udp::Socket, net::udp::processor> m_udp_innet;
         pip::Action m_action;
         pip::Market m_market;
         pip::OutNetwork m_outnet;

@@ -25,7 +25,7 @@ void Core::start()
     while (m_running)
     {
         try {
-            m_innet.status();
+            m_tcp_innet.status();
             m_market.status();
             m_action.status();
             m_outnet.status();
@@ -42,7 +42,7 @@ void Core::stop()
     if (m_running) {
         m_running = false;
         Logger::Log("[Core] Stoping...");
-        while (m_innet.stop() != std::future_status::deferred)
+        while (m_tcp_innet.stop() != std::future_status::deferred)
         Logger::Log("[Core] Input network exited");
         while (m_action.stop() != std::future_status::deferred)
         Logger::Log("[Core] Action pipeline exited");
@@ -66,7 +66,7 @@ bool Core::internal_start()
     } else if (!m_action.start()) {
         Logger::Log("[Core] Failed to start action pipeline");
         stop();
-    } else if (!m_innet.start()) {
+    } else if (!m_tcp_innet.start()) {
         Logger::Log("[Core] Failed to start input network");
         stop();
     } else {
