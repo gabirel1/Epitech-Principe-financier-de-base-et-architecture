@@ -16,7 +16,7 @@ namespace pip
     /// @tparam T is the socket type managed.
     /// @tparam _T is function to process when an action is needed on a socket.
     /// @tparam __T is the format socket are stored in the vector referenced.
-    template<IsSocket T, class _T, class __T = std::shared_ptr<T>>
+    template<IsSocket T, auto _T, class __T = std::shared_ptr<T>>
     requires SocketClient<__T, T>
     class InNetwork : public Pipeline<InNetwork<T, _T, __T>>
     {

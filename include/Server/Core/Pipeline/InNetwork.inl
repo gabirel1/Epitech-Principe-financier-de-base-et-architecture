@@ -5,7 +5,7 @@
 
 namespace pip
 {
-    template<IsSocket T, class _T, class __T>
+    template<IsSocket T, auto _T, class __T>
     requires SocketClient<__T, T>
     InNetwork<T, _T, __T>::InNetwork(std::vector<__T> &_clients, NetToSerial &_output, uint32_t _port)
         : m_clients(_clients), m_output(_output), m_acceptor(), m_selector()
@@ -14,14 +14,14 @@ namespace pip
         Logger::Log("[InNetwork] listening to port: ", _port);
     }
 
-    template<IsSocket T, class _T, class __T>
+    template<IsSocket T, auto _T, class __T>
     requires SocketClient<__T, T>
     InNetwork<T, _T, __T>::~InNetwork()
     {
         (void)this->template stop();
     }
 
-    template<IsSocket T, class _T, class __T>
+    template<IsSocket T, auto _T, class __T>
     requires SocketClient<__T, T>
     bool InNetwork<T, _T, __T>::start()
     {
@@ -31,7 +31,7 @@ namespace pip
         return this->m_running;
     }
 
-    template<IsSocket T, class _T, class __T>
+    template<IsSocket T, auto _T, class __T>
     requires SocketClient<__T, T>
     void InNetwork<T, _T, __T>::loop()
     {
@@ -50,8 +50,8 @@ namespace pip
             clients = m_selector.pull();
             for (Client &_client : clients) {
                 if (_T(_client)) {
-                    m_selector.erase(_client);
-                    m_clients.erase(_client);
+                    // m_selector.erase(_client);
+                    // m_clients.erase(_client);
                 }
             }
         }
