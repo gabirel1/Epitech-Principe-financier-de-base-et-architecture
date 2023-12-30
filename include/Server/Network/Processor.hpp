@@ -14,6 +14,6 @@ namespace net
 
     namespace udp
     {
-        [[nodiscard]] bool processor(std::shared_ptr<net::tcp::Socket> _socket);
+        [[nodiscard]] bool processor(std::shared_ptr<net::udp::Socket> _socket);
     }
 }

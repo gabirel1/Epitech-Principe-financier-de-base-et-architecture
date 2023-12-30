@@ -64,6 +64,7 @@ namespace net
         {
             Logger::Log("[tcp::Socket] New TCP socket");
         }
+
     }
 
     namespace udp
@@ -72,6 +73,38 @@ namespace net
             : ::net::Socket(SOCK_DGRAM)
         {
             Logger::Log("[udp::Socket] New UDP socket");
+        }
+
+        bool Socket::broadcasting() const
+        {
+            return m_broadcast;
+        }
+
+        bool Socket::broadcastOn(uint32_t _port)
+        {
+            int enable = 1;
+
+            create();
+            if (setsockopt(raw(), SOL_SOCKET, SO_BROADCAST, &enable, sizeof(enable)) == -1) {
+                Logger::Log("[udp::Socket] Failed to set the broadcast flag: ", strerror(errno));
+                close();
+                return false;
+            }
+            std::memset(&m_broad_addr, 0, sizeof(m_broad_addr));
+            m_broad_addr.sin_family = AF_INET;
+            m_broad_addr.sin_port = htons(_port);
+            m_broad_addr.sin_addr.s_addr = INADDR_BROADCAST;
+            m_broadcast = true;
+            return true;
+        }
+
+        bool Socket::broadcast(const uint8_t *_data, size_t _size)
+        {
+            if (sendto(raw(), _data, _size, 0, (struct sockaddr*)&m_broad_addr, sizeof(m_broad_addr)) == -1) {
+                Logger::Log("[udp::Socket] Failed to send the data on the broadcast: ", strerror(errno));
+                return false;
+            }
+            return true;
         }
     }
 }

@@ -4,11 +4,11 @@
 #include "Server/Core/Core.hpp"
 
 Core::Core(uint32_t _tcp_port, uint32_t _udp_port)
-    : m_ob(), m_tcp_innet(m_tcp_client, m_nt_to_sr, _tcp_port),
-        m_udp_innet(m_udp_client, m_udp_input, _udp_port),
+    : m_ob(), m_innet(m_tcp_client, m_nt_to_sr, _tcp_port),
         m_action(m_nt_to_sr, m_sr_to_mk, m_mk_to_nt),
         m_market(m_ob, m_sr_to_mk, m_mk_to_nt),
-        m_outnet(m_mk_to_nt)
+        m_outnet(m_mk_to_nt),
+        m_udp(m_udp_input, _udp_port)
 {
 }
 
@@ -26,7 +26,8 @@ void Core::start()
     while (m_running)
     {
         try {
-            m_tcp_innet.status();
+            m_udp.status();
+            m_innet.status();
             m_market.status();
             m_action.status();
             m_outnet.status();
@@ -43,9 +44,9 @@ void Core::stop()
     if (m_running) {
         m_running = false;
         Logger::Log("[Core] Stoping...");
-        while (m_udp_innet.stop() != std::future_status::deferred)
-        Logger::Log("[Core] Input UDP network exited");
-        while (m_tcp_innet.stop() != std::future_status::deferred)
+        while (m_udp.stop() != std::future_status::deferred)
+        Logger::Log("[Core] UDP broadcast network exited");
+        while (m_innet.stop() != std::future_status::deferred)
         Logger::Log("[Core] Input TCP network exited");
         while (m_action.stop() != std::future_status::deferred)
         Logger::Log("[Core] Action pipeline exited");
@@ -69,10 +70,10 @@ bool Core::internal_start()
     } else if (!m_action.start()) {
         Logger::Log("[Core] Failed to start action pipeline");
         stop();
-    } else if (!m_udp_innet.start()) {
-        Logger::Log("[Core] Failed to start input UDP network");
+    } else if (!m_udp.start()) {
+        Logger::Log("[Core] Failed to start UDP broadcast network");
         stop();
-    } else if (!m_tcp_innet.start()) {
+    } else if (!m_innet.start()) {
         Logger::Log("[Core] Failed to start input TCP network");
         stop();
     } else {

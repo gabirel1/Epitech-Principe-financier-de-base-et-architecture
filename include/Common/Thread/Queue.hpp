@@ -21,6 +21,8 @@ namespace ts
             template<class ...Ts>
             void append(Ts &&..._args);
 
+            [[nodiscard]] const T &front() const;
+
             void pop();
             [[nodiscard]] T pop_front();
 
