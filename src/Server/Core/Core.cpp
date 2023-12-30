@@ -43,8 +43,10 @@ void Core::stop()
     if (m_running) {
         m_running = false;
         Logger::Log("[Core] Stoping...");
+        while (m_udp_innet.stop() != std::future_status::deferred)
+        Logger::Log("[Core] Input UDP network exited");
         while (m_tcp_innet.stop() != std::future_status::deferred)
-        Logger::Log("[Core] Input network exited");
+        Logger::Log("[Core] Input TCP network exited");
         while (m_action.stop() != std::future_status::deferred)
         Logger::Log("[Core] Action pipeline exited");
         while (m_market.stop() != std::future_status::deferred)
@@ -67,8 +69,11 @@ bool Core::internal_start()
     } else if (!m_action.start()) {
         Logger::Log("[Core] Failed to start action pipeline");
         stop();
+    } else if (!m_udp_innet.start()) {
+        Logger::Log("[Core] Failed to start input UDP network");
+        stop();
     } else if (!m_tcp_innet.start()) {
-        Logger::Log("[Core] Failed to start input network");
+        Logger::Log("[Core] Failed to start input TCP network");
         stop();
     } else {
         Logger::Log("[Core] All pipeline are running");
