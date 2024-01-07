@@ -175,6 +175,7 @@ namespace pip
         }
         data.Client = _input.Client;
         data.OrderData.action = OrderBook::Data::Action::Modify;
+        data.OrderData.order.userId = _input.Client.User;
         data.OrderData.order.orderId = utils::to<OrderId>(_input.Message.at(fix::Tag::OrigClOrdID));
         data.OrderData.order.quantity = utils::to<Quantity>(_input.Message.at(fix::Tag::OrderQty));
         data.OrderData.price = utils::to<Price>(_input.Message.at(fix::Tag::Price));

@@ -22,19 +22,19 @@ bool OrderBook::add(OrderType _type, Price _price, Order& _order)
     return res;
 }
 
-void OrderBook::modify(OrderType _type, Price _price, Price _oprice, Order& _order)
+bool OrderBook::modify(OrderType _type, Price _price, Order &_order)
 {
     if (_type == OrderType::Ask)
-        modify<BidBook>(m_bid, _price, _oprice, _order);
+        return modify<BidBook>(m_bid, _price, _order);
     else
-        modify<AskBook>(m_ask, _price, _oprice, _order);
+        return modify<AskBook>(m_ask, _price, _order);
 }
 
-bool OrderBook::cancel(OrderType _type, Price _price, UserId _userId, OrderId _orderId)
+bool OrderBook::cancel(OrderType _type, Order &_order)
 {
     if (_type == OrderType::Ask)
-        return cancel<AskBook>(m_ask, _price, _userId, _orderId);
-    return cancel<BidBook>(m_bid, _price, _userId, _orderId);
+        return cancel<AskBook>(m_ask, _order);
+    return cancel<BidBook>(m_bid, _order);
 }
 
 std::vector<Price> OrderBook::getPrice(OrderType _type)

@@ -69,7 +69,7 @@ namespace pip
     {
         int error = 0;
         fix::Serializer::AnonMessage msg;
-        fix::Reject reject; 
+        fix::Reject reject;
 
         if (!_client) {
             m_selector.erase(_client.getSocket());
