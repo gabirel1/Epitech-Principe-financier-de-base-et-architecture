@@ -17,24 +17,8 @@ namespace fix
         // need to verify transaction time, symbol
         std::pair<bool, Reject> reject = utils::Has<Tag::ClOrdID, Tag::OrigClOrdID, Tag::Side, Tag::Symbol, Tag::TransactTime>(_msg);
 
-        if (reject.first) {
-            return reject;
-        } else if (!utils::is_numeric(_msg.at(Tag::ClOrdID))) {
-            reject.second.set371_refTagId(Tag::ClOrdID);
-            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
-            reject.second.set58_text("Not supported order Id");
-        } else if (!utils::is_numeric(_msg.at(Tag::OrigClOrdID))) {
-            reject.second.set371_refTagId(Tag::OrigClOrdID);
-            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
-            reject.second.set58_text("Not supported origin order Id");
-        } else if (_msg.at(Tag::Side) != "3" && _msg.at(Tag::Side) != "4") {
-            reject.first = true;
-            reject.second.set371_refTagId(Tag::Side);
-            reject.second.set373_sessionRejectReason(Reject::ValueOORange);
-            reject.second.set58_text("Value not supported (only 3 or 4 are allowed)");
-        } else {
-            reject.first = false;
-        }
+        if (reject.first)
+            reject = verify_all<Tag::ClOrdID, Tag::OrigClOrdID, Tag::Side, Tag::Symbol, Tag::TransactTime>(_msg);
         return reject;
     }
 
