@@ -5,8 +5,7 @@
 
 #include "Server/Core/Order.hpp"
 #include "Server/Core/meta.hpp"
-
-#include "Server/Core/Pipeline/Naming.hpp"
+#include "Common/Thread/Queue.hpp"
 
 using AskBook = std::map<Price, OrderList, std::greater<Price>>;
 using BidBook = std::map<Price, OrderList, std::less<Price>>;
@@ -20,6 +19,15 @@ enum class OrderType
 class OrderBook
 {
     public:
+        struct Event
+        {
+            OrderId orderId;
+            OrderStatus status;
+            Price price;
+            Quantity quantity;
+            Side side;
+        };
+
         struct Data
         {
             enum class Action
@@ -32,18 +40,16 @@ class OrderBook
             Action action;
             OrderType type;
             Price price;
-            UserId userId;
-            OrderId orderId;
             Price oprice;
             Order order;
         };
 
-        OrderBook(OBOutput &_output);
+        OrderBook(ts::Queue<Event> &_output);
         virtual ~OrderBook() = default;
 
         bool add(OrderType _type, Price _price, Order& _order);
-        void modify(OrderType _type, Price _price, Price _oprice, Order &_order);
-        bool cancel(OrderType _type, Price _price, UserId _userId, OrderId _orderId);
+        bool modify(OrderType _type, Price _price, Order &_order);
+        bool cancel(OrderType _type, Order &_order);
 
         // front only
         [[nodiscard]] std::vector<Price> getPrice(OrderType _type);
@@ -53,11 +59,11 @@ class OrderBook
 
     protected:
         template<IsBook T, class _T>
-        bool add(T &_book, Price _price, Order& _order);
+        bool add(T &_book, Price _price, Order &_order);
         template<IsBook T>
-        void modify(T &_book, Price _price, Price _oprice, Order &_order);
+        bool modify(T &_book, Price _price, Order &_order);
         template<IsBook T>
-        bool cancel(T& _book, Price _price, UserId _userId, OrderId _orderId);
+        bool cancel(T& _book, Order &_order);
 
         template<IsBook T>
         [[nodiscard]] std::vector<Price> inter_getPrice(const T &_book);
@@ -65,7 +71,7 @@ class OrderBook
     private:
         std::mutex m_mutex;
 
-        OBOutput &m_output;
+        ts::Queue<Event> &m_output;
 
         BidBook m_bid;
         AskBook m_ask;

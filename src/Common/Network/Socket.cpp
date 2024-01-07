@@ -52,6 +52,11 @@ namespace net
         return c_close();
     }
 
+    Socket::operator bool()
+    {
+        return is_open();
+    }
+
     Socket::Socket(int _type)
         : c::Socket(AF_INET, _type, 0)
     {
@@ -84,7 +89,7 @@ namespace net
         {
             int enable = 1;
 
-            create();
+            c_create();
             if (setsockopt(raw(), SOL_SOCKET, SO_BROADCAST, &enable, sizeof(enable)) == -1) {
                 Logger::Log("[udp::Socket] Failed to set the broadcast flag: ", strerror(errno));
                 close();

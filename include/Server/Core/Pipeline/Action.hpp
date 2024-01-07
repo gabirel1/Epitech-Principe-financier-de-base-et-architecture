@@ -27,6 +27,15 @@ namespace pip
             /// @brief Core function of the pipeline determining it's behavior
             void loop();
 
+        protected:
+            bool treatLogon(SerialIn &_input);
+            bool treatLogout(SerialIn &_input);
+            bool treatNewOrderSingle(SerialIn &_input);
+            //bool treatOrderCancelRequest(SerialIn &_input);
+            bool treatOrderCancelReplaceRequest(SerialIn &_input);
+            bool treatUnknown(SerialIn &_input);
+            bool treatHeartbeat(SerialIn &_input);
+
         private:
             NetToSerial &m_input;       ///< Intput data queue.
             SerialToMarket &m_output;   ///< Ouput data queue.

@@ -34,7 +34,6 @@ namespace fix
         if (key.empty() && std::all_of(key.begin(), key.end(), ::isdigit))
             return Error::InvalidKey;
         _pair = { std::move(key), std::move(_msg.substr(split + 1, size - (key.size() + 1))) };
-
         _msg.erase(0, size + 1);
         return Error::None;
     }

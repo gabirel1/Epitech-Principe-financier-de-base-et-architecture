@@ -29,9 +29,9 @@ namespace net
 
             [[nodiscard]] std::string receive(size_t _size, int &_error);
 
-            [[nodiscard]] uint32_t getPort() const;
-
             bool close();
+
+            operator bool();
 
         protected:
             Socket(int _type);

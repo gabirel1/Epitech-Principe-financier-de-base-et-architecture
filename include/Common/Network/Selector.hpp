@@ -32,6 +32,8 @@ namespace net
             /// @param _client New client to track event on.
             /// @return False if the client is already track by the selector or an error occured, otherwise true.
             bool client(Client _client);
+            void erase(Client _client);
+
 
             /// @brief Set the timeout for event checking in the function net::Selector<T>::pull.
             /// @param _to Time in second.

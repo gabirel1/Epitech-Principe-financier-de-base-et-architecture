@@ -31,7 +31,7 @@ class Core
         NetToSerial m_nt_to_sr;
         SerialToMarket m_sr_to_mk;
         MarketToNet m_mk_to_nt;
-        OBOutput m_ob_event;
+        ts::Queue<OrderBook::Event> m_ob_event;
 
         pip::InNetwork<net::tcp::Socket, &net::tcp::processor, ClientSocket> m_innet;
         pip::Action m_action;

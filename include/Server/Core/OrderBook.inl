@@ -5,7 +5,7 @@
 
 // OrdType (40) = 1 Market
 // Price (44)
-// LeavesQty (151) = remaing
+// LeavesQty (151) = remaining
 // ExecID = global Id of the market?
 // OrdStatus (39) = status
 // Symbol (55) = market symbol
@@ -18,7 +18,7 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
 {
     std::lock_guard<std::mutex> guard(m_mutex);
     _T cmp{};
-    data::MarketEvent event;
+    Event event;
 
     if constexpr (std::is_same_v<T, BidBook>)
         event.side = 4;
@@ -35,7 +35,7 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
 
             event.orderId = order.orderId;
             event.status = OrderStatus::Filled;
-            event.remaing = 0;
+            event.quantity = 0;
             if (order.quantity == _order.quantity) {
                 ol.erase(ol.begin() + i);
                 m_output.append(event);
@@ -46,7 +46,7 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
                 m_output.append(event);
             } else {
                 order.quantity -= _order.quantity;
-                event.remaing = order.quantity;
+                event.quantity = order.quantity;
                 event.status = OrderStatus::PartiallyFilled;
                 m_output.append(event);
                 return false;
@@ -57,38 +57,37 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
 }
 
 template<IsBook T>
-void OrderBook::modify(T &_book, Price _price, Price _oprice, Order &_order)
+bool OrderBook::modify(T &_book, Price _price, Order &_order)
 {
     std::lock_guard<std::mutex> guard(m_mutex);
-    OrderList &loprice = _book.at(_oprice);
-    auto it = std::find_if(loprice.begin(), loprice.end(), [_order] (const Order &_iorder) {
-        return _iorder.orderId == _order.orderId && _iorder.userId == _order.userId;
+    Order order = _order;
+
+    auto it = std::find_if(_book.begin(), _book.end(), [_order] (const T::value_type &_lorder) {
+        return std::find_if(_lorder.second.begin(), _lorder.second.end(), [_order] (const Order &_iorder) {
+            return _iorder.orderId == _order.orderId && _iorder.userId == _order.userId;
+        }) != _lorder.second.end();
     });
 
-    if (_price == _oprice) {
-        it->quantity = _order.quantity;
-    } else {
-        OrderList &lprice = _book.at(_oprice);
-
-        lprice.emplace_back(std::move(*it));
-        loprice.erase(it);
-    }
+    if (it == _book.end())
+        return false;
+    auto order_it = std::find_if(it->second.begin(), it->second.end(), [_order] (const Order &_iorder) {
+        return _iorder.orderId == _order.orderId && _iorder.userId == _order.userId;
+    });
+    it->second.erase(order_it);
+    _book.at(_price).emplace_back(order);
+    return true;
 }
 
 template<IsBook T>
-bool OrderBook::cancel(T& _book, Price _price, UserId _userId, OrderId _orderId)
+bool OrderBook::cancel(T &_book, Order &_order)
 {
     std::lock_guard<std::mutex> guard(m_mutex);
 
-    if (_book.contains(_price)) {
-        OrderList &ol = _book.at(_price);
-
-        std::erase_if(ol, [_userId, _orderId] (const Order& _order) {
-            return _order.userId == _userId && _order.orderId == _orderId;
-        });
-        return true;
-    }
-    return false;
+    return std::erase_if(_book, [_order] (T::value_type &_lorder) {
+            return std::remove_if(_lorder.second.begin(), _lorder.second.end(), [_order] (Order &_iorder) {
+                return _iorder.orderId == _order.orderId && _iorder.userId == _order.userId;
+            }) != _lorder.second.end();
+        }) != 0;
 }
 
 template<IsBook T>
