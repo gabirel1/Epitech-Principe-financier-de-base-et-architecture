@@ -3,27 +3,52 @@
 
 #include "Server/Core/OrderBook.hpp"
 
-template<IsBook T>
+// OrdType (40) = 1 Market
+// Price (44)
+// LeavesQty (151) = remaing
+// ExecID = global Id of the market?
+// OrdStatus (39) = status
+// Symbol (55) = market symbol
+// OrderId
+
+// AvgPx (6) = ????
+
+template<IsBook T, class _T>
 bool OrderBook::add(T &_book, Price _price, Order &_order)
 {
     std::lock_guard<std::mutex> guard(m_mutex);
+    _T cmp{};
+    data::MarketEvent event;
 
+    if constexpr (std::is_same_v<T, BidBook>)
+        event.side = 4;
+    else
+        event.side = 3;
     for (auto &[_key, _val] : _book) {
-        if (_key > _price)
+        if (cmp(_key, _price))
             break;
         OrderList &ol = _book.at(_key);
 
+        event.price = _key;
         for (size_t i = 0; i < ol.size(); i++) {
             Order &order = ol.at(i);
 
+            event.orderId = order.orderId;
+            event.status = OrderStatus::Filled;
+            event.remaing = 0;
             if (order.quantity == _order.quantity) {
                 ol.erase(ol.begin() + i);
+                m_output.append(event);
                 return false;
             } else if (order.quantity < _order.quantity) {
                 _order.quantity -= order.quantity;
                 ol.erase(ol.begin() + i);
+                m_output.append(event);
             } else {
                 order.quantity -= _order.quantity;
+                event.remaing = order.quantity;
+                event.status = OrderStatus::PartiallyFilled;
+                m_output.append(event);
                 return false;
             }
         }
@@ -46,7 +71,7 @@ void OrderBook::modify(T &_book, Price _price, Price _oprice, Order &_order)
         OrderList &lprice = _book.at(_oprice);
 
         lprice.emplace_back(std::move(*it));
-        lprice.erase(it);
+        loprice.erase(it);
     }
 }
 

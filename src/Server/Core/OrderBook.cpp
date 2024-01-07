@@ -2,21 +2,29 @@
 
 #include "Server/Core/OrderBook.hpp"
 
+OrderBook::OrderBook(OBOutput &_output)
+    : m_output(_output)
+{
+}
+
 bool OrderBook::add(OrderType _type, Price _price, Order& _order)
 {
     bool res = false;
 
     if (_type == OrderType::Bid) {
-        if (add<AskBook>(m_ask, _price, _order)) {
+        if (add<AskBook, std::less<Price>>(m_ask, _price, _order)) {
             std::lock_guard<std::mutex> guard(m_mutex);
 
             m_bid.at(_price).push_back(_order);
+            res = true;
         }
     }
     else {
-        if (add<BidBook>(m_bid, _price, _order)) {
+        if (add<BidBook, std::greater<Price>>(m_bid, _price, _order)) {
             std::lock_guard<std::mutex> guard(m_mutex);
+
             m_ask.at(_price).push_back(_order);
+            res = true;
         }
     }
     return res;

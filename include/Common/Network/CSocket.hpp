@@ -102,7 +102,7 @@ namespace net
                 /// @return True if the socket is succefully bind otherwise false.
                 [[nodiscard]] bool c_bind(struct sockaddr *_addr);
 
-                /// @brief Set the socket to listening/
+                /// @brief Set the socket to listening.
                 /// @param _max The maximum handled socket at once.
                 /// @return True if the initialisation of listen is succefully otherwise false.
                 bool c_listen(int _max);

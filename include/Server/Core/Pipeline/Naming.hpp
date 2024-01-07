@@ -5,6 +5,18 @@
 #include "Common/Thread/Queue.hpp"
 #include "Server/Core/ClientSocket.hpp"
 
+#define UDP_FLAG_SET_BID(_flag)     _flag &= 00
+#define UDP_FLAG_SET_ASK(_flag)     _flag &= 01
+#define UDP_FLAG_GET_BOOK(_flag)    _flag & 01
+
+#define UDP_FLAG_SET_ADD(_flag)
+#define UDP_FLAG_SET_MOD(_flag)
+#define UDP_FLAG_SET_CAN(_flag)
+#define UDP_FLAG_GET_TYPE(_flag)    (_flag >> 1) & 011
+
+#define UDP_FLAG_SET_STATUS(_flag, _s) _s & 0111
+#define UDP_FLAG_GET_STATUS(_flag) OrderStatus((_flag >> 3) & 0111)
+
 namespace data
 {
     /// @brief Data transfered from the pip::InNetwork pipeline to the pip::Action pipeline.
@@ -43,13 +55,22 @@ namespace data
         fix::Message Message{}; ///< Final message send to the client.
     };
 
+    struct MarketEvent
+    {
+        OrderId orderId;
+        OrderStatus status;
+        Price price;
+        Quantity remaing;
+        Side side;
+    };
+
     /// @brief Data send to the UDP broadcast in pip::UDPOutNetwork pipeline.
     struct UDPPackage
     {
         uint32_t time;
         uint8_t flag;
-        double quantity;
-        double price;
+        Quantity quantity;
+        Price price;
     };
 }
 
@@ -76,5 +97,8 @@ using SerialToMarket = ts::Queue<SerialOut>;
 using MarketToNet = ts::Queue<MarketOut>;
 /// @brief Queue type use to transfer direct message from any pipeline to the pip::OutNetwork pipeline.
 using RawOutput = ts::Queue<NetIn>;
+
 /// @brief Queue type use to transfer data to be formated and send by the pip::UDPOutNetwork pipeline.
-using UdpInput = ts::Queue<NetIn>;
+using UdpInput = ts::Queue<data::UDPPackage>;
+
+using OBOutput = ts::Queue<data::MarketEvent>;

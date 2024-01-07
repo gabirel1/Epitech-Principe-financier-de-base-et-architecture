@@ -6,6 +6,8 @@
 #include "Server/Core/Order.hpp"
 #include "Server/Core/meta.hpp"
 
+#include "Server/Core/Pipeline/Naming.hpp"
+
 using AskBook = std::map<Price, OrderList, std::greater<Price>>;
 using BidBook = std::map<Price, OrderList, std::less<Price>>;
 
@@ -36,7 +38,7 @@ class OrderBook
             Order order;
         };
 
-        OrderBook() = default;
+        OrderBook(OBOutput &_output);
         virtual ~OrderBook() = default;
 
         bool add(OrderType _type, Price _price, Order& _order);
@@ -50,7 +52,7 @@ class OrderBook
         [[nodiscard]] Quantity sumQuantity(OrderType _type, Price _price);
 
     protected:
-        template<IsBook T>
+        template<IsBook T, class _T>
         bool add(T &_book, Price _price, Order& _order);
         template<IsBook T>
         void modify(T &_book, Price _price, Price _oprice, Order &_order);
@@ -62,6 +64,8 @@ class OrderBook
 
     private:
         std::mutex m_mutex;
+
+        OBOutput &m_output;
 
         BidBook m_bid;
         AskBook m_ask;
