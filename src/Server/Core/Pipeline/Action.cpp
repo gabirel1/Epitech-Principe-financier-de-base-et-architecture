@@ -36,6 +36,7 @@ namespace pip
         {
             if (!m_input.empty())
             {
+                std::cout << "Action found!: " << m_input.size() << std::endl; // todo: remove
                 input = m_input.pop_front();
                 // need more checking, more info inside the function
                 reject = fix::Header::Verify(input.Message);

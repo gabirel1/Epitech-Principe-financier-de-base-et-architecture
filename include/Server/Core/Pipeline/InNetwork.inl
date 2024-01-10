@@ -67,6 +67,7 @@ namespace pip
                     // erase inside the selecter and client list
                 }
             }
+            (void)m_acceptor.blocking(false);
         }
     }
 }

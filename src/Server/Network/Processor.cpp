@@ -20,6 +20,7 @@ namespace net
                 return true;
             }
             std::string data(_socket.getSocket()->receive(MAX_RECV_SIZE, error));
+            std::cout << "data received: '" << data << "'" << std::endl;
 
             if (error == 0) {
                 Logger::Log("[InNetwork] Error: no data receive from the client: "); // todo log
@@ -31,7 +32,7 @@ namespace net
                 _error.push(ErrorMsg(_socket, reject));
                 return false;
             }
-            Logger::Log("[InNetwork] Porcessing request from the client: "); // todo log
+            Logger::Log("[InNetwork] Processing request from the client: "); // todo log
             _serial.push(NetOut(_socket, msg));
             return false;
         }
