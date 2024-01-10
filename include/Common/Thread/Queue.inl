@@ -40,6 +40,12 @@ namespace ts
     }
 
     template<class T>
+    const T &Queue<T>::front() const
+    {
+        return m_queue.front();
+    }
+
+    template<class T>
     void Queue<T>::pop()
     {
         std::lock_guard<std::mutex> guard(m_mutex);

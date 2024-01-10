@@ -3,6 +3,8 @@
 #include <string>
 #include <type_traits>
 
+#include <netinet/in.h>
+
 #include "Common/Network/CSocket.hpp"
 #include "Common/Network/Ip.hpp"
 #include "Common/Thread/Queue.hpp"
@@ -26,6 +28,8 @@ namespace net
             size_t send(const uint8_t *_data, size_t _size);
 
             [[nodiscard]] std::string receive(size_t _size, int &_error);
+
+            [[nodiscard]] uint32_t getPort() const;
 
             [[nodiscard]] bool is_open() const;
             bool close();
@@ -56,6 +60,15 @@ namespace net
             public:
                 Socket();
                 ~Socket() = default;
+
+                [[nodiscard]] bool broadcasting() const;
+                [[nodiscard]] bool broadcastOn(uint32_t _port);
+                [[nodiscard]] bool broadcast(const uint8_t *_str, size_t _size);
+
+            private:
+                bool m_broadcast = false;
+
+                struct sockaddr_in m_broad_addr;
         };
     }
 }

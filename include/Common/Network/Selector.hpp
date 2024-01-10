@@ -34,6 +34,8 @@ namespace net
 
             std::vector<Client> pull();
 
+            [[nodiscard]] size_t size() const;
+
         private:
             std::map<int, Client> m_clients;
 

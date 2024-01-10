@@ -47,6 +47,15 @@ namespace data
         fix::Message Message{};                     ///< Final message send to the client.
         std::chrono::_V2::system_clock::time_point Time{};  ///< Time of the action.
     };
+
+    /// @brief Data send to the UDP broadcast in pip::UDPOutNetwork pipeline.
+    struct UDPPackage
+    {
+        uint32_t time;
+        uint8_t flag;
+        double quantity;
+        double price;
+    };
 }
 
 /// @brief Output data type of the pip::InNetwork pipeline.
@@ -73,3 +82,5 @@ using SerialToMarket = ts::Queue<SerialOut>;
 using MarketToNet = ts::Queue<MarketOut>;
 /// @brief Queue type use to transfer direct message from any pipeline to the pip::OutNetwork pipeline.
 using RawOutput = ts::Queue<NetIn>;
+/// @brief Queue type use to transfer data to be formated and send by the pip::UDPOutNetwork pipeline.
+using UdpInput = ts::Queue<NetIn>;

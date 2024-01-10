@@ -1,6 +1,7 @@
 #pragma once
 
 #include <concepts>
+#include <memory>
 #include <type_traits>
 
 #include "Common/Core/meta.hpp"
@@ -18,3 +19,8 @@ concept IsBook = std::is_same_v<typename T::key_type, Price> &&
         { _map.contains(_price) } -> std::same_as<bool>;
         { _map.at(_price) } -> std::same_as<typename T::mapped_type &>;
     };
+
+template<class T, class _T>
+concept SocketClient = IsSocket<_T> && (std::is_same_v<std::shared_ptr<_T>, T> || requires (std::shared_ptr<_T> _s) {
+    { T(_s) };
+});
