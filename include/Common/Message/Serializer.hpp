@@ -1,6 +1,10 @@
 #pragma once
 
-#include "Common/Message/Fix.hpp"
+#ifndef FIX_DELIMITER
+    #define FIX_DELIMITER 1
+#endif
+
+#include "Common/Container/InsertMap.hpp"
 
 namespace fix
 {

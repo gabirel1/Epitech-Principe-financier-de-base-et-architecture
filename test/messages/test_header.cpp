@@ -8,13 +8,14 @@ class HeaderTest : public ::testing::Test
     protected:
         void SetUp() override
         {
-            m_header = fix::Header();
-            m_header.setBodyLength(123);
-            m_header.setMsgType("A");
-            m_header.setSeqNum(32);
+            m_header.set49_SenderCompId("CLIENT");
+            m_header.set56_TargetCompId("TARGET");
+            m_header.set9_bodyLength("123");
+            m_header.set35_MsgType("A");
+            m_header.set34_msgSeqNum("32");
         }
 
-    fix::Header m_header;
+        fix::Header m_header{};
 };
 
 TEST_F(HeaderTest, TestHeaderToString)
@@ -27,10 +28,5 @@ TEST_F(HeaderTest, TestHeaderToString)
                             "34=32" + std::string(1, FIX_DELIMITER) +
                             "52=" + std::string(1, FIX_DELIMITER);
 
-    std::string actual = m_header;
-
-    std::cout << "Expected: '" << expected << "'" << std::endl;
-    std::cout << "Actual: '" << actual << "'" << std::endl;
-
-    EXPECT_EQ(actual, expected);
+    EXPECT_EQ(static_cast<std::string>(m_header), expected);
 }

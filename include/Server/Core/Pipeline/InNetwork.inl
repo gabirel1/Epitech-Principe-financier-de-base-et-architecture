@@ -2,13 +2,14 @@
 
 #include "Server/Core/Pipeline/InNetwork.hpp"
 #include "Common/Core/Logger.hpp"
+#include "Common/Message/Message.hpp"
 
 namespace pip
 {
     template<IsSocket T, auto _T, class __T>
     requires SocketClient<__T, T>
-    InNetwork<T, _T, __T>::InNetwork(std::vector<__T> &_clients, NetToSerial &_output, uint32_t _port)
-        : m_clients(_clients), m_output(_output), m_acceptor(), m_selector()
+    InNetwork<T, _T, __T>::InNetwork(std::vector<__T> &_clients, NetToSerial &_output, RawOutput &_error, uint32_t _port)
+        : m_clients(_clients), m_output(_output), m_acceptor(), m_error(_error), m_selector()
     {
         m_acceptor.listen(_port);
         m_acceptor.blocking(false);
@@ -40,6 +41,7 @@ namespace pip
 
         Client accept = nullptr;
         std::vector<Client> clients;
+        int error = 0;
 
         while (this->m_running) {
             accept = m_acceptor.accept();

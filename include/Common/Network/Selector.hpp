@@ -26,6 +26,8 @@ namespace net
             ~Selector() = default;
 
             bool client(Client _client);
+            void erase(Client _client);
+
 
             void timeout(float _to);
             [[nodiscard]] float timeout() const;

@@ -47,9 +47,22 @@ namespace net
         return str;
     }
 
+    bool Socket::is_open() const
+    {
+        char buffer = 0;
+        int res = recv(raw(), &buffer, 1, MSG_PEEK);
+
+        return res < 0 || (res == 0 && (errno == EWOULDBLOCK || errno == EAGAIN || errno == EINTR));
+    }
+
     bool Socket::close()
     {
         return c_close();
+    }
+
+    Socket::operator bool() const
+    {
+        return is_open();
     }
 
     Socket::Socket(int _type)

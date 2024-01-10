@@ -4,10 +4,8 @@ namespace fix
 {
     ExecutionReport::ExecutionReport()
     {
-        header.setMsgType(m_msgType);
+        header.set35_MsgType(MsgType);
     }
-
-    ExecutionReport::~ExecutionReport() {}
 
     void ExecutionReport::set37_OrderID(const std::string &_val)
     {

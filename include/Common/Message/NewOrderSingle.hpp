@@ -4,79 +4,51 @@
 
 namespace fix
 {
+    /// @brief Fix [New Order Single](https://www.onixs.biz/fix-dictionary/4.2/msgType_D_68.html) message class.
     class NewOrderSingle : public Message
     {
-    public:
-        NewOrderSingle();
-        ~NewOrderSingle();
-        /**
-         * Unique identifier of the order as assigned by institution.
-         */
-        void set11_ClOrdID(const std::string &_val);
+        public:
+            NewOrderSingle();
+            ~NewOrderSingle() = default;
 
-        /**
-         * 21 - HandlInst
-         * Instructions for order handling on Broker trading floor
-         * Valid values:
-         * 1 = Automated execution order, private, no Broker intervention
-         * 2 = Automated execution order, public, Broker intervention OK
-         * 3 = Manual order, best execution
-         */
-        void set21_HandlInst(const std::string &_val);
+            /// @brief Verify if the fix::NewOrderSingle message receive is correctly formated.
+            /// @param _msg Message to check.
+            /// @return If the first element is true then second is set, otherwise it rigly formated.
+            static std::pair<bool, Reject> Verify(Serializer::AnonMessage &_msg);
 
-        /**
-         * Ticker symbol
-         */
-        void set55_Symbol(const std::string &_val);
+            /// @brief Set the order Id [11](https://www.onixs.biz/fix-dictionary/4.2/tagNum_11.html).
+            /// @param _val Value assigned to it: int.
+            void set11_clOrdID(const std::string &_val);
 
-        /**
-         * Side of order
-         * @param _val
-         * Valid values:
-         * 1 = Buy
-         * 2 = Sell
-         * 3 = Buy minus
-         * 4 = Sell plus
-         * 5 = Sell short
-         * 6 = Sell short exempt
-         * 7 = Undisclosed (valid for IOI and List Order messages only)
-         * 8 = Cross (orders where counterparty is an exchange, valid for all messages except IOIs)
-         * 9 = Cross short
-         */
-        void set54_Side(const std::string &_val);
+            /// @brief Set the trading strategy of the order [21](https://www.onixs.biz/fix-dictionary/4.2/tagNum_21.html).
+            /// @param _val Value assigned to it: (3).
+            void set21_handlInst(const std::string &_val);
 
-        /**
-         * Time this order request was initiated/released by the trader or trading system.
-         */
-        void set60_TransactTime(const std::string &_val);
+            /// @brief Set the quantity trad [38](https://www.onixs.biz/fix-dictionary/4.2/tagNum_38.html).
+            /// @param _val Value assigned to it: double.
+            void set38_orderQty(const std::string &_val);
 
-        /**
-         * Order type.
-         * @param _val
-         * Valid values:
-         * 1 = Market
-         * 2 = Limit
-         * 3 = Stop
-         * 4 = Stop limit
-         * 5 = Market on close
-         * 6 = With or without
-         * 7 = Limit or better
-         * 8 = Limit with or without
-         * 9 = On basis
-         * A = On close
-         * B = Limit on close
-         * C = Forex - Market
-         * D = Previously quoted
-         * E = Previously indicated
-         * F = Forex - Limit
-         * G = Forex - Swap
-         * H = Forex - Previously Quoted
-         * I = Funari (Limit Day Order with unexecuted portion handled as Market On Close. e.g. Japan)
-         * P = Pegged
-         */
-        void set40_OrdType(const std::string &_val);
+            /// @brief Set the type of the order [40](https://www.onixs.biz/fix-dictionary/4.2/tagNum_40.html).
+            /// @param _val Value assigned to it: (2).
+            void set40_ordType(const std::string &_val);
 
-    protected:
-        static constexpr const char *m_msgType = "D";
+            /// @brief Set the price of the trad [44](https://www.onixs.biz/fix-dictionary/4.2/tagNum_44.html).
+            /// @param _val Value assigned to it: double.
+            void set44_price(const std::string &_val);
+
+            /// @brief Set the strategy of buying/selling [54](https://www.onixs.biz/fix-dictionary/4.2/tagNum_54.html).
+            /// @param _val Value assigned ot it: (3 or 4).
+            void set54_side(const std::string &_val);
+
+            /// @brief Set the symbol of the target market to trad on [55](https://www.onixs.biz/fix-dictionary/4.2/tagNum_21.html).
+            /// @param _val Value assigned to it: string.
+            void set55_symbol(const std::string &_val);
+
+            /// @brief Set the time of the transaction [60](https://www.onixs.biz/fix-dictionary/4.2/tagNum_60.html).
+            /// @param _val Value assigned to it: UTC timestamp.
+            void set60_transactTime(const std::string &_val);
+
+            static constexpr const char MsgType[] = "D";         ///< Message type value as string.
+            static constexpr const char cMsgType = MsgType[0];  ///< Message type value as char.
     };
 }

@@ -1,13 +1,26 @@
+#include "Common/Core/Utils.hpp"
 #include "Common/Message/OrderCancelRequest.hpp"
+#include "Common/Message/Reject.hpp"
+#include "Common/Message/Tag.hpp"
 
 namespace fix
 {
     OrderCancelRequest::OrderCancelRequest()
     {
-        header.setMsgType(m_msgType);
+        header.set35_MsgType(MsgType);
     }
 
     OrderCancelRequest::~OrderCancelRequest() {}
+
+    std::pair<bool, Reject> OrderCancelRequest::Verify(Serializer::AnonMessage &_msg)
+    {
+        // need to verify transaction time, symbol
+        std::pair<bool, Reject> reject = utils::Has<Tag::ClOrdID, Tag::OrigClOrdID, Tag::Side, Tag::Symbol, Tag::TransactTime>(_msg);
+
+        if (reject.first)
+            reject = verify_all<Tag::ClOrdID, Tag::OrigClOrdID, Tag::Side, Tag::Symbol, Tag::TransactTime>(_msg);
+        return reject;
+    }
 
     void OrderCancelRequest::set41_OrigClOrdID(const std::string &_val)
     {

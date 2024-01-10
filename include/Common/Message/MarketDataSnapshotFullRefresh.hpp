@@ -9,31 +9,31 @@ namespace fix
     */
     class MarketDataSnapshotFullRefresh: public Message
     {
-    public:
-        MarketDataSnapshotFullRefresh();
-        ~MarketDataSnapshotFullRefresh();
+        public:
+            MarketDataSnapshotFullRefresh();
+            ~MarketDataSnapshotFullRefresh() = default;
 
-        /**
-         * @brief Set the 55 Symbol object
-         */
-        void set55_Symbol(const std::string &_val);
+            /**
+             * @brief Set the 55 Symbol object
+             */
+            void set55_Symbol(const std::string &_val);
 
-        /**
-         * @brief Number of entries following.
-         */
-        void set268_NoMDEntries(const std::string &_val);
+            /**
+             * @brief Number of entries following.
+             */
+            void set268_NoMDEntries(const std::string &_val);
 
-        /**
-         * @brief MDEntryType Must be the first field in this repeating group.
-         */
-        void set269_MDEntryType(const std::string &_val);
+            /**
+             * @brief MDEntryType Must be the first field in this repeating group.
+             */
+            void set269_MDEntryType(const std::string &_val);
 
-        /**
-         * @brief MDEntryPx Price of the Market Data Entry.
-         */
-        void set270_MDEntryPx(const std::string &_val);
+            /**
+             * @brief MDEntryPx Price of the Market Data Entry.
+             */
+            void set270_MDEntryPx(const std::string &_val);
 
-    protected:
-        static constexpr const char *m_msgType = "W";
+            static constexpr const char MsgType[] = "V";        ///< Message type value as string.
+            static constexpr const char cMsgType = MsgType[0];  ///< Message type value as char.
     };
 }

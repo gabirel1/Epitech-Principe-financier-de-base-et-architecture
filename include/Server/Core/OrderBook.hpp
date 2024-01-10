@@ -30,8 +30,6 @@ class OrderBook
             Action action;
             OrderType type;
             Price price;
-            UserId userId;
-            OrderId orderId;
             Price oprice;
             Order order;
         };
@@ -40,8 +38,8 @@ class OrderBook
         virtual ~OrderBook() = default;
 
         bool add(OrderType _type, Price _price, Order& _order);
-        void modify(OrderType _type, Price _price, Price _oprice, Order &_order);
-        bool cancel(OrderType _type, Price _price, UserId _userId, OrderId _orderId);
+        bool modify(OrderType _type, Price _price, Order &_order);
+        bool cancel(OrderType _type, Order &_order);
 
         // front only
         [[nodiscard]] std::vector<Price> getPrice(OrderType _type);
@@ -51,11 +49,11 @@ class OrderBook
 
     protected:
         template<IsBook T>
-        bool add(T &_book, Price _price, Order& _order);
+        bool add(T &_book, Price _price, Order &_order);
         template<IsBook T>
-        void modify(T &_book, Price _price, Price _oprice, Order &_order);
+        bool modify(T &_book, Price _price, Order &_order);
         template<IsBook T>
-        bool cancel(T& _book, Price _price, UserId _userId, OrderId _orderId);
+        bool cancel(T& _book, Order &_order);
 
         template<IsBook T>
         [[nodiscard]] std::vector<Price> inter_getPrice(const T &_book);

@@ -31,7 +31,10 @@ namespace net
 
             [[nodiscard]] uint32_t getPort() const;
 
+            [[nodiscard]] bool is_open() const;
             bool close();
+
+            operator bool() const;
 
         protected:
             Socket(int _type);
