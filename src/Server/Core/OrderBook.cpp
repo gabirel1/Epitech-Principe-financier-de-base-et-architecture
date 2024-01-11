@@ -15,7 +15,8 @@ bool OrderBook::add(OrderType _type, Price _price, Order& _order)
         if (add<AskBook, std::less<Price>>(m_ask, _price, _order)) {
             std::lock_guard<std::mutex> guard(m_mutex);
 
-            m_bid.at(_price).push_back(_order);
+            m_bid[_price].push_back(_order);
+
             res = true;
         }
     }

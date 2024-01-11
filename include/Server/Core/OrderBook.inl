@@ -3,6 +3,8 @@
 
 #include "Server/Core/OrderBook.hpp"
 
+#include <iostream> // todo remove
+
 // OrdType (40) = 1 Market
 // Price (44)
 // LeavesQty (151) = remaining
@@ -38,21 +40,27 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
             event.quantity = 0;
             if (order.quantity == _order.quantity) {
                 ol.erase(ol.begin() + i);
+                std::cout << "add: append quantity == " << std::endl; // todo remove
                 m_output.append(event);
+                std::cout << "add: returning false" << std::endl; // todo remove
                 return false;
             } else if (order.quantity < _order.quantity) {
                 _order.quantity -= order.quantity;
                 ol.erase(ol.begin() + i);
+                std::cout << "add: append < quantity" << std::endl; // todo remove
                 m_output.append(event);
             } else {
                 order.quantity -= _order.quantity;
                 event.quantity = order.quantity;
                 event.status = OrderStatus::PartiallyFilled;
+                std::cout << "add: append else" << std::endl; // todo remove
                 m_output.append(event);
+                std::cout << "add: returning false" << std::endl; // todo remove
                 return false;
             }
         }
     }
+    std::cout << "add: returning true" << std::endl; // todo remove
     return true;
 }
 

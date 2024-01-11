@@ -46,7 +46,9 @@ namespace pip
 
         switch (_data.OrderData.action) {
             case OrderBook::Data::Action::Add:
+                std::cout << "process add" << std::endl; // todo remove
                 result = m_ob.add(_data.OrderData.type, _data.OrderData.price, _data.OrderData.order);
+                std::cout << "process add result: " << result << std::endl; // todo remove
                 m_tp.enqueue([this, _data = std::move(_data), quantity, result] () {
                     buildAdd(_data, quantity, result);
                 });
@@ -65,6 +67,7 @@ namespace pip
 
     void Market::buildAdd(const MarketIn &_data, Quantity _quantity, bool _result)
     {
+        std::cout << "build add " << std::endl; // todo remove
         data::UDPPackage udp;
         fix::ExecutionReport report;
 
@@ -74,6 +77,8 @@ namespace pip
         report.set44_price(std::to_string(_data.OrderData.price));
         report.set37_orderID(std::to_string(_data.OrderData.order.orderId));
         report.set54_side((_data.OrderData.type == OrderType::Ask) ? "3" : "4");
+
+        std::cout << "result" << _result << std::endl;
         if (_result) { // added
             udp.quantity = _data.OrderData.order.quantity;
             udp.price = _data.OrderData.price;
@@ -94,6 +99,6 @@ namespace pip
             report.set151_leavesQty("0");
         }
         report.set17_execID();
-        // m_output.append(data::MarketToNet{ _data.Client, report, _data.Time });
+        m_output.append(data::MarketToNet{ _data.Client, report });
     }
 }

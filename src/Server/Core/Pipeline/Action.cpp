@@ -39,6 +39,7 @@ namespace pip
                 std::cout << "Action found!: " << m_input.size() << std::endl; // todo: remove
                 input = m_input.pop_front();
                 // need more checking, more info inside the function
+                std::cout << "input ==== " << input.Message.at("35") << std::endl;
                 reject = fix::Header::Verify(input.Message);
                 if (reject.first) {
                     reject.second.header.set56_TargetCompId(std::to_string(input.Client.User));
@@ -116,8 +117,11 @@ namespace pip
 
     bool Action::treatNewOrderSingle(SerialIn &_input)
     {
+        std::cout << "CALLING treatNewOrderSingle" << std::endl; // todo: remove
         SerialOut data;
         std::pair<bool, fix::Reject> verif = fix::NewOrderSingle::Verify(_input.Message);
+
+        std::cout << "treatNewOrderSingle: first == " << verif.first << std::endl; // todo: remove
 
         if (verif.first) {
             m_raw.push({ _input.Client, verif.second });
