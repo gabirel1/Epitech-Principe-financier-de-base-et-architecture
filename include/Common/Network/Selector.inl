@@ -7,7 +7,7 @@ namespace net
 {
     template<IsSocket T>
     Selector<T>::Selector()
-        : c::EPoll((int)MAX_EVENT_EPOLL), m_to(0)
+        : c::EPoll((int)MAX_EVENT_EPOLL), m_to(100)
     {
         Logger::Log("[Selector] New selector with maximum of event from epoll: ", MAX_EVENT_EPOLL);
     }
