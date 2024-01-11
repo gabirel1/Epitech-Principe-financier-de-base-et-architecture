@@ -25,7 +25,7 @@ namespace fix
 
     void ExecutionReport::set17_execID()
     {
-        m_params.emplace({ Tag::ExecId, std::to_string(ExecId) });
+        m_params.emplace({ Tag::ExecId, std::to_string(ExecId++) });
     }
 
     void ExecutionReport::set20_execTransType(const std::string &_val)

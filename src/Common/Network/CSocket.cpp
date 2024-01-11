@@ -52,14 +52,14 @@ namespace net::c
         return fcntl(_fd, F_SETFL, _block ? (flags & ~O_NONBLOCK) : (flags | O_NONBLOCK)) == 0;
     }
 
-    bool Socket::blocking(int _fd)
+    bool Socket::get_blocking(int _fd)
     {
         return fcntl(_fd, F_GETFL, 0) & O_NONBLOCK;
     }
 
     bool Socket::blocking() const
     {
-        return blocking(m_fd);
+        return get_blocking(m_fd);
     }
 
     bool Socket::close(int _fd)

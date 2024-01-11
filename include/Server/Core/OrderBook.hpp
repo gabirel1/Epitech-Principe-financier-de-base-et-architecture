@@ -25,6 +25,7 @@ class OrderBook
             OrderStatus status;
             Price price;
             Quantity quantity;
+            Quantity orgQty;
             Side side;
         };
 
@@ -44,7 +45,9 @@ class OrderBook
             Order order;
         };
 
-        OrderBook(ts::Queue<Event> &_output);
+        using EventQueue = ts::Queue<Event>;
+
+        OrderBook(EventQueue &_output);
         virtual ~OrderBook() = default;
 
         bool add(OrderType _type, Price _price, Order& _order);
@@ -71,7 +74,7 @@ class OrderBook
     private:
         std::mutex m_mutex;
 
-        ts::Queue<Event> &m_output;
+        EventQueue &m_output;
 
         BidBook m_bid;
         AskBook m_ask;
