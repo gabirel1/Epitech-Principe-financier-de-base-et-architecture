@@ -1,4 +1,5 @@
 import socket
+import time
 
 PORT = 8080
 HOST = "localhost"
@@ -28,6 +29,7 @@ for _msg in msg_list:
     socket.sendall(_msg["msg"].encode())
     data = socket.recv(1024).decode()
     print(f"Received message from server: '{data}'", "\n\n")
+    time.sleep(1)
 
 print("Market state should be: ")
 print("Bid ==> orders: 2, price: 100, quantity: 55")
