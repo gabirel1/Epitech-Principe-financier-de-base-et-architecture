@@ -71,7 +71,6 @@ bool OrderBook::cancel(OrderIdMap<T> &_mapId, OrderId _orderId, bool _event)
             event.sold = false;
             m_output.append(event);
         }
-        // fix the compiler error
         it->second.first->second.erase(it->second.second);
         _mapId.erase(it);
         return true;

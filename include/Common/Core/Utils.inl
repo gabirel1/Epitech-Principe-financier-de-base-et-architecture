@@ -1,6 +1,7 @@
 #include <sstream>
 
 #include "Common/Core/Utils.hpp"
+#include "Common/Message/Reject.hpp"
 
 namespace utils
 {
@@ -21,12 +22,13 @@ namespace utils
 
         if (!_msg.contains(T)) {
             reject.first = true;
-            reject.second.set373_sessionRejectReason("1"/*Reject::ReqTagMissing*/);
+            reject.second.set371_refTagId(T);
+            reject.second.set373_sessionRejectReason(fix::Reject::ReqTagMissing);
             reject.second.set58_text("Unable to find required field");
         } else if (_msg.at(T).empty()) {
             reject.first = true;
             reject.second.set371_refTagId(T);
-            reject.second.set373_sessionRejectReason("4"/*Reject::EmptyValue*/);
+            reject.second.set373_sessionRejectReason(fix::Reject::EmptyValue);
             reject.second.set58_text("Waiting a value");
         } else {
             if constexpr (sizeof...(Ts) == 0)
