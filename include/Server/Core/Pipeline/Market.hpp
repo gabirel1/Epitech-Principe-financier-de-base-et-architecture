@@ -34,10 +34,9 @@ namespace pip
             /// @param _data Data to build and run action on the OrderBook.
             void process(MarketIn &_data);
 
-            /// @brief Build the reply for udp and tcp of the OrderBook::Data::Action::Add process.
-            /// @param _data Data receive and modify by the function OrderBook::add.
-            /// @param _result Result of the actions.
-            void buildAdd(const MarketIn &_data, Quantity _quantity, bool _result);
+            bool runAdd(MarketIn _data);
+            bool runModify(MarketIn _data);
+            bool runCancel(MarketIn _data);
 
             SerialToMarket &m_input;        ///< Intput data queue.
             MarketToNet &m_output;          ///< Output data queue.

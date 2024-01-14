@@ -1,6 +1,7 @@
 #include <numeric>
 
-#include "Server/Core/OrderBook.hpp"
+#include "Common/Message/ExecutionReport.hpp"
+#include "Server/Core/Pipeline/Naming.hpp"
 
 OrderBook::OrderBook(ts::Queue<Event> &_output)
     : m_output(_output)
@@ -9,40 +10,36 @@ OrderBook::OrderBook(ts::Queue<Event> &_output)
 
 bool OrderBook::add(OrderType _type, Price _price, Order& _order)
 {
-    bool res = false;
-
-    if (_type == OrderType::Bid) {
-        if (add<AskBook, std::less<Price>>(m_ask, _price, _order)) {
-            std::lock_guard<std::mutex> guard(m_mutex);
-
-            m_bid.at(_price).push_back(_order);
-            res = true;
-        }
-    }
-    else {
-        if (add<BidBook, std::greater<Price>>(m_bid, _price, _order)) {
-            std::lock_guard<std::mutex> guard(m_mutex);
-
-            m_ask.at(_price).push_back(_order);
-            res = true;
-        }
-    }
-    return res;
+    if (has(_type, _order.orderId))
+        return false;
+    add(_type, _price, _order, OrderStatus::Replaced);
+    return true;
 }
 
 bool OrderBook::modify(OrderType _type, Price _price, Order &_order)
 {
+    if (has(_type, _order.orderId))
+        return false;
     if (_type == OrderType::Ask)
-        return modify<BidBook>(m_bid, _price, _order);
+        (void)cancel<AskBook>(m_ask_id, _order.orderId, false);
     else
-        return modify<AskBook>(m_ask, _price, _order);
+        (void)cancel<BidBook>(m_bid_id, _order.orderId, false);
+    add(_type, _price, _order, OrderStatus::Replaced);
+    return true;
 }
 
-bool OrderBook::cancel(OrderType _type, Order &_order)
+bool OrderBook::cancel(OrderType _type, OrderId _orderId)
 {
     if (_type == OrderType::Ask)
-        return cancel<AskBook>(m_ask, _order);
-    return cancel<BidBook>(m_bid, _order);
+        return cancel<AskBook>(m_ask_id, _orderId, true);
+    return cancel<BidBook>(m_bid_id, _orderId, true);
+}
+
+bool OrderBook::has(OrderType _type, OrderId _orderId) const
+{
+    if (_type == OrderType::Ask)
+        return m_ask_id.contains(_orderId);
+    return m_bid_id.contains(_orderId);
 }
 
 std::vector<Price> OrderBook::getPrice(OrderType _type)
@@ -79,4 +76,40 @@ Quantity OrderBook::sumQuantity(OrderType _type, Price _price)
     return std::accumulate(ref.begin(), ref.end(), 0ull, [] (Quantity _total, const Order& _order) {
         return std::move(_total) + _order.quantity;
     });
+}
+
+void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _status)
+{
+    Event event;
+
+    event.orderId = _order.orderId;
+    event.orgQty = _order.quantity;
+    event.price = _price;
+    event.side = _type;
+    event.sold = false;
+    if (_type == OrderType::Bid) {
+        if (add<AskBook, std::less<Price>>(m_ask, _price, _order)) {
+            std::lock_guard<std::mutex> guard(m_mutex);
+
+            m_bid[_price].push_back(_order);
+            m_bid_id.emplace(_order.orderId, std::make_pair(m_bid.find(_price), m_bid.at(_price).end() - 1));
+            event.status = OrderStatus::PartiallyFilled;
+        }
+    }
+    else {
+        if (add<BidBook, std::greater<Price>>(m_bid, _price, _order)) {
+            std::lock_guard<std::mutex> guard(m_mutex);
+
+            m_ask[_price].push_back(_order);
+            m_ask_id.emplace(_order.orderId, std::make_pair(m_ask.find(_price), m_ask.at(_price).end() - 1));
+        }
+    }
+    event.quantity = _order.quantity;
+    if (event.quantity == event.orgQty)
+        event.status = _status;
+    else if (event.quantity != 0)
+        event.status = OrderStatus::PartiallyFilled;
+    else
+        event.status = OrderStatus::Filled;
+    m_output.append(event);
 }

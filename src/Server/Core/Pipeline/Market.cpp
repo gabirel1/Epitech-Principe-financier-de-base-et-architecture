@@ -41,21 +41,20 @@ namespace pip
     void Market::process(MarketIn &_data)
     {
         Logger::Log("[Market] Processing action: "); // todo log
-        Quantity quantity = _data.OrderData.order.quantity;
-        bool result = false;
 
         switch (_data.OrderData.action) {
             case OrderBook::Data::Action::Add:
-                result = m_ob.add(_data.OrderData.type, _data.OrderData.price, _data.OrderData.order);
-                m_tp.enqueue([this, _data = std::move(_data), quantity, result] () {
-                    buildAdd(_data, quantity, result);
+                m_tp.enqueue([this, _data] () {
+                    runAdd(_data);
                 });
                 break;
             case OrderBook::Data::Action::Modify:
-                m_ob.modify(_data.OrderData.type, _data.OrderData.price, _data.OrderData.order);
+                // m_ob.modify(_data.OrderData.type, _data.OrderData.price, _data.OrderData.order);
                 break;
             case OrderBook::Data::Action::Cancel:
-                m_ob.cancel(_data.OrderData.type, _data.OrderData.order);
+                m_tp.enqueue([this, _data] () {
+                    runCancel(_data);
+                });
                 break;
             default:
                 // send an internal error message
@@ -63,37 +62,47 @@ namespace pip
         }
     }
 
-    void Market::buildAdd(const MarketIn &_data, Quantity _quantity, bool _result)
+    bool Market::runAdd(MarketIn _data)
     {
-        data::UDPPackage udp;
         fix::ExecutionReport report;
 
-        report.set20_execTransType("1");
-        report.set38_orderQty(std::to_string(_quantity));
-        report.set40_ordType("2");
-        report.set44_price(std::to_string(_data.OrderData.price));
-        report.set37_orderID(std::to_string(_data.OrderData.order.orderId));
-        report.set54_side((_data.OrderData.type == OrderType::Ask) ? "3" : "4");
-        if (_result) { // added
-            udp.quantity = _data.OrderData.order.quantity;
-            udp.price = _data.OrderData.price;
-            UDP_FLAG_SET_ADD(udp.flag);
-            (_data.OrderData.type == OrderType::Ask) ? UDP_FLAG_SET_ASK(udp.flag) : UDP_FLAG_SET_BID(udp.flag);
-            UDP_FLAG_SET_STATUS(udp.flag, OrderStatus::New);
-            // send over udp
-
-            report.set14_cumQty(std::to_string(_quantity - _data.OrderData.order.quantity));
-            report.set151_leavesQty(std::to_string(_data.OrderData.order.quantity));
-            if (_data.OrderData.order.quantity == 0)
-                report.set39_ordStatus("2");
-            else
-                report.set39_ordStatus("0");
-        } else {
-            report.set39_ordStatus("0");
-            report.set14_cumQty(std::to_string(_quantity));
+        if (!m_ob.add(_data.OrderData.type, _data.OrderData.price, _data.OrderData.order)) {
+            report.set14_cumQty("0");
+            report.set17_execID();
+            report.set20_execTransType("1");
+            report.set37_orderID(std::to_string(_data.OrderData.order.orderId));
+            report.set38_orderQty(std::to_string(_data.OrderData.order.quantity));
+            report.set39_ordStatus("8");
+            report.set40_ordType("2");
+            report.set44_price(std::to_string(_data.OrderData.price));
+            report.set54_side((_data.OrderData.type == OrderType::Ask) ? "3" : "4");
+            report.set58_text("Order Id already used");
             report.set151_leavesQty("0");
+            m_output.append(data::MarketToNet{ _data.Client, report });
+            return false;
         }
-        report.set17_execID();
-        // m_output.append(data::MarketToNet{ _data.Client, report, _data.Time });
+        return true;
+    }
+
+    bool Market::runModify(MarketIn _data)
+    {
+        if (!m_ob.has(_data.OrderData.type, _data.OrderData.order.orderId)) {
+            return false;
+        } else {
+            // pending
+            if (m_ob.modify(_data.OrderData.type, _data.OrderData.price, _data.OrderData.order)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool Market::runCancel(MarketIn _data)
+    {
+        if (!m_ob.cancel(_data.OrderData.type, _data.OrderData.order.orderId)) {
+            // reject
+            return false;
+        }
+        return true;
     }
 }

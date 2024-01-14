@@ -41,7 +41,6 @@ namespace pip
 
         Client accept = nullptr;
         std::vector<Client> clients;
-        int error = 0;
 
         while (this->m_running) {
             accept = m_acceptor.accept();

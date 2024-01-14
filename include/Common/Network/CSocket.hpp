@@ -61,10 +61,10 @@ namespace net
                 /// @brief Retreive the blocking policy of a file descriptor.
                 /// @param _fd File descriptor to check on.
                 /// @return True if it is blocking otherwise false.
-                [[nodiscard]] static bool blocking(int _fd);
+                [[nodiscard]] static bool isBlocking(int _fd);
                 /// @brief Retreive the blocking policy of a socket.
                 /// @return True if it is blocking otherwise false.
-                [[nodiscard]] bool blocking() const;
+                [[nodiscard]] bool isBlocking() const;
 
                 /// @brief C++ binding to the C function close.
                 /// @param _fd File descriptor to close.

@@ -24,5 +24,6 @@ enum OrderStatus {
     PartiallyFilled,
     Filled,
     Canceld = 4,
-    Replaced
+    Replaced,
+    Pending
 };

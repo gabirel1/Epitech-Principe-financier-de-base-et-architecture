@@ -68,6 +68,11 @@ namespace fix
         m_params.emplace({ Tag::Symbol, _val });
     }
 
+    void ExecutionReport::set58_text(const std::string &_val)
+    {
+        m_params.emplace({ Tag::Text, _val });
+    }
+
     void ExecutionReport::set150_execType(const std::string &_val)
     {
         m_params.emplace({ Tag::ExecType, _val });

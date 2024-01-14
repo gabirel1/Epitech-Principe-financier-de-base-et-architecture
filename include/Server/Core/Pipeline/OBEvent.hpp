@@ -1,8 +1,14 @@
 #pragma once
 
+#include "Common/Thread/Pool.hpp"
 #include "Server/Core/Pipeline/Core.hpp"
 #include "Server/Core/Pipeline/Naming.hpp"
 #include "Server/Core/OrderBook.hpp"
+
+#ifndef TS_SIZE_OE
+    #define TS_SIZE_OE 1
+#endif
+
 
 namespace pip
 {
@@ -23,14 +29,16 @@ namespace pip
             void loop();
 
         protected:
-            bool createTcp(OrderBook::Event &input);
-            bool createUdp(OrderBook::Event &input);
+            bool createTcp(OrderBook::Event _input);
+            bool createUdp(OrderBook::Event _input);
 
         private:
             OrderBook::EventQueue &m_input;
             UdpInput &m_udp;
             RawOutput &m_tcp;
 
-            ThreadPool m_tp;
+            uint64_t m_id = 0;
+
+            ThreadPool<TS_SIZE_OE> m_tp;
     };
 }

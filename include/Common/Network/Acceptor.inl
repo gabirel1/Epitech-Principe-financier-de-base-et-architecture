@@ -23,6 +23,12 @@ namespace net
     }
 
     template<IsSocket T>
+    void Acceptor<T>::blocking(bool _block)
+    {
+        (void)c_blocking(_block);
+    }
+
+    template<IsSocket T>
     bool Acceptor<T>::listen(uint32_t _port)
     {
         struct sockaddr_in addr;

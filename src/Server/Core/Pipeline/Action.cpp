@@ -83,9 +83,6 @@ namespace pip
         _input.Client.Logged = true;
         _input.Client.User = utils::to<UserId>(_input.Message.at(fix::Tag::SenderCompId));
         _input.Client.SeqNumber = utils::to<size_t>(_input.Message.at(fix::Tag::MsqSeqNum));
-        logon.header.set49_SenderCompId(_input.Message.at(fix::Tag::TargetCompId));
-        logon.header.set56_TargetCompId(_input.Message.at(fix::Tag::SenderCompId));
-        logon.header.set34_msgSeqNum(_input.Message.at(fix::Tag::MsqSeqNum));
         logon.set98_EncryptMethod("0");
         logon.set108_HeartBtInt(_input.Message.at(fix::Tag::HearBtInt));
         m_raw.push({ _input.Client, logon });
@@ -106,9 +103,6 @@ namespace pip
         _input.Client.Logged = false;
         _input.Client.Disconnect = true;
         _input.Client.User = 0;
-        logout.header.set49_SenderCompId(_input.Message.at(fix::Tag::TargetCompId));
-        logout.header.set56_TargetCompId(_input.Message.at(fix::Tag::SenderCompId));
-        logout.header.set34_msgSeqNum(std::to_string(_input.Client.SeqNumber));
         m_raw.push({ _input.Client, logout });
         return true;
     }
@@ -129,7 +123,6 @@ namespace pip
         data.OrderData.order.userId = _input.Client.User;
         data.OrderData.order.orderId = utils::to<OrderId>(_input.Message.at(fix::Tag::ClOrdID));
         data.OrderData.order.quantity = utils::to<Quantity>(_input.Message.at(fix::Tag::OrderQty));
-        data.Time = _input.Time;
         m_output.push(data);
         return true;
     }
@@ -180,7 +173,6 @@ namespace pip
         data.OrderData.order.quantity = utils::to<Quantity>(_input.Message.at(fix::Tag::OrderQty));
         data.OrderData.price = utils::to<Price>(_input.Message.at(fix::Tag::Price));
         data.OrderData.type = (_input.Message.at(fix::Tag::Side) == "3") ? OrderType::Bid : OrderType::Ask;
-        data.Time = _input.Time;
         return true;
     }
 
@@ -188,7 +180,10 @@ namespace pip
     {
         fix::Reject reject;
 
-        reject.set45_refSeqNum(_input.Message.at(fix::Tag::MsqSeqNum));
+        if (_input.Message.contains(fix::Tag::MsqSeqNum))
+            reject.set45_refSeqNum(_input.Message.at(fix::Tag::MsqSeqNum));
+        reject.set371_refTagId(fix::Tag::MsgType);
+        reject.set373_sessionRejectReason(fix::Reject::NotSupporType);
         reject.set58_text("Unknown message type");
         m_raw.push({ _input.Client, reject });
         return true;
@@ -204,9 +199,6 @@ namespace pip
             m_raw.push({ _input.Client, verif.second });
             return false;
         }
-        heartbeat.header.set49_SenderCompId(_input.Message.at(fix::Tag::TargetCompId));
-        heartbeat.header.set56_TargetCompId(_input.Message.at(fix::Tag::SenderCompId));
-        heartbeat.header.set34_msgSeqNum(_input.Message.at(fix::Tag::MsqSeqNum));
         m_raw.push({ _input.Client, heartbeat });
         return true;
     }

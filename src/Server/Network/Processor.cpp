@@ -32,6 +32,7 @@ namespace net
                 return false;
             }
             Logger::Log("[InNetwork] Porcessing request from the client: "); // todo log
+            _socket.newRequest();
             _serial.push(NetOut(_socket, msg));
             return false;
         }
