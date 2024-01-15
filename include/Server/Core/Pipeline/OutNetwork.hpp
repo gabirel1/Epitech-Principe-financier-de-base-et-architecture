@@ -37,7 +37,7 @@ namespace pip
 
         private:
             MarketToNet &m_input;                   ///< Intput data queue.
-            std::vector<ClientSocket> m_clients;    ///< List of connected clients.
+            std::vector<ClientSocket> &m_clients;   ///< List of connected clients.
 
             ThreadPool<TS_SIZE_ON> m_tp;            ///< Thread pool used to send data to the target client in async.
     };

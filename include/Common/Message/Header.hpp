@@ -26,7 +26,7 @@ namespace fix
             void set9_bodyLength(const size_t &_len);
 
             /// @brief Set the type of message send [35](https://www.onixs.biz/fix-dictionary/4.2/tagNum_35.html).
-            /// @param _val Value assigned to it: char.
+            /// @param _val Value assigned to it: string.
             void set35_MsgType(const std::string &_val);
 
             /// @brief Set the sequence number of the message [34](https://www.onixs.biz/fix-dictionary/4.2/tagNum_34.html).

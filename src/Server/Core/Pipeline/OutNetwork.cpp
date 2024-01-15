@@ -38,18 +38,22 @@ namespace pip
                     UserId userId = 0;
 
                     _input.Message.header.set49_SenderCompId("Market");
+                    Logger::Log("client list size: ", m_clients.size());
                     if (_input.Client.getSocket()) {
+                        it = std::find_if(m_clients.begin(), m_clients.end(), [_socket = _input.Client.getSocket()] (const ClientSocket &_client) {
+                            return _client.getSocket() == _socket;
+                        });
                         userId = _input.Client.User;
-                        Logger::Log("[OutNetwork] Comming from an Action pipeline, from user: ", userId);
+                        Logger::Log("[OutNetwork] (Reply) Comming from an Action pipeline");
                     } else {
-                        userId = _input.Message.header.getTargetCompId();
-                        Logger::Log("[OutNetwork] Comming from an anonymous pipeline, from user: ", userId);
+                        it = std::find_if(m_clients.begin(), m_clients.end(), [userId = _input.Client.User] (const ClientSocket &_client) {
+                            return _client.User == userId;
+                        });
+                        Logger::Log("[OutNetwork] (Reply) Comming from an anonymous pipeline");
                     }
-                    it = std::find_if(m_clients.begin(), m_clients.end(), [userId = _input.Client.User] (const ClientSocket &_client) {
-                        return _client.User == userId;
-                    });
 
                     if (it != m_clients.end()) {
+                        userId = it->User;
                         _input.Message.header.set34_msgSeqNum(std::to_string(it->SeqNumber));
                         _input.Message.header.set56_TargetCompId(std::to_string(it->User));
                         std::string data = _input.Message.to_string();
@@ -66,9 +70,11 @@ namespace pip
                             }
                             logTiming(it);
                         } else {
-                            Logger::Log("[OutNetwork] Client not found: ", userId);
+                            Logger::Log("[OutNetwork] Client not connected: ", userId);
                             m_clients.erase(it);
                         }
+                    } else {
+                        Logger::Log("[OutNetwork] Client not found: ", userId);
                     }
                 });
             }
