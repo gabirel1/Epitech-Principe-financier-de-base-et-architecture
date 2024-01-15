@@ -7,7 +7,7 @@ namespace net
 {
     template<IsSocket T>
     Selector<T>::Selector()
-        : c::EPoll((int)MAX_EVENT_EPOLL), m_to(100)
+        : c::EPoll((int)MAX_EVENT_EPOLL), m_to(0)
     {
         Logger::Log("[Selector] New selector with maximum of event from epoll: ", MAX_EVENT_EPOLL);
     }
@@ -50,9 +50,6 @@ namespace net
     std::vector<typename Selector<T>::Client> Selector<T>::pull()
     {
         Event events[MAX_EVENT_EPOLL];
-        // std::cout << "pull: " << m_to << std::endl;
-        // std::cout << "pull2: " << events << std::endl;
-        // std::cout << "pull: " << m_to << " " << events << std::endl; 
         int set = wait(events, m_to);
         std::vector<Client> clients;
 

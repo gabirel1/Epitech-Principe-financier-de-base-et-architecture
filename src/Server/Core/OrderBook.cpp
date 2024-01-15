@@ -111,5 +111,6 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
         event.status = OrderStatus::PartiallyFilled;
     else
         event.status = OrderStatus::Filled;
+    Logger::Log("[OrderBook] (Add) New order event: ");
     m_output.append(event);
 }

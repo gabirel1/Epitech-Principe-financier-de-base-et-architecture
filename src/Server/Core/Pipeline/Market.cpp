@@ -40,7 +40,7 @@ namespace pip
 
     void Market::process(MarketIn &_data)
     {
-        Logger::Log("[Market] Processing action: "); // todo log
+        Logger::Log("[Market] Processing new action: "); // todo log
 
         switch (_data.OrderData.action) {
             case OrderBook::Data::Action::Add:
@@ -49,7 +49,9 @@ namespace pip
                 });
                 break;
             case OrderBook::Data::Action::Modify:
-                // m_ob.modify(_data.OrderData.type, _data.OrderData.price, _data.OrderData.order);
+                m_tp.enqueue([this, _data] () {
+                    runModify(_data);
+                });
                 break;
             case OrderBook::Data::Action::Cancel:
                 m_tp.enqueue([this, _data] () {
@@ -66,7 +68,9 @@ namespace pip
     {
         fix::ExecutionReport report;
 
+        Logger::Log("[Market] (New) request: "); // todo log
         if (!m_ob.add(_data.OrderData.type, _data.OrderData.price, _data.OrderData.order)) {
+            Logger::Log("[Market] (New) Reject: Order ID already used: ", _data.OrderData.order.orderId);
             report.set14_cumQty("0");
             report.set17_execID();
             report.set20_execTransType("1");
@@ -81,16 +85,23 @@ namespace pip
             m_output.append(data::MarketToNet{ _data.Client, report });
             return false;
         }
+        Logger::Log("[Market] (New) Order executaded sucefully: "); // todo log
         return true;
     }
 
     bool Market::runModify(MarketIn _data)
     {
+        Logger::Log("[Market] (Modify) Request: "); // todo log
         if (!m_ob.has(_data.OrderData.type, _data.OrderData.order.orderId)) {
+            Logger::Log("[Market] (Modify) Reject: Order ID not found: ", _data.OrderData.order.orderId);
+            // reject
             return false;
         } else {
+            Logger::Log("[Market] (Modify) Request is pending: "); // todo log
             // pending
             if (m_ob.modify(_data.OrderData.type, _data.OrderData.price, _data.OrderData.order)) {
+                Logger::Log("[Market] (Modify) Reject: Order ID not found: ", _data.OrderData.order.orderId);
+                // reject
                 return false;
             }
         }
@@ -99,10 +110,13 @@ namespace pip
 
     bool Market::runCancel(MarketIn _data)
     {
+        Logger::Log("[Market] (Cancel) Request: ", _data.OrderData.order.orderId);
         if (!m_ob.cancel(_data.OrderData.type, _data.OrderData.order.orderId)) {
+            Logger::Log("[Market] (Cancel) Reject: Order ID not found: ", _data.OrderData.order.orderId);
             // reject
             return false;
         }
+        Logger::Log("[Market] (Cancel) Sucessfuly executaed: ", _data.OrderData.order.orderId);
         return true;
     }
 }

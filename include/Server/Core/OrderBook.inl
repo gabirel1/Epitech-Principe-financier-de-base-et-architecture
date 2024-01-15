@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <vector>
 
+#include "Common/Core/Logger.hpp"
 #include "Server/Core/OrderBook.hpp"
 
 template<IsBook T, class _T>
@@ -32,15 +33,21 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
             if (order.quantity == _order.quantity) {
                 ol.erase(ol.begin() + i);
                 m_output.append(event);
+                Logger::Log("[OrderBook] (Add) Filled the order: "); // todo log
+                Logger::Log("[OrderBook] (Add) Completly sold the order: "); // todo log
                 return false;
             } else if (order.quantity < _order.quantity) {
                 _order.quantity -= order.quantity;
                 ol.erase(ol.begin() + i);
+                Logger::Log("[OrderBook] (Add) Partially filled the order: "); // todo log
+                Logger::Log("[OrderBook] (Add) Partially sold the order: "); // todo log
                 m_output.append(event);
             } else {
                 order.quantity -= _order.quantity;
                 event.quantity = order.quantity;
                 event.status = OrderStatus::PartiallyFilled;
+                Logger::Log("[OrderBook] (Add) Filled the order: "); // todo log
+                Logger::Log("[OrderBook] (Add) Partially sold the order: "); // todo log
                 m_output.append(event);
                 return false;
             }
@@ -69,8 +76,10 @@ bool OrderBook::cancel(OrderIdMap<T> &_mapId, OrderId _orderId, bool _event)
             event.quantity = it->second.second->quantity;
             event.orgQty = it->second.second->quantity;
             event.sold = false;
+            Logger::Log("[OrderBook] (Cancel) Sended event: "); // todo log
             m_output.append(event);
         }
+            Logger::Log("[OrderBook] (Cancel) Sucefully canceled the order: ", _orderId);
         it->second.first->second.erase(it->second.second);
         _mapId.erase(it);
         return true;

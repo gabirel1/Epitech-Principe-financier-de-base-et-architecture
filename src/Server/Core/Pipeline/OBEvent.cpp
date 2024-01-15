@@ -31,7 +31,7 @@ namespace pip
         while (m_running) {
             if (!m_input.empty()) {
                 input = m_input.pop_front();
-
+                Logger::Log("[OBEvent] New event from the OderBook: "); // todo log
                 m_tp.enqueue([this, input] () {
                     createUdp(input);
                     createTcp(input);
@@ -56,6 +56,7 @@ namespace pip
         report.header.set56_TargetCompId(std::to_string(_input.userId));
         report.set151_leavesQty(std::to_string(_input.quantity));
         m_tcp.append(NetIn{ {}, report });
+        Logger::Log("[OBEvent] (TCP) Report created: "); // todo log
         return true;
     }
 
@@ -74,6 +75,7 @@ namespace pip
         package.quantity = _input.quantity;
         package.price = _input.price;
         m_udp.append(package);
+        Logger::Log("[OBEvent] (UDP) Report created: "); // todo log
         return true;
     }
 }

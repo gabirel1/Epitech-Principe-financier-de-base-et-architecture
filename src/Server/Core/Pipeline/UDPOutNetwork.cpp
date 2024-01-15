@@ -33,6 +33,7 @@ namespace pip
             auto now = std::chrono::steady_clock::now();
 
             for (size_t it = 0; it < UDP_MAX_MSG && !m_input.empty(); it++) {
+                Logger::Log("[UDPOutNetwork] New notification to be broadcast: "); // todo log
                 m_message.emplace_back(now, reinterpret_cast<const uint8_t*>(&m_input.front()));
                 m_input.pop();
             }
@@ -51,6 +52,7 @@ namespace pip
 
         for (auto it = m_message.begin(); it != m_message.end(); ) {
             if (std::chrono::duration_cast<std::chrono::seconds>(now - it->first).count() > 2) {
+                Logger::Log("[UDPOutNetwork] Cleaned UDP message: "); // todo log
                 it = m_message.erase(it);
                 cleaned++;
             } else {
