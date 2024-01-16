@@ -38,5 +38,6 @@ for _msg in msg_list:
 print("Market state should be: ")
 print("Bid ==> orders: 2, price: 100, quantity: 55")
 print("Ask ==> orders: 1, price: 500, quantity: 25")
+print("DONT TRUST MISCALCULATED CHECK TEST_ASSERT_3")
 
 socket.close()
