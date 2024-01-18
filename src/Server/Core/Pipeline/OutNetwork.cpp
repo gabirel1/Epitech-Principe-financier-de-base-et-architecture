@@ -37,7 +37,8 @@ namespace pip
                     std::string data = _input.Message.to_string();
 
                     _input.Client.getSocket()->send(reinterpret_cast<const uint8_t *>(data.c_str()), data.size());
-                    Logger::Log("[OutNetwork] Send data to: ");
+                    Logger::Log("[OutNetwork] Send data to: " , data);
+                    // update Client info
                 });
             }
         }

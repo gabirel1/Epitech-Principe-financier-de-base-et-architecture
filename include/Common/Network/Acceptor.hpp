@@ -11,7 +11,11 @@ namespace net
             using Client = std::shared_ptr<T>;
 
             Acceptor();
-            ~Acceptor() = default;
+            ~Acceptor();
+
+            void blocking(bool _block);
+
+            [[nodiscard]] bool close();
 
             bool listen(uint32_t _port);
 

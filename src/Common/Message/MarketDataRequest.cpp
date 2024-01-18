@@ -4,11 +4,7 @@ namespace fix
 {
     MarketDataRequest::MarketDataRequest()
     {
-        header.setMsgType(m_msgType);
-    }
-
-    MarketDataRequest::~MarketDataRequest()
-    {
+        header.set35_MsgType(MsgType);
     }
 
     void MarketDataRequest::set262_MDReqID(const std::string &_val)

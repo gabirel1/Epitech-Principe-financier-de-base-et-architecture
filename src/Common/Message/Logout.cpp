@@ -1,16 +1,17 @@
 #include "Common/Message/Logout.hpp"
+#include "Common/Message/Reject.hpp"
 
 namespace fix
 {
     Logout::Logout()
     {
-        header.setMsgType(m_msgType);
+        header.set35_MsgType(MsgType);
     }
 
-    Logout::~Logout() {}
-
-    void Logout::set58_Text(const std::string &_val)
+    std::pair<bool, Reject> Logout::Verify(Serializer::AnonMessage &_msg)
     {
-        m_params.emplace({ "58", _val });
+        std::ignore = _msg;
+
+        return { false, Reject{} };
     }
 }

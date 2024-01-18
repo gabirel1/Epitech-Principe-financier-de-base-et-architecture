@@ -1,0 +1,19 @@
+#pragma once
+
+#include <string>
+
+#include "Common/Message/Serializer.hpp"
+#include "Common/Message/Reject.hpp"
+
+namespace utils
+{
+    bool is_numeric(const std::string &_str);
+    bool is_double(const std::string &_str);
+
+    template<class T>
+    T to(const std::string &_str);
+    template<const char *T, const char *...Ts>
+    std::pair<bool, fix::Reject> Has(fix::Serializer::AnonMessage &_msg);
+}
+
+#include "Common/Core/Utils.inl"

@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <iostream>
 
 #include "Common/Network/Selector.hpp"
 
@@ -6,7 +7,7 @@ namespace net
 {
     template<IsSocket T>
     Selector<T>::Selector()
-        : c::EPoll((int)MAX_EVENT_EPOLL)
+        : c::EPoll((int)MAX_EVENT_EPOLL), m_to(100)
     {
         Logger::Log("[Selector] New selector with maximum of event from epoll: ", MAX_EVENT_EPOLL);
     }
@@ -26,6 +27,14 @@ namespace net
     }
 
     template<IsSocket T>
+    void Selector<T>::erase(Client _client)
+    {
+        std::erase_if(m_clients, [_client] (const std::pair<int, Client> &_lclient) {
+            return _client == _lclient.second;
+        });
+    }
+
+    template<IsSocket T>
     void Selector<T>::timeout(float _to)
     {
         m_to = _to;
@@ -40,12 +49,29 @@ namespace net
     template<IsSocket T>
     std::vector<typename Selector<T>::Client> Selector<T>::pull()
     {
-        Event *events = nullptr;
-        size_t set = wait(events, m_to);
-        std::vector<Client> clients{set};
+        Event events[MAX_EVENT_EPOLL];
+        // std::cout << "pull: " << m_to << std::endl;
+        // std::cout << "pull2: " << events << std::endl;
+        // std::cout << "pull: " << m_to << " " << events << std::endl; 
+        int set = wait(events, m_to);
+        std::vector<Client> clients;
 
-        for (size_t it = 0; it < std::min(set, (size_t)MAX_SOCKET); it++)
+        if (set == -1) {
+            Logger::Log("[Selector] Error when waiting event from epoll: ", strerror(errno));
+            return clients;
+        }
+        for (int it = 0; it < std::min(set, MAX_SOCKET); it++) {
             clients.emplace_back(m_clients.at(events[it].data.fd));
+            std::cout << "add" << std::endl;
+        }
         return clients;
     }
+
+
+    template<IsSocket T>
+    size_t Selector<T>::size() const
+    {
+        return m_clients.size();
+    }
+
 }

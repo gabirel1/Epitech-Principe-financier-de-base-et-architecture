@@ -11,43 +11,50 @@ namespace net
 {
     void Socket::blocking(bool _block)
     {
-        blocking(_block);
-    }
-
-    bool Socket::blocking() const
-    {
-        return blocking();
+        (void)c_blocking(_block);
     }
 
     bool Socket::connect(const Ip &_ip, uint32_t _port)
     {
-        create();
-        return c::Socket::connect(_ip.c_str(), _port);
+        if (!c_create())
+            return false;
+        return c_connect(_ip.c_str(), _port);
     }
 
     size_t Socket::send(const std::string &_data)
     {
-        return send(reinterpret_cast<const uint8_t *>(_data.c_str()), _data.size());
+        return c_send(reinterpret_cast<const uint8_t *>(_data.c_str()), _data.size());
     }
 
     size_t Socket::send(const uint8_t *_data, size_t _size)
     {
-        return c::Socket::send(_data, _size);
+        return c_send(_data, _size);
     }
 
     std::string Socket::receive(size_t _size, int &_error)
     {
-        const uint8_t *data = c::Socket::receive(_size, _error);
+        const uint8_t *data = c_receive(_size, _error);
         std::string str = "";
 
-        if (_error != -1)
-            str.assign(data, data + _error);
+        if (_error == -1) {
+            Logger::Log("[Socket] Error will trying to receive data: ", strerror(errno));
+            if (data != nullptr)
+                delete[] data;
+            return str;
+        }
+        str.assign(data, data + _error);
+        delete[] data;
         return str;
     }
 
     bool Socket::close()
     {
-        return c::Socket::close();
+        return c_close();
+    }
+
+    Socket::operator bool()
+    {
+        return is_open();
     }
 
     Socket::Socket(int _type)
@@ -62,6 +69,7 @@ namespace net
         {
             Logger::Log("[tcp::Socket] New TCP socket");
         }
+
     }
 
     namespace udp
@@ -70,6 +78,38 @@ namespace net
             : ::net::Socket(SOCK_DGRAM)
         {
             Logger::Log("[udp::Socket] New UDP socket");
+        }
+
+        bool Socket::broadcasting() const
+        {
+            return m_broadcast;
+        }
+
+        bool Socket::broadcastOn(uint32_t _port)
+        {
+            int enable = 1;
+
+            c_create();
+            if (setsockopt(raw(), SOL_SOCKET, SO_BROADCAST, &enable, sizeof(enable)) == -1) {
+                Logger::Log("[udp::Socket] Failed to set the broadcast flag: ", strerror(errno));
+                close();
+                return false;
+            }
+            std::memset(&m_broad_addr, 0, sizeof(m_broad_addr));
+            m_broad_addr.sin_family = AF_INET;
+            m_broad_addr.sin_port = htons(_port);
+            m_broad_addr.sin_addr.s_addr = INADDR_BROADCAST;
+            m_broadcast = true;
+            return true;
+        }
+
+        bool Socket::broadcast(const uint8_t *_data, size_t _size)
+        {
+            if (sendto(raw(), _data, _size, 0, (struct sockaddr*)&m_broad_addr, sizeof(m_broad_addr)) == -1) {
+                Logger::Log("[udp::Socket] Failed to send the data on the broadcast: ", strerror(errno));
+                return false;
+            }
+            return true;
         }
     }
 }
