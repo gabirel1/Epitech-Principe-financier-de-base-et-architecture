@@ -53,6 +53,7 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
             }
         }
     }
+    Logger::Log("[OrderBook] (Add) Finishedd selling: "); // todo log
     return true;
 }
 

@@ -91,6 +91,7 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
         if (add<AskBook, std::less<Price>>(m_ask, _price, _order)) {
             std::lock_guard<std::mutex> guard(m_mutex);
 
+            Logger::Log("[OrderBook] (Add) New order in BID: "); // todo log
             m_bid[_price].push_back(_order);
             m_bid_id.emplace(_order.orderId, std::make_pair(m_bid.find(_price), m_bid.at(_price).end() - 1));
             event.status = OrderStatus::PartiallyFilled;
@@ -100,6 +101,7 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
         if (add<BidBook, std::greater<Price>>(m_bid, _price, _order)) {
             std::lock_guard<std::mutex> guard(m_mutex);
 
+            Logger::Log("[OrderBook] (Add) New order in ADK: "); // todo log
             m_ask[_price].push_back(_order);
             m_ask_id.emplace(_order.orderId, std::make_pair(m_ask.find(_price), m_ask.at(_price).end() - 1));
         }
