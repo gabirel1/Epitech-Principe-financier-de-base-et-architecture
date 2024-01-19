@@ -55,7 +55,7 @@ namespace pip
                 Logger::Log("[InNetwork] Received event from: ", clients.size(), " clients");
             for (Client &_client : clients) {
                 auto client = std::find_if(m_clients.begin(), m_clients.end(), [_client] (const ClientSocket _lclient) {
-                    return _client == _lclient;
+                    return _client == _lclient.getSocket();
                 });
                 if (client == m_clients.end()) {
                     fix::Reject reject;
