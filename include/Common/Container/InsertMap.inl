@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "Common/Container/InsertMap.hpp"
 
 template<IsKey T, class _T>

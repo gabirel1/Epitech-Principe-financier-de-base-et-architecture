@@ -25,13 +25,14 @@ class Core
         bool m_running = false;
 
         std::vector<ClientSocket> m_tcp_clients;
-        OrderBook m_ob;
 
+        OrderBook::EventQueue m_ob_event;
         UdpInput m_udp_input;
         NetToSerial m_nt_to_sr;
         SerialToMarket m_sr_to_mk;
         MarketToNet m_mk_to_nt;
-        ts::Queue<OrderBook::Event> m_ob_event;
+
+        OrderBook m_ob;
 
         pip::InNetwork<net::tcp::Socket, &net::tcp::processor, ClientSocket> m_innet;
         pip::Action m_action;

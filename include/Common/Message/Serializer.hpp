@@ -4,6 +4,8 @@
     #define FIX_DELIMITER 1
 #endif
 
+#include <string>
+
 #include "Common/Container/InsertMap.hpp"
 
 namespace fix

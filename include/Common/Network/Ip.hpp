@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include <stdint.h>
+
 namespace net
 {
     /// @brief Class for ip address manipulation

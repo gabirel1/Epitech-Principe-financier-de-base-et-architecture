@@ -54,6 +54,8 @@ void Core::stop()
         Logger::Log("[Core] Action pipeline exited");
         while (m_market.stop() != std::future_status::deferred)
         Logger::Log("[Core] Market exited");
+        while (m_obevent.stop() != std::future_status::deferred)
+        Logger::Log("[Core] OrderBook event pipeline exited");
         while (m_outnet.stop() != std::future_status::deferred)
         Logger::Log("[Core] Output network exited");
         Logger::Log("[Core] All pipeline are stoped");
@@ -65,6 +67,9 @@ bool Core::internal_start()
     Logger::Log("[Core] Starting pipeline...");
     if (!m_outnet.start()) {
         Logger::Log("[Core] Failed to start output network");
+        stop();
+    } else if (!m_obevent.start()) {
+        Logger::Log("[Core] Failed to start OrderBook Event");
         stop();
     } else if (!m_market.start()) {
         Logger::Log("[Core] Failed to start market");
