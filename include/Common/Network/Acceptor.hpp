@@ -13,11 +13,13 @@ namespace net
             Acceptor();
             ~Acceptor();
 
-            [[nodiscard]] bool close();
+            void blocking(bool _block);
 
             bool listen(uint32_t _port);
 
             Client accept();
+
+            [[nodiscard]] bool close();
     };
 }
 

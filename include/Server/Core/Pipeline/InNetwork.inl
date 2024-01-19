@@ -9,10 +9,11 @@ namespace pip
     template<IsSocket T, auto _T, class __T>
     requires SocketClient<__T, T>
     InNetwork<T, _T, __T>::InNetwork(std::vector<__T> &_clients, NetToSerial &_output, RawOutput &_error, uint32_t _port)
-        : m_clients(_clients), m_output(_output), m_acceptor(), m_error(_error), m_selector()
+        : m_clients(_clients), m_output(_output), m_error(_error), m_acceptor(), m_selector()
     {
-        m_acceptor.listen(_port);
-        m_acceptor.blocking(false);
+        (void)m_acceptor.listen(_port);
+        (void)m_acceptor.blocking(false);
+        m_selector.timeout(100);
         Logger::Log("[InNetwork] listening to port: ", _port);
     }
 
@@ -41,7 +42,6 @@ namespace pip
 
         Client accept = nullptr;
         std::vector<Client> clients;
-        int error = 0;
 
         while (this->m_running) {
             accept = m_acceptor.accept();
@@ -51,10 +51,23 @@ namespace pip
                 Logger::Log("[InNetwork] Accepted new client: "); // todo log
             }
             clients = m_selector.pull();
+            if (clients.size())
+                Logger::Log("[InNetwork] Received event from: ", clients.size(), " clients");
             for (Client &_client : clients) {
-                if (_T(_client)) {
-                    // m_selector.erase(_client);
-                    // m_clients.erase(_client);
+                auto client = std::find_if(m_clients.begin(), m_clients.end(), [_client] (const ClientSocket _lclient) {
+                    return _client == _lclient.getSocket();
+                });
+                if (client == m_clients.end()) {
+                    fix::Reject reject;
+
+                    (void)_client->close();
+                    Logger::Log("[InNetwork] Unable to find the client's information: "); // todo log
+                    // build reject
+                    m_error.push(ErrorMsg(ClientSocket(_client), reject));
+                    continue;
+                } else if (_T(*client, m_output, m_error)) {
+                    Logger::Log("[InNetwork] Disconnecting client: "); // todo log
+                    // erase inside the selecter and client list
                 }
             }
         }

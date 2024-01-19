@@ -3,6 +3,7 @@
 #include "Server/Core/Pipeline/Action.hpp"
 #include "Server/Core/Pipeline/InNetwork.hpp"
 #include "Server/Core/Pipeline/Market.hpp"
+#include "Server/Core/Pipeline/OBEvent.hpp"
 #include "Server/Core/Pipeline/OutNetwork.hpp"
 #include "Server/Core/Pipeline/UDPOutNetwork.hpp"
 #include "Server/Network/Processor.hpp"
@@ -23,18 +24,20 @@ class Core
     private:
         bool m_running = false;
 
-        std::vector<ClientSocket> m_tcp_client;
-        std::vector<std::shared_ptr<net::udp::Socket>> m_udp_client;
-        OrderBook m_ob;
+        std::vector<ClientSocket> m_tcp_clients;
 
+        OrderBook::EventQueue m_ob_event;
         UdpInput m_udp_input;
         NetToSerial m_nt_to_sr;
         SerialToMarket m_sr_to_mk;
         MarketToNet m_mk_to_nt;
 
+        OrderBook m_ob;
+
         pip::InNetwork<net::tcp::Socket, &net::tcp::processor, ClientSocket> m_innet;
         pip::Action m_action;
         pip::Market m_market;
+        pip::OBEvent m_obevent;
         pip::OutNetwork m_outnet;
         pip::UDPOutNetwork m_udp;
 };

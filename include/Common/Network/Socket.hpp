@@ -29,12 +29,9 @@ namespace net
 
             [[nodiscard]] std::string receive(size_t _size, int &_error);
 
-            [[nodiscard]] uint32_t getPort() const;
-
-            [[nodiscard]] bool is_open() const;
             bool close();
 
-            operator bool() const;
+            operator bool();
 
         protected:
             Socket(int _type);
@@ -61,14 +58,23 @@ namespace net
                 Socket();
                 ~Socket() = default;
 
+                /// @brief Check if the socket is in broadcasting mode.
+                /// @return True if it is, otherwise false.
                 [[nodiscard]] bool broadcasting() const;
+                /// @brief Start broading on a port.
+                /// @param _port Port to broadcast from.
+                /// @return False if the setup of the broadcast failed, otherwise true.
                 [[nodiscard]] bool broadcastOn(uint32_t _port);
-                [[nodiscard]] bool broadcast(const uint8_t *_str, size_t _size);
+                /// @brief Broadcast data.
+                /// @param _data Data to send.
+                /// @param _size Size of the data to send.
+                /// @return False if the broadcast failed, otherwise true.
+                [[nodiscard]] bool broadcast(const uint8_t *_data, size_t _size);
 
             private:
-                bool m_broadcast = false;
+                bool m_broadcast = false;               ///< Broadcast mode.
 
-                struct sockaddr_in m_broad_addr;
+                struct sockaddr_in m_broad_addr;        ///< Broadcast address.
         };
     }
 }
