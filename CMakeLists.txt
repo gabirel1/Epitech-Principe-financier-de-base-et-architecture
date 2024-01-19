@@ -89,5 +89,5 @@ target_compile_definitions(MarketServer PRIVATE NET_RECV_SIZE=4096)       # Pack
 # target_include_directories(MarketTest PRIVATE test)
 # target_link_libraries(MarketTest MarketCommon GTest::gtest_main)
 
-include(GoogleTest)
-gtest_discover_tests(MarketTest)
+# include(GoogleTest)
+# gtest_discover_tests(MarketTest)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <iostream>
 #include <vector>
 
 using UserId = uint64_t;
@@ -14,6 +15,8 @@ struct Order
     OrderId orderId;
     Quantity quantity;
 };
+
+std::ostream &operator<<(std::ostream &_os, const Order &_order);
 
 using Price = double;
 using OrderList = std::vector<Order>;
