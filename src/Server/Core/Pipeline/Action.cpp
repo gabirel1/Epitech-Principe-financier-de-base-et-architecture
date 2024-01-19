@@ -151,11 +151,8 @@ namespace pip
         data.Client = _input.Client;
         data.OrderData.action = OrderBook::Data::Action::Cancel;
         data.OrderData.order.orderId = utils::to<OrderId>(_input.Message.at(fix::Tag::OrigClOrdID));
-        data.OrderData.type = (_input.Message.at(fix::Tag::Side) == "3") ? OrderType::Bid : OrderType::Ask;
-        
         data.OrderData.order.userId = _input.Client.User;
-
-        data.Time = _input.Time;
+        data.OrderData.type = (_input.Message.at(fix::Tag::Side) == "3") ? OrderType::Bid : OrderType::Ask;
         m_output.push(data);
         return true;
     }
