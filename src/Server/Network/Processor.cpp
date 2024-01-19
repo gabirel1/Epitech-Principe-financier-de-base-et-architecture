@@ -16,23 +16,24 @@ namespace net
             fix::Reject reject;
 
             if (!_socket.getSocket()) {
-                Logger::Log("[InNetwork] Client disconnected: "); // todo log
+                Logger::Log("[Processor] Client disconnected: "); // todo log
                 return true;
             }
             std::string data(_socket.getSocket()->receive(MAX_RECV_SIZE, error));
-            std::cout << "data received: '" << data << "'" << std::endl;
 
+            Logger::Log("[Processor] Received from the client: ", _socket.User, ", data:", data); // todo log
             if (error == 0) {
-                Logger::Log("[InNetwork] Error: no data receive from the client: "); // todo log
+                Logger::Log("[Processor] Error: no data receive from the client: "); // todo log
                 return true;
             }
             if (fix::Serializer::run(data, msg) != fix::Serializer::Error::None) {
-                Logger::Log("[InNetwork] Error: will parsing the client message: "); // todo log
+                Logger::Log("[Processor] Error: will parsing the client message: "); // todo log
                 // build reject
                 _error.push(ErrorMsg(_socket, reject));
                 return false;
             }
-            Logger::Log("[InNetwork] Processing request from the client: "); // todo log
+            Logger::Log("[Processor] Porcessing request from the client: "); // todo log
+            _socket.newRequest();
             _serial.push(NetOut(_socket, msg));
             return false;
         }

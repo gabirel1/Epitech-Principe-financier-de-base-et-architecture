@@ -25,7 +25,7 @@ namespace net
     template<IsSocket T>
     void Acceptor<T>::blocking(bool _block)
     {
-        c_blocking(_block);
+        (void)c_blocking(_block);
     }
 
     template<IsSocket T>

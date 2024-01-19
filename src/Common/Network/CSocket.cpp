@@ -57,7 +57,7 @@ namespace net::c
         return fcntl(_fd, F_GETFL, 0) & O_NONBLOCK;
     }
 
-    bool Socket::blocking() const
+    bool Socket::isBlocking() const
     {
         return isBlocking(m_fd);
     }
@@ -103,7 +103,7 @@ namespace net::c
 
     bool Socket::is_open()
     {
-        bool block = blocking();
+        bool block = isBlocking();
 
         if (!c_blocking(false) || !is_open(m_fd))
             return false;

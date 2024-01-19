@@ -26,7 +26,7 @@ namespace fix
             void set9_bodyLength(const size_t &_len);
 
             /// @brief Set the type of message send [35](https://www.onixs.biz/fix-dictionary/4.2/tagNum_35.html).
-            /// @param _val Value assigned to it: char.
+            /// @param _val Value assigned to it: string.
             void set35_MsgType(const std::string &_val);
 
             /// @brief Set the sequence number of the message [34](https://www.onixs.biz/fix-dictionary/4.2/tagNum_34.html).
@@ -44,6 +44,7 @@ namespace fix
             /// @brief Set the receiver Id of the message [56](https://www.onixs.biz/fix-dictionary/4.2/tagNum_56.html).
             /// @param _val Value assigned to it: int.
             void set56_TargetCompId(const std::string &_val);
+            [[nodiscard]] uint64_t getTargetCompId() const;
 
             /// @brief Convert the header to a string.
             operator std::string() const;

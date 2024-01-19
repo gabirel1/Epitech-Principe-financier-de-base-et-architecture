@@ -121,6 +121,11 @@ namespace fix
         SendingTime = formattedTime;
     }
 
+    uint64_t Header::getTargetCompId() const
+    {
+        return utils::to<uint64_t>(TargetCompId);
+    }
+
     void Header::updateMsgSeqNum()
     {
         MsgSeqNum = std::to_string(std::stoi(MsgSeqNum) + 1);

@@ -3,8 +3,6 @@
 #include "Common/Core/Utils.hpp"
 #include "Common/Message/Reject.hpp"
 
-#include <iostream> // for debug
-
 namespace utils
 {
     template<class T>
@@ -21,8 +19,6 @@ namespace utils
     std::pair<bool, fix::Reject> Has(fix::Serializer::AnonMessage &_msg)
     {
         std::pair<bool, fix::Reject> reject = { false, {} };
-
-        std::cout << "T: " << T << " , at(T): " << _msg.at(T) << std::endl;
 
         if (!_msg.contains(T)) {
             reject.first = true;

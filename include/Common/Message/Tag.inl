@@ -1,6 +1,5 @@
 #include "Common/Message/Tag.hpp"
 #include "Common/Core/Utils.hpp"
-#include <iostream>
 
 namespace fix
 {
@@ -149,8 +148,6 @@ namespace fix
     std::pair<bool, Reject> verify<Tag::Symbol>(const std::string &_value)
     {
         std::ignore = _value;
-
-        std::cout << "Symbol: " << _value << std::endl;
 
         return { false, {} };
     }

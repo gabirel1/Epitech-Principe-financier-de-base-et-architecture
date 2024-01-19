@@ -15,11 +15,11 @@ namespace net
 
             void blocking(bool _block);
 
-            [[nodiscard]] bool close();
-
             bool listen(uint32_t _port);
 
             Client accept();
+
+            [[nodiscard]] bool close();
     };
 }
 

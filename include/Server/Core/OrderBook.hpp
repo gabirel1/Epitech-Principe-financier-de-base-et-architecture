@@ -2,6 +2,7 @@
 
 #include <mutex>
 #include <map>
+#include <unordered_map>
 
 #include "Server/Core/Order.hpp"
 #include "Server/Core/meta.hpp"
@@ -22,10 +23,13 @@ class OrderBook
         struct Event
         {
             OrderId orderId;
+            Quantity orgQty;
             OrderStatus status;
             Price price;
             Quantity quantity;
-            Side side;
+            OrderType side;
+            UserId userId;
+            bool sold;
         };
 
         struct Data
@@ -44,12 +48,14 @@ class OrderBook
             Order order;
         };
 
-        OrderBook(ts::Queue<Event> &_output);
+        using EventQueue = ts::Queue<Event>;
+
+        OrderBook(EventQueue &_output);
         virtual ~OrderBook() = default;
 
-        bool add(OrderType _type, Price _price, Order& _order);
-        bool modify(OrderType _type, Price _price, Order &_order);
-        bool cancel(OrderType _type, Order &_order);
+        [[nodiscard]] bool add(OrderType _type, Price _price, Order &_order);
+        [[nodiscard]] bool modify(OrderType _type, Price _price, Order &_order);
+        [[nodiscard]] bool cancel(OrderType _type, OrderId _orderId);
 
         // front only
         [[nodiscard]] std::vector<Price> getPrice(OrderType _type);
@@ -57,13 +63,18 @@ class OrderBook
         [[nodiscard]] const OrderList &getOrders(OrderType _type, Price _price);
         [[nodiscard]] Quantity sumQuantity(OrderType _type, Price _price);
 
+        [[nodiscard]] bool has(OrderType _type, OrderId _orderId) const;
+
     protected:
+        template<IsBook T>
+        using OrderIdMap = std::unordered_map<OrderId, std::pair<typename T::iterator, OrderList::iterator>>;
+
+        void add(OrderType _type, Price _price, Order &_order, OrderStatus _status);
+
         template<IsBook T, class _T>
         bool add(T &_book, Price _price, Order &_order);
         template<IsBook T>
-        bool modify(T &_book, Price _price, Order &_order);
-        template<IsBook T>
-        bool cancel(T& _book, Order &_order);
+        bool cancel(OrderIdMap<T> &_mapId, OrderId _orderId, bool _event);
 
         template<IsBook T>
         [[nodiscard]] std::vector<Price> inter_getPrice(const T &_book);
@@ -71,7 +82,10 @@ class OrderBook
     private:
         std::mutex m_mutex;
 
-        ts::Queue<Event> &m_output;
+        OrderIdMap<BidBook> m_bid_id;
+        OrderIdMap<AskBook> m_ask_id;
+
+        EventQueue &m_output;
 
         BidBook m_bid;
         AskBook m_ask;

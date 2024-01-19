@@ -55,6 +55,10 @@ namespace fix
             /// @param _val Value assigned to it: string.
             void set55_symbol(const std::string &_val);
 
+            /// @brief Set an optional text to explain the reason [58](https://www.onixs.biz/fix-dictionary/4.2/tagNum_58.html).
+            /// @param _val Value assigned to it: string.
+            void set58_text(const std::string &_val);
+
             /// @brief Set the type of execution on the order [150](https://www.onixs.biz/fix-dictionary/4.2/tagNum_150.html).
             /// @param _val Value assigned to it: (0, 1, 2, 4, or 8)
             void set150_execType(const std::string &_val);

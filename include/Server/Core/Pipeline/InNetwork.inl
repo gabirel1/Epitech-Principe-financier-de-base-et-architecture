@@ -13,6 +13,7 @@ namespace pip
     {
         (void)m_acceptor.listen(_port);
         (void)m_acceptor.blocking(false);
+        m_selector.timeout(100);
         Logger::Log("[InNetwork] listening to port: ", _port);
     }
 
@@ -41,7 +42,6 @@ namespace pip
 
         Client accept = nullptr;
         std::vector<Client> clients;
-        int error = 0;
 
         while (this->m_running) {
             accept = m_acceptor.accept();
@@ -51,6 +51,8 @@ namespace pip
                 Logger::Log("[InNetwork] Accepted new client: "); // todo log
             }
             clients = m_selector.pull();
+            if (clients.size())
+                Logger::Log("[InNetwork] Received event from: ", clients.size(), " clients");
             for (Client &_client : clients) {
                 auto client = std::find_if(m_clients.begin(), m_clients.end(), [_client] (const ClientSocket _lclient) {
                     return _client == _lclient;
@@ -64,10 +66,10 @@ namespace pip
                     m_error.push(ErrorMsg(ClientSocket(_client), reject));
                     continue;
                 } else if (_T(*client, m_output, m_error)) {
+                    Logger::Log("[InNetwork] Disconnecting client: "); // todo log
                     // erase inside the selecter and client list
                 }
             }
-            (void)m_acceptor.blocking(false);
         }
     }
 }
