@@ -26,21 +26,21 @@ namespace fix
              * Unique identifier of the order
              * @brief ClOrdID <11> of the order to be canceled.
              */
-            void set41_OrigClOrdID(const std::string &_val);
+            void set41_origClOrdID(const std::string &_val);
 
             /**
              * Unique ID of cancel request as assigned by the institution.
              * @param _val
              * Unique identifier for Order as assigned by institution (identified by SenderCompID <49> or OnBehalfOfCompID <115> as appropriate).
              */
-            void set11_ClOrdID(const std::string &_val);
+            void set11_clOrdID(const std::string &_val);
 
             /**
              * Ticker symbol
              * @param _val
              * Ticker symbol
              */
-            void set55_Symbol(const std::string &_val);
+            void set55_symbol(const std::string &_val);
 
             /**
              * Side of order
@@ -56,14 +56,14 @@ namespace fix
              * 8 = Cross (orders where counterparty is an exchange, valid for all messages except IOIs)
              * 9 = Cross short
              */
-            void set54_Side(const std::string &_val);
+            void set54_side(const std::string &_val);
 
             /**
              * Time this order request was initiated/released by the trader or trading system.
              * @param _val
              * Time this order request was initiated/released by the trader or trading system.
              */
-            void set60_TransactTime(const std::string &_val);
+            void set60_transactTime(const std::string &_val);
 
             static constexpr const char MsgType[] = "F";         ///< Message type value as string.
             static constexpr const char cMsgType = MsgType[0];  ///< Message type value as char.

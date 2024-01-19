@@ -4,18 +4,15 @@
 #include "Common/Message/Logon.hpp"
 #include "Common/Message/Logout.hpp"
 #include "Common/Message/NewOrderSingle.hpp"
-#include "Common/Message/NewOrderList.hpp"
 #include "Common/Message/OrderCancelRequest.hpp"
 #include "Common/Message/OrderCancelReplaceRequest.hpp"
 #include "Common/Message/OrderStatusRequest.hpp"
 #include "Common/Message/MarketDataRequest.hpp"
 #include "Common/Message/HeartBeat.hpp"
 
-#include <QDateTime>
-#include <QHBoxLayout>
-#include <QComboBox>
-
 #include <iostream>
+
+#include <QDateTime>
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -61,8 +58,10 @@ void MainWindow::slot_log()
 {
     if (m_ui->btn_log->text() == "Log On") {
         fix::Logon logon;
-
-        logon.header.setSeqNum(messageID);
+    
+        logon.header.set34_msgSeqNum(std::to_string(messageID));
+        logon.header.set49_SenderCompId("1");
+        logon.header.set56_TargetCompId("0");
         logon.set98_EncryptMethod("0");
         logon.set108_HeartBtInt("30");
 
@@ -72,11 +71,11 @@ void MainWindow::slot_log()
         m_ui->btn_log->setText("Log Out");
 
     } else {
-
         fix::Logout logout;
 
-        logout.header.setSeqNum(messageID);
-        logout.set58_Text("c'est ciao !");
+        logout.header.set34_msgSeqNum(std::to_string(messageID));
+        logout.header.set49_SenderCompId("1");
+        logout.header.set56_TargetCompId("0");
 
         m_gestionnaireSocket->sendTcpSocket(logout.to_string());
 
@@ -121,15 +120,17 @@ void MainWindow::slot_sendNewOrderSingle()
 {
     fix::NewOrderSingle newOrderSingle;
 
-    newOrderSingle.header.setSeqNum(messageID);
-    newOrderSingle.set11_ClOrdID(std::to_string(orderID));
-    newOrderSingle.set21_HandlInst("3");
-    newOrderSingle.set38_OrderQty(m_ui->quantityValue_NewOrderSingle->text().toStdString());
-    newOrderSingle.set40_OrdType("2");
-    newOrderSingle.set44_Price(m_ui->priceValue_NewOrderSingle->text().toStdString());
-    newOrderSingle.set54_Side(std::to_string(m_ui->orderType_NewOrderSingle->currentIndex() + 1));
-    newOrderSingle.set55_Symbol("");
-    newOrderSingle.set60_TransactTime(getDate());
+    newOrderSingle.header.set34_msgSeqNum(std::to_string(messageID));
+    newOrderSingle.header.set49_SenderCompId("1");
+    newOrderSingle.header.set56_TargetCompId("0");
+    newOrderSingle.set11_clOrdID(std::to_string(orderID));
+    newOrderSingle.set21_handlInst("3");
+    newOrderSingle.set38_orderQty(m_ui->quantityValue_NewOrderSingle->text().toStdString());
+    newOrderSingle.set40_ordType("2");
+    newOrderSingle.set44_price(m_ui->priceValue_NewOrderSingle->text().toStdString());
+    newOrderSingle.set54_side(std::to_string(m_ui->orderType_NewOrderSingle->currentIndex() + 3));
+    newOrderSingle.set55_symbol("3");
+    newOrderSingle.set60_transactTime(getDate());
 
     m_gestionnaireSocket->sendTcpSocket(newOrderSingle.to_string());
 
@@ -174,12 +175,14 @@ void MainWindow::slot_cancelOrder()
         fix::OrderCancelRequest orderCancel;
         QTableWidgetItem *item = m_ui->orderHistory->item(list.at(0)->row(), 1);
 
-        orderCancel.header.setSeqNum(1);
-        orderCancel.set11_ClOrdID(m_ui->orderIDValue_OrderCancel->text().toStdString());
-        orderCancel.set41_OrigClOrdID(std::to_string(orderID));
-        orderCancel.set54_Side(item->text().toStdString().c_str());
-        orderCancel.set55_Symbol("");
-        orderCancel.set60_TransactTime(getDate());
+        orderCancel.header.set34_msgSeqNum(std::to_string(messageID));
+        orderCancel.header.set49_SenderCompId("1");
+        orderCancel.header.set56_TargetCompId("0");
+        orderCancel.set11_clOrdID(m_ui->orderIDValue_OrderCancel->text().toStdString());
+        orderCancel.set41_origClOrdID(std::to_string(orderID));
+        orderCancel.set54_side(item->text().toStdString().c_str());
+        orderCancel.set55_symbol("");
+        orderCancel.set60_transactTime(getDate());
 
         m_gestionnaireSocket->sendTcpSocket(orderCancel.to_string());
 
@@ -200,14 +203,16 @@ void MainWindow::slot_modifyOrder()
 
         fix::OrderCancelReplaceRequest orderCancelReplace;
 
-        orderCancelReplace.header.setSeqNum(1);
-        orderCancelReplace.set11_ClOrdID(m_ui->orderIDValue_OrderCancel->text().toStdString());
-        orderCancelReplace.set21_HandlInst("");
-        orderCancelReplace.set40_OrdType("");
-        orderCancelReplace.set41_OrigClOrdID(std::to_string(orderID));
-        orderCancelReplace.set54_Side(item->text().toStdString().c_str());
-        orderCancelReplace.set55_Symbol("");
-        orderCancelReplace.set60_TransactTime(getDate());
+        orderCancelReplace.header.set34_msgSeqNum(std::to_string(messageID));
+        orderCancelReplace.header.set49_SenderCompId("1");
+        orderCancelReplace.header.set56_TargetCompId("0");
+        orderCancelReplace.set11_clOrdID(m_ui->orderIDValue_OrderCancel->text().toStdString());
+        orderCancelReplace.set21_handlInst("");
+        orderCancelReplace.set40_ordType("");
+        orderCancelReplace.set41_origClOrdID(std::to_string(orderID));
+        orderCancelReplace.set54_side(item->text().toStdString().c_str());
+        orderCancelReplace.set55_symbol("");
+        orderCancelReplace.set60_transactTime(getDate());
 
         m_gestionnaireSocket->sendTcpSocket(orderCancelReplace.to_string());
 

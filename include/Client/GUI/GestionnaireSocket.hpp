@@ -20,7 +20,8 @@ class GestionnaireSocket
         net::tcp::Socket m_tcp;
         net::udp::Socket m_udp;
 
-        ThreadSocket *thread;
+        ThreadSocket *m_thread_tcp;
+        ThreadSocket *m_thread_udp;
 };
 
 #endif /* !GESTIONNAIRESOCKET_HPP_ */
