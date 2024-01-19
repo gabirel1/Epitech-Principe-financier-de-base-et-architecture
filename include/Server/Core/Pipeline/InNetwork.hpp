@@ -30,6 +30,7 @@ namespace pip
             /// @brief Setup the network input and start listening on _port
             /// @param _clients List of clients connected in to this network
             /// @param _output Output data queue of the pipeline.
+            /// @param _error Error output directly connected to pip::OutNetwork
             /// @param _port Port on which the network will listen to, for connection and receive message.
             InNetwork(std::vector<__T> &_clients, NetToSerial &_output, RawOutput &_error, uint32_t _port);
             /// @brief Disconnect from listening, stop the pipeline and the destroy it.
