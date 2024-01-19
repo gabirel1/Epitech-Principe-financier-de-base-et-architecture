@@ -42,7 +42,7 @@ namespace pip
             void clean();
 
         private:
-            std::vector<std::pair<std::chrono::steady_clock::time_point, const uint8_t *>> m_message;
+            std::vector<std::pair<std::chrono::steady_clock::time_point, data::UDPPackage>> m_message;
 
             net::udp::Socket m_socket;
 

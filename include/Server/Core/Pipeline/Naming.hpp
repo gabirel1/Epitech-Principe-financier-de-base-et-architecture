@@ -14,7 +14,7 @@
 #define UDP_FLAG_GET_STATUS(_flag)      OrderStatus((_flag >> 1) & 0111)
 
 #define UDP_FLAG_SET_SOLD(_flag, _s)    _flag = (_flag & ~010000) | ((_s & 01) << 4)
-#define UDP_FLAG_GET_IS_SOLD()          bool((_flag >> 4) & 01)
+#define UDP_FLAG_GET_IS_SOLD(_flag)          bool((_flag >> 4) & 01)
 
 namespace data
 {
@@ -65,6 +65,8 @@ namespace data
         Quantity quantity;
         Price price;
     };
+
+    std::ostream &operator<<(std::ostream &_os, const UDPPackage &_package);
 }
 
 /// @brief Output data type of the pip::InNetwork pipeline.

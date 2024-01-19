@@ -33,14 +33,15 @@ namespace pip
             auto now = std::chrono::steady_clock::now();
 
             for (size_t it = 0; it < UDP_MAX_MSG && !m_input.empty(); it++) {
-                Logger::Log("[UDPOutNetwork] New notification to be broadcast: "); // todo log
-                m_message.emplace_back(now, reinterpret_cast<const uint8_t*>(&m_input.front()));
-                m_input.pop();
+                Logger::Log("[UDPOutNetwork] New notification to be broadcast: ", m_input.front());
+                m_message.emplace_back(now, m_input.pop_front());
+            }
+            for (const auto &[_, _val] : m_message) {
+                Logger::Log("[UDPOutNetwork] Broadcasting message: ", _val);
+                (void)m_socket.broadcast(reinterpret_cast<const uint8_t*>(&_val), sizeof(data::UDPPackage));
             }
             clean();
-            for (const auto &[_, _val] : m_message)
-                (void)m_socket.broadcast(_val, sizeof(data::UDPPackage));
-            sleep(UDP_TICK);
+            sleep(UDP_TICK * 10);
         }
     }
 
@@ -51,8 +52,8 @@ namespace pip
         size_t cleaned = 0;
 
         for (auto it = m_message.begin(); it != m_message.end(); ) {
-            if (std::chrono::duration_cast<std::chrono::seconds>(now - it->first).count() > 2) {
-                Logger::Log("[UDPOutNetwork] Cleaned UDP message: "); // todo log
+            if (std::chrono::duration_cast<std::chrono::seconds>(now - it->first).count() >= 2) {
+                Logger::Log("[UDPOutNetwork] Cleaning message:", it->second);
                 it = m_message.erase(it);
                 cleaned++;
             } else {
@@ -60,6 +61,6 @@ namespace pip
             }
         }
         if (cleaned)
-            Logger::Log("[UDPOutNetwork] Cleaned ", cleaned, " messages from the UDP queue");
+            Logger::Log("[UDPOutNetwork] Cleaned ", cleaned, " messages from the UDP queue, new size: ", m_message.size());
     }
 }
