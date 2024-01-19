@@ -11,7 +11,7 @@ namespace data
         : Client(_client), Message(_msg)
     {
     }
-    
+
     NetToSerial &NetToSerial::operator=(const NetToSerial &_data)
     {
         Client = _data.Client;
@@ -47,5 +47,14 @@ namespace data
         Client = _data.Client;
         Message = _data.Message;
         return *this;
+    }
+
+    std::ostream &operator<<(std::ostream &_os, const UDPPackage &_packeage)
+    {
+        _os << "{ id: " << _packeage.id <<  ", prcie: " << _packeage.price << ", quantity: " << _packeage.quantity;
+        _os << ", book: " << ((UDP_FLAG_GET_BOOK(_packeage.flag) == OrderType::Ask) ? "Ask" : "Bid");
+        _os << ", status: " << UDP_FLAG_GET_STATUS(_packeage.flag);
+        _os << ", is-sold: " << UDP_FLAG_GET_IS_SOLD(_packeage.flag) << " }";
+        return _os;
     }
 }

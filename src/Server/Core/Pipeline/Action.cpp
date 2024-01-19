@@ -139,35 +139,23 @@ namespace pip
         return true;
     }
 
-    /*bool Action::treatOrderCancelRequest(SerialIn &_input)
+    bool Action::treatOrderCancelRequest(SerialIn &_input)
     {
         SerialOut data;
-        fix::Reject reject;
+        std::pair<bool, fix::Reject> verif = fix::OrderCancelRequest::Verify(_input.Message);
 
-        reject.set45_refSeqNum(_input.Message.at(fix::Tag::MsqSeqNum));
-        reject.set58_text("Not implemented yet");
-        // NOT IMPLEMENTED YET
-        m_raw.push({ _input.Client, reject });
-        return false;
-
-        if (!_input.Message.contains(fix::Tag::ClOrdID) || !_input.Message.contains(fix::Tag::OrigClOrdID)) {
-            // reject
-            m_raw.push({ _input.Client, reject });
-            return false;
-        } else if (_input.Message.at(fix::Tag::Side) != "3" && _input.Message.at(fix::Tag::Side) != "4") {
-            // reject
-            m_raw.push({ _input.Client, reject });
+        if (verif.first) {
+            m_raw.push({ _input.Client, verif.second });
             return false;
         }
-
         data.Client = _input.Client;
         data.OrderData.action = OrderBook::Data::Action::Cancel;
         data.OrderData.order.orderId = utils::to<OrderId>(_input.Message.at(fix::Tag::OrigClOrdID));
+        data.OrderData.order.userId = _input.Client.User;
         data.OrderData.type = (_input.Message.at(fix::Tag::Side) == "3") ? OrderType::Bid : OrderType::Ask;
-        data.Time = _input.Time;
         m_output.push(data);
         return true;
-    }*/
+    }
 
     bool Action::treatOrderCancelReplaceRequest(SerialIn &_input)
     {
