@@ -35,7 +35,7 @@ namespace pip
                 Logger::Log("[OutNetwork] New message message to send: ", input.Message.to_string());
                 m_tp.enqueue([this, _input = std::move(input)] () mutable {
                     std::vector<ClientSocket>::iterator it;
-                    UserId userId = 0;
+                    UserId userId = "";
 
                     _input.Message.header.set49_SenderCompId("Market");
                     Logger::Log("client list size: ", m_clients.size());
@@ -55,15 +55,15 @@ namespace pip
                     if (it != m_clients.end()) {
                         userId = it->User;
                         _input.Message.header.set34_msgSeqNum(std::to_string(it->SeqNumber));
-                        _input.Message.header.set56_TargetCompId(std::to_string(it->User));
+                        _input.Message.header.set56_TargetCompId(it->User);
                         std::string data = _input.Message.to_string();
 
                         if (it->getSocket()) {
                             it->getSocket()->send(reinterpret_cast<const uint8_t *>(data.c_str()), data.size());
-                            Logger::Log("[OutNetwork] Data send successfuly: "); // todo log
+                            Logger::Log("[OutNetwork] Data send successfuly: ", data);
                             it->Logged = _input.Client.Logged;
                             Logger::Log("[OutNetwork] New login status: ", it->Logged);
-                            if (it->Disconnect) {
+                            if (_input.Client.Disconnect) {
                                 it->getSocket()->close();
                                 m_clients.erase(it);
                                 Logger::Log("[OutNetwork] Client has been disconnected: ", userId);

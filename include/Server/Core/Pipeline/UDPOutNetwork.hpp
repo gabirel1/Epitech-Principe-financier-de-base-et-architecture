@@ -6,7 +6,7 @@
 #include "Server/Core/Pipeline/Naming.hpp"
 
 #ifndef UDP_TICK
-    #define UDP_TICK 0.2
+    #define UDP_TICK 1
 #endif
 
 #ifndef UDP_CLEAR

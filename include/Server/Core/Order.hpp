@@ -4,7 +4,7 @@
 #include <iostream>
 #include <vector>
 
-using UserId = uint64_t;
+using UserId = std::string;
 using OrderId = uint64_t;
 using Quantity = uint64_t;
 using Side = uint8_t;

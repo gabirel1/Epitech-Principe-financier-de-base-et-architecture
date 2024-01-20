@@ -53,7 +53,7 @@ namespace pip
         report.set40_ordType("2");
         report.set44_price(std::to_string(_input.price));
         report.set54_side((_input.side == OrderType::Ask) ? "3" : "4");
-        report.header.set56_TargetCompId(std::to_string(_input.userId));
+        report.header.set56_TargetCompId(_input.userId);
         report.set151_leavesQty(std::to_string(_input.quantity));
         m_tcp.append(NetIn{ {}, report });
         Logger::Log("[OBEvent] (TCP) Report created: "); // todo log

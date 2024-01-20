@@ -67,7 +67,8 @@ namespace pip
                     continue;
                 } else if (_T(*client, m_output, m_error)) {
                     Logger::Log("[InNetwork] Disconnecting client: "); // todo log
-                    // erase inside the selecter and client list
+                    m_clients.erase(client);
+                    m_selector.erase(client->getSocket());
                 }
             }
         }

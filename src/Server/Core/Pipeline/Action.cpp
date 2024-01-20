@@ -41,7 +41,7 @@ namespace pip
                 reject = fix::Header::Verify(input.Message);
                 if (reject.first) {
                     Logger::Log("[Action] Incorect header received from client: ", input.Client.User);
-                    reject.second.header.set56_TargetCompId(std::to_string(input.Client.User));
+                    reject.second.header.set56_TargetCompId(input.Client.User);
                     reject.second.header.set49_SenderCompId(input.Message.at(fix::Tag::TargetCompId));  // WARN: if the tag is missing?
                     m_raw.push({ input.Client, reject.second });
                     continue;
@@ -85,7 +85,7 @@ namespace pip
             return false;
         }
         _input.Client.Logged = true;
-        _input.Client.User = utils::to<UserId>(_input.Message.at(fix::Tag::SenderCompId));
+        _input.Client.User = _input.Message.at(fix::Tag::SenderCompId);
         _input.Client.SeqNumber = utils::to<size_t>(_input.Message.at(fix::Tag::MsqSeqNum));
         logon.set98_EncryptMethod("0");
         logon.set108_HeartBtInt(_input.Message.at(fix::Tag::HearBtInt));
@@ -109,7 +109,7 @@ namespace pip
         }
         _input.Client.Logged = false;
         _input.Client.Disconnect = true;
-        _input.Client.User = 0;
+        _input.Client.User = "";
         Logger::Log("[Action] (Logout) Request from: ", _input.Client.User, ", sucessfuly handle");
         m_raw.push({ _input.Client, logout });
         return true;

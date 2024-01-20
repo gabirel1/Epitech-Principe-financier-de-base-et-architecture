@@ -17,7 +17,7 @@ class ClientSocket
 
         bool Logged = false;
         bool Disconnect = false;
-        UserId User = 0;
+        UserId User = "";
         size_t SeqNumber = 1;
 
         void newRequest();
