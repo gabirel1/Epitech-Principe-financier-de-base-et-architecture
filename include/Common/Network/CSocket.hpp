@@ -61,10 +61,10 @@ namespace net
                 /// @brief Retreive the blocking policy of a file descriptor.
                 /// @param _fd File descriptor to check on.
                 /// @return True if it is blocking otherwise false.
-                [[nodiscard]] static bool blocking(int _fd);
+                [[nodiscard]] static bool isBlocking(int _fd);
                 /// @brief Retreive the blocking policy of a socket.
                 /// @return True if it is blocking otherwise false.
-                [[nodiscard]] bool blocking() const;
+                [[nodiscard]] bool isBlocking() const;
 
                 /// @brief C++ binding to the C function close.
                 /// @param _fd File descriptor to close.
@@ -102,7 +102,7 @@ namespace net
                 /// @return True if the socket is succefully bind otherwise false.
                 [[nodiscard]] bool c_bind(struct sockaddr *_addr);
 
-                /// @brief Set the socket to listening/
+                /// @brief Set the socket to listening.
                 /// @param _max The maximum handled socket at once.
                 /// @return True if the initialisation of listen is succefully otherwise false.
                 bool c_listen(int _max);

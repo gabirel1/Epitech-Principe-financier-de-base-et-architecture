@@ -3,6 +3,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
+#include <netinet/ip.h>
 
 #include "Common/Core/Logger.hpp"
 #include "Common/Network/Socket.hpp"
@@ -47,20 +48,12 @@ namespace net
         return str;
     }
 
-    bool Socket::is_open() const
-    {
-        char buffer = 0;
-        int res = recv(raw(), &buffer, 1, MSG_PEEK);
-
-        return res < 0 || (res == 0 && (errno == EWOULDBLOCK || errno == EAGAIN || errno == EINTR));
-    }
-
     bool Socket::close()
     {
         return c_close();
     }
 
-    Socket::operator bool() const
+    Socket::operator bool()
     {
         return is_open();
     }
@@ -97,7 +90,10 @@ namespace net
         {
             int enable = 1;
 
-            create();
+            if (is_open())
+                close();
+            if (!c_create())
+                return false;
             if (setsockopt(raw(), SOL_SOCKET, SO_BROADCAST, &enable, sizeof(enable)) == -1) {
                 Logger::Log("[udp::Socket] Failed to set the broadcast flag: ", strerror(errno));
                 close();

@@ -3,7 +3,18 @@
 #include "Common/Message/Fix.hpp"
 #include "Common/Message/Serializer.hpp"
 #include "Common/Thread/Queue.hpp"
+#include "Server/Core/OrderBook.hpp"
 #include "Server/Core/ClientSocket.hpp"
+
+#define UDP_FLAG_SET_BID(_flag)         _flag |= 01
+#define UDP_FLAG_SET_ASK(_flag)         _flag &= ~01
+#define UDP_FLAG_GET_BOOK(_flag)        OrderType(_flag & 01)
+
+#define UDP_FLAG_SET_STATUS(_flag, _s)  _flag = (_flag & ~01110) | ((_s & 0111) << 1)
+#define UDP_FLAG_GET_STATUS(_flag)      OrderStatus((_flag >> 1) & 0111)
+
+#define UDP_FLAG_SET_SOLD(_flag, _s)    _flag = (_flag & ~010000) | ((_s & 01) << 4)
+#define UDP_FLAG_GET_IS_SOLD(_flag)          bool((_flag >> 4) & 01)
 
 namespace data
 {
@@ -18,7 +29,6 @@ namespace data
 
         ClientSocket Client{};                      ///< Sender client information.
         fix::Serializer::AnonMessage Message{};     ///< Undefined message data.
-        std::chrono::_V2::system_clock::time_point Time{};  ///< Time of the action.
     };
 
     /// @brief Data transfered from the pip::Action pipeline to the pip::Market pipeline
@@ -31,7 +41,6 @@ namespace data
 
         ClientSocket Client{};                              ///< Sender client information.
         OrderBook::Data OrderData{};                        ///< Action to apply to the OrderBook.
-        std::chrono::_V2::system_clock::time_point Time{};  ///< Time of the action.
     };
 
     /// @brief Data transfered from the pip::Market pipeline to the pip::OutNetwork pipeline
@@ -45,17 +54,19 @@ namespace data
 
         ClientSocket Client{};                      ///< Sender client information.
         fix::Message Message{};                     ///< Final message send to the client.
-        std::chrono::_V2::system_clock::time_point Time{};  ///< Time of the action.
     };
 
     /// @brief Data send to the UDP broadcast in pip::UDPOutNetwork pipeline.
     struct UDPPackage
     {
         uint32_t time;
+        uint64_t id;
         uint8_t flag;
-        double quantity;
-        double price;
+        Quantity quantity;
+        Price price;
     };
+
+    std::ostream &operator<<(std::ostream &_os, const UDPPackage &_package);
 }
 
 /// @brief Output data type of the pip::InNetwork pipeline.
@@ -82,5 +93,6 @@ using SerialToMarket = ts::Queue<SerialOut>;
 using MarketToNet = ts::Queue<MarketOut>;
 /// @brief Queue type use to transfer direct message from any pipeline to the pip::OutNetwork pipeline.
 using RawOutput = ts::Queue<NetIn>;
+
 /// @brief Queue type use to transfer data to be formated and send by the pip::UDPOutNetwork pipeline.
-using UdpInput = ts::Queue<NetIn>;
+using UdpInput = ts::Queue<data::UDPPackage>;

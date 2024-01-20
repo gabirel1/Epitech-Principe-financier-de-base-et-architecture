@@ -17,14 +17,14 @@ namespace fix
             static std::pair<bool, Reject> Verify(Serializer::AnonMessage &_msg);
 
             /// @brief Set the order Id [11](https://www.onixs.biz/fix-dictionary/4.2/tagNum_11.html).
-            /// @param _val Value assigned to it: int.
+            /// @param _val Value assigned to it: string.
             void set11_clOrdID(const std::string &_val);
 
             /// @brief Set the trading strategy of the order [21](https://www.onixs.biz/fix-dictionary/4.2/tagNum_21.html).
             /// @param _val Value assigned to it: (3).
             void set21_handlInst(const std::string &_val);
 
-            /// @brief Set the quantity trad [38](https://www.onixs.biz/fix-dictionary/4.2/tagNum_38.html).
+            /// @brief Set the quantity order [38](https://www.onixs.biz/fix-dictionary/4.2/tagNum_38.html).
             /// @param _val Value assigned to it: double.
             void set38_orderQty(const std::string &_val);
 
@@ -32,7 +32,7 @@ namespace fix
             /// @param _val Value assigned to it: (2).
             void set40_ordType(const std::string &_val);
 
-            /// @brief Set the price of the trad [44](https://www.onixs.biz/fix-dictionary/4.2/tagNum_44.html).
+            /// @brief Set the price of the order [44](https://www.onixs.biz/fix-dictionary/4.2/tagNum_44.html).
             /// @param _val Value assigned to it: double.
             void set44_price(const std::string &_val);
 

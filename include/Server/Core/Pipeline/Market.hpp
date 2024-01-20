@@ -34,9 +34,9 @@ namespace pip
             /// @param _data Data to build and run action on the OrderBook.
             void process(MarketIn &_data);
 
-            /// @brief Format and send result of the action applied to the pip::OutNetwork pipeline.
-            /// @param _data Resulting data of the Action::process function.
-            void send(const MarketIn _data);
+            bool runAdd(MarketIn _data);
+            bool runModify(MarketIn _data);
+            bool runCancel(MarketIn _data);
 
             SerialToMarket &m_input;        ///< Intput data queue.
             MarketToNet &m_output;          ///< Output data queue.

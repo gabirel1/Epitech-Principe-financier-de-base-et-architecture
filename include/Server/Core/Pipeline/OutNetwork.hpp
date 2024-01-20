@@ -19,7 +19,8 @@ namespace pip
 
             /// @brief Construct the pipeline.
             /// @param _input Input data queue.
-            OutNetwork(MarketToNet &_input);
+            /// @param _clients List of the connected client.
+            OutNetwork(MarketToNet &_input, std::vector<ClientSocket> &_clients);
             /// @brief Stop and then destroy the pipeline.
             ~OutNetwork();
 
@@ -30,9 +31,14 @@ namespace pip
             /// @brief Core function of the pipeline determining it's behavior
             void loop();
 
-        private:
-            MarketToNet &m_input;           ///< Intput data queue.
+        protected:
+            void logTiming(std::vector<ClientSocket>::iterator _it);
 
-            ThreadPool<TS_SIZE_ON> m_tp;    ///< Thread pool used to send data to the target client in async.
+
+        private:
+            MarketToNet &m_input;                   ///< Intput data queue.
+            std::vector<ClientSocket> &m_clients;   ///< List of connected clients.
+
+            ThreadPool<TS_SIZE_ON> m_tp;            ///< Thread pool used to send data to the target client in async.
     };
 }

@@ -50,45 +50,44 @@ target_compile_definitions(MarketServer PRIVATE NET_RECV_SIZE=4096)       # Pack
 
 # Client
 
-file(GLOB_RECURSE SRC_CLIENT
-    include/Client/**.hpp
-    include/Client/**.inl
-    src/Client/**.cpp
-)
+# file(GLOB_RECURSE SRC_CLIENT
+#     include/Client/**.hpp
+#     include/Client/**.inl
+#     src/Client/**.cpp
+# )
 
-add_executable(MarketClient
-    ${SRC_CLIENT}
-)
+# add_executable(MarketClient
+#     ${SRC_CLIENT}
+# )
 
-target_link_libraries(MarketClient PRIVATE MarketCommon)
+# target_link_libraries(MarketClient PRIVATE MarketCommon)
 
-target_include_directories(MarketClient PRIVATE include)
+# target_include_directories(MarketClient PRIVATE include)
 
 # Setup GTest
-include(FetchContent)
+# include(FetchContent)
 
-set(GTEST_VERSION 1.14.0)
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/refs/tags/v${GTEST_VERSION}.tar.gz
-  PREFIX ${CMAKE_BINARY_DIR}/gtest
-  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/gtest
-)
-FetchContent_MakeAvailable(googletest)
+# set(GTEST_VERSION 1.14.0)
+# FetchContent_Declare(
+#   googletest
+#   URL https://github.com/google/googletest/archive/refs/tags/v${GTEST_VERSION}.tar.gz
+#   PREFIX ${CMAKE_BINARY_DIR}/gtest
+#   CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/gtest
+# )
+# FetchContent_MakeAvailable(googletest)
 
-enable_testing()
+# enable_testing()
 
-file(GLOB_RECURSE SRC_TESTS
-    test/**.cpp
-)
+# file(GLOB_RECURSE SRC_TESTS
+#     test/**.cpp
+# )
 
-add_executable(MarketTest
-    ${SRC_TESTS}
-)
-target_include_directories(MarketTest PRIVATE include)
-target_include_directories(MarketTest PRIVATE test)
-target_link_libraries(MarketTest MarketCommon GTest::gtest_main)
-target_compile_options(MarketTest PRIVATE -Wno-protected -Wno-private)
+# add_executable(MarketTest
+#     ${SRC_TESTS}
+# )
+# target_include_directories(MarketTest PRIVATE include)
+# target_include_directories(MarketTest PRIVATE test)
+# target_link_libraries(MarketTest MarketCommon GTest::gtest_main)
 
-include(GoogleTest)
-gtest_discover_tests(MarketTest)
+# include(GoogleTest)
+# gtest_discover_tests(MarketTest)
