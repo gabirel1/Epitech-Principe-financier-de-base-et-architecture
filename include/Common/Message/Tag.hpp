@@ -43,7 +43,6 @@ namespace fix
         constexpr const char RefTagId[] = "371";            ///< Tag [371](https://www.onixs.biz/fix-dictionary/4.2/tagNum_371.html).
         constexpr const char RefMsgType[] = "352";          ///< Tag [352](https://www.onixs.biz/fix-dictionary/4.2/tagNum_352.html).
         constexpr const char SessionRejectReason[] = "373"; ///< Tag [373](https://www.onixs.biz/fix-dictionary/4.2/tagNum_373.html).
-
     };
 
     /// @brief Verify the value of all the fix::Tag passed as template.
