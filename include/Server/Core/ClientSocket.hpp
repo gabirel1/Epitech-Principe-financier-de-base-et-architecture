@@ -4,8 +4,8 @@
 #include <memory>
 #include <unordered_map>
 
+#include "Common/Core/Order.hpp"
 #include "Common/Network/Socket.hpp"
-#include "Server/Core/Order.hpp"
 
 class ClientSocket
 {

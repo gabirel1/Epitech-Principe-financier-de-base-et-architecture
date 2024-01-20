@@ -30,3 +30,9 @@ enum OrderStatus {
     Replaced,
     Pending
 };
+
+enum class OrderType
+{
+    Bid,
+    Ask
+};

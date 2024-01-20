@@ -8,7 +8,7 @@ namespace pip
 {
     template<IsSocket T, auto _T, class __T>
     requires SocketClient<__T, T>
-    InNetwork<T, _T, __T>::InNetwork(std::vector<__T> &_clients, NetToSerial &_output, RawOutput &_error, uint32_t _port)
+    InNetwork<T, _T, __T>::InNetwork(std::vector<__T> &_clients, NetToAction &_output, RawOutput &_error, uint32_t _port)
         : m_clients(_clients), m_output(_output), m_error(_error), m_acceptor(), m_selector()
     {
         (void)m_acceptor.listen(_port);

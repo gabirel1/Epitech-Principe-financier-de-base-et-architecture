@@ -3,8 +3,8 @@
 #include "Common/Message/ExecutionReport.hpp"
 #include "Server/Core/Pipeline/Naming.hpp"
 
-OrderBook::OrderBook(EventQueue &_output)
-    : m_output(_output)
+OrderBook::OrderBook(const std::string &_name, EventQueue &_output)
+    : m_name(_name), m_output(_output)
 {
 }
 

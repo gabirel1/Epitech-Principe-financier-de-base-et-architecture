@@ -9,7 +9,7 @@ namespace net
 {
     namespace tcp
     {
-        bool processor(ClientSocket &_socket, NetToSerial &_serial, RawOutput &_error)
+        bool processor(ClientSocket &_socket, NetToAction &_serial, RawOutput &_error)
         {
             int error = 0;
             fix::Serializer::AnonMessage msg;

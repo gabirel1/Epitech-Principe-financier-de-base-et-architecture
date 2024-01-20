@@ -4,8 +4,8 @@
 
 namespace pip
 {
-    OBEvent::OBEvent(OrderBook::EventQueue &_input, UdpInput &_udp, RawOutput &_tcp)
-        : m_input(_input), m_udp(_udp), m_tcp(_tcp)
+    OBEvent::OBEvent(const std::string &_name, OrderBook::EventQueue &_input, UdpInput &_udp, RawOutput &_tcp)
+        : m_name(_name), m_input(_input), m_udp(_udp), m_tcp(_tcp)
     {
     }
 
@@ -53,10 +53,11 @@ namespace pip
         report.set40_ordType("2");
         report.set44_price(std::to_string(_input.price));
         report.set54_side((_input.side == OrderType::Ask) ? "3" : "4");
+        report.set55_symbol(m_name);
         report.header.set56_TargetCompId(_input.userId);
         report.set151_leavesQty(std::to_string(_input.quantity));
         m_tcp.append(NetIn{ {}, report });
-        Logger::Log("[OBEvent] (TCP) Report created: "); // todo log
+        Logger::Log("[OBEvent] (", m_name, ") {TCP} Report created: "); // todo log
         return true;
     }
 
@@ -75,7 +76,7 @@ namespace pip
         package.quantity = _input.quantity;
         package.price = _input.price;
         m_udp.append(package);
-        Logger::Log("[OBEvent] (UDP) Report created: "); // todo log
+        Logger::Log("[OBEvent] (", m_name, "){UDP} Report created: "); // todo log
         return true;
     }
 }

@@ -5,7 +5,7 @@
 #include <type_traits>
 
 #include "Common/Core/meta.hpp"
-#include "Server/Core/Order.hpp"
+#include "Common/Core/Order.hpp"
 
 template <typename T>
 concept IsBook = std::is_same_v<typename T::key_type, Price> &&

@@ -8,7 +8,7 @@
 
 namespace pip
 {
-    Action::Action(NetToSerial &_input, SerialToMarket &_output, RawOutput &_raw)
+    Action::Action(NetToAction &_input, MarketEntry &_output, RawOutput &_raw)
         : m_input(_input), m_output(_output), m_raw(_raw)
     {
     }
@@ -30,7 +30,7 @@ namespace pip
     {
         Logger::SetThreadName(THIS_THREAD_ID, "Action convertion");
         std::pair<bool, fix::Reject> reject;
-        SerialIn input;
+        ActionIn input;
 
         while (m_running)
         {
@@ -79,7 +79,7 @@ namespace pip
         }
     }
 
-    bool Action::treatLogon(SerialIn &_input)
+    bool Action::treatLogon(ActionIn &_input)
     {
         fix::Logon logon;
         std::pair<bool, fix::Reject> verif = fix::Logon::Verify(_input.Message);
@@ -101,7 +101,7 @@ namespace pip
         return true;
     }
 
-    bool Action::treatLogout(SerialIn &_input)
+    bool Action::treatLogout(ActionIn &_input)
     {
         fix::Logout logout;
         std::pair<bool, fix::Reject> reject = fix::Logout::Verify(_input.Message);
@@ -122,7 +122,7 @@ namespace pip
         return true;
     }
 
-    bool Action::treatNewOrderSingle(SerialIn &_input)
+    bool Action::treatNewOrderSingle(ActionIn &_input)
     {
         SerialOut data;
         std::pair<bool, fix::Reject> verif = fix::NewOrderSingle::Verify(_input.Message);
@@ -142,11 +142,11 @@ namespace pip
         data.OrderData.order.orderId = utils::to<OrderId>(_input.Message.at(fix::Tag::ClOrdID));
         data.OrderData.order.quantity = utils::to<Quantity>(_input.Message.at(fix::Tag::OrderQty));
         Logger::Log("[Action] (New Order Single) Waiting for action from data: "); // todo log
-        m_output.push(data);
+        m_output.at(_input.Message.at(fix::Tag::Symbol)).push(data);
         return true;
     }
 
-    bool Action::treatOrderCancelRequest(SerialIn &_input)
+    bool Action::treatOrderCancelRequest(ActionIn &_input)
     {
         SerialOut data;
         std::pair<bool, fix::Reject> verif = fix::OrderCancelRequest::Verify(_input.Message);
@@ -160,11 +160,11 @@ namespace pip
         data.OrderData.order.orderId = utils::to<OrderId>(_input.Message.at(fix::Tag::OrigClOrdID));
         data.OrderData.order.userId = _input.Client.User;
         data.OrderData.type = (_input.Message.at(fix::Tag::Side) == "3") ? OrderType::Bid : OrderType::Ask;
-        m_output.push(data);
+        m_output.at(_input.Message.at(fix::Tag::Symbol)).push(data);
         return true;
     }
 
-    bool Action::treatOrderCancelReplaceRequest(SerialIn &_input)
+    bool Action::treatOrderCancelReplaceRequest(ActionIn &_input)
     {
         SerialOut data;
         std::pair<bool, fix::Reject> verif = fix::OrderCancelReplaceRequest::Verify(_input.Message);
@@ -185,11 +185,11 @@ namespace pip
         data.OrderData.price = utils::to<Price>(_input.Message.at(fix::Tag::Price));
         data.OrderData.type = (_input.Message.at(fix::Tag::Side) == "3") ? OrderType::Bid : OrderType::Ask;
         Logger::Log("[Action] (Order Cancel Replace) Waiting for action from data: "); // todo log
-        m_output.push(data);
+        m_output.at(_input.Message.at(fix::Tag::Symbol)).push(data);
         return true;
     }
 
-    bool Action::treatUnknown(SerialIn &_input)
+    bool Action::treatUnknown(ActionIn &_input)
     {
         fix::Reject reject;
 
@@ -202,7 +202,7 @@ namespace pip
         return true;
     }
 
-    bool Action::treatHeartbeat(SerialIn &_input)
+    bool Action::treatHeartbeat(ActionIn &_input)
     {
         fix::HeartBeat heartbeat;
         std::pair<bool, fix::Reject> verif = fix::HeartBeat::Verify(_input.Message);

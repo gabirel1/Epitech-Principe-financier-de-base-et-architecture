@@ -18,7 +18,7 @@ namespace pip
             /// @brief Core pipeline type
             using PipeType = Pipeline<OBEvent>;
 
-            OBEvent(OrderBook::EventQueue &_input, UdpInput &_udp, RawOutput &_tcp);
+            OBEvent(const std::string &_name, OrderBook::EventQueue &_input, UdpInput &_udp, RawOutput &_tcp);
             ~OBEvent();
 
             /// @brief Run the pipeline
@@ -33,6 +33,8 @@ namespace pip
             bool createUdp(OrderBook::Event _input);
 
         private:
+            const std::string m_name;
+
             OrderBook::EventQueue &m_input;
             UdpInput &m_udp;
             RawOutput &m_tcp;

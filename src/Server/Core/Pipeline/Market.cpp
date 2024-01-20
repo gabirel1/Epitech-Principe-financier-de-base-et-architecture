@@ -8,8 +8,8 @@
 
 namespace pip
 {
-    Market::Market(OrderBook &_ob, SerialToMarket &_input, MarketToNet &_output)
-        : m_input(_input), m_output(_output), m_ob(_ob)
+    Market::Market(const std::string &_name, OrderBook &_ob, ActionToMarket &_input, MarketToNet &_output)
+        : m_name(_name), m_input(_input), m_output(_output), m_ob(_ob)
     {
     }
 
@@ -22,7 +22,7 @@ namespace pip
     {
         if (!m_running)
             tstart(this);
-        Logger::Log("[Market] Running: ", m_running);
+        Logger::Log("[Market] (", m_name ,") Running: ", m_running);
         return m_running;
     }
 
@@ -41,7 +41,7 @@ namespace pip
 
     void Market::process(MarketIn &_data)
     {
-        Logger::Log("[Market] Processing new action: "); // todo log
+        Logger::Log("[Market] (", m_name ,") Processing new action: "); // todo log
 
         switch (_data.OrderData.action) {
             case OrderBook::Data::Action::Add:
@@ -69,9 +69,9 @@ namespace pip
     {
         fix::ExecutionReport report;
 
-        Logger::Log("[Market] (New) request: "); // todo log
+        Logger::Log("[Market] (", m_name ,") {New} request: "); // todo log
         if (!m_ob.add(_data.OrderData.type, _data.OrderData.price, _data.OrderData.order)) {
-            Logger::Log("[Market] (New) Reject: Order ID already used: ", _data.OrderData.order.orderId);
+            Logger::Log("[Market] (", m_name ,") {New} Reject: Order ID already used: ", _data.OrderData.order.orderId);
             report.set14_cumQty("0");
             report.set17_execID();
             report.set20_execTransType("1");
@@ -86,7 +86,7 @@ namespace pip
             m_output.append(data::MarketToNet{ _data.Client, report });
             return false;
         }
-        Logger::Log("[Market] (New) Order executaded sucefully: ", _data.OrderData.order, ", price: ", _data.OrderData.price);
+        Logger::Log("[Market] (", m_name ,") {New} Order executaded sucefully: ", _data.OrderData.order, ", price: ", _data.OrderData.price);
         return true;
     }
 
@@ -101,12 +101,12 @@ namespace pip
         if (!m_ob.cancel(_data.OrderData.type, _data.OrderData.target, false)) {
             report.set39_ordStatus("8");
             report.set58_text("Order ID doesn't exist");
-            Logger::Log("[Market] (Modify-Cancel) Reject: Order ID already exist: ", _data.OrderData.target);
+            Logger::Log("[Market] (", m_name ,") {Modify-Cancel} Reject: Order ID already exist: ", _data.OrderData.target);
             return false;
         } else if (!m_ob.modify(_data.OrderData.type, _data.OrderData.price, _data.OrderData.order)) {
             report.set39_ordStatus("4");
             report.set58_text("Order ID already exist, target got canceled");
-            Logger::Log("[Market] (Modify-Add) Reject: Order ID already exist: ", _data.OrderData.order.orderId);
+            Logger::Log("[Market] (", m_name ,") {Modify-Add} Reject: Order ID already exist: ", _data.OrderData.order.orderId);
             m_output.append(data::MarketToNet{ _data.Client, report });
             return false;
         }
@@ -118,9 +118,9 @@ namespace pip
     {
         fix::OrderCancelReject report;
 
-        Logger::Log("[Market] (Cancel) Request: ", _data.OrderData.order.orderId);
+        Logger::Log("[Market] (", m_name ,") {Cancel} Request: ", _data.OrderData.order.orderId);
         if (!m_ob.cancel(_data.OrderData.type, _data.OrderData.order.orderId)) {
-            Logger::Log("[Market] (Cancel) Reject: Order ID not found: ", _data.OrderData.order.orderId);
+            Logger::Log("[Market] (", m_name ,") {Cancel} Reject: Order ID not found: ", _data.OrderData.order.orderId);
             report.set11_clOrdID(_data.OrderData.order.orderId);
             report.set37_orderID(_data.OrderData.order.orderId);
             report.set41_origClOrdID(_data.OrderData.order.orderId);
@@ -129,7 +129,7 @@ namespace pip
             m_output.append(data::MarketToNet{ _data.Client, report });
             return false;
         }
-        Logger::Log("[Market] (Cancel) Sucessfuly executed on: ", _data.OrderData.order.orderId);
+        Logger::Log("[Market] (", m_name ,") {Cancel} Sucessfuly executed on: ", _data.OrderData.order.orderId);
         return true;
     }
 }

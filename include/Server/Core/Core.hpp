@@ -2,10 +2,9 @@
 
 #include "Server/Core/Pipeline/Action.hpp"
 #include "Server/Core/Pipeline/InNetwork.hpp"
-#include "Server/Core/Pipeline/Market.hpp"
-#include "Server/Core/Pipeline/OBEvent.hpp"
 #include "Server/Core/Pipeline/OutNetwork.hpp"
 #include "Server/Core/Pipeline/UDPOutNetwork.hpp"
+#include "Server/Core/MarketContainer.hpp"
 #include "Server/Network/Processor.hpp"
 
 class Core
@@ -14,30 +13,27 @@ class Core
         Core(uint32_t _tcp_port, uint32_t _udp_port);
         ~Core();
 
-        void start();
+        [[nodiscard]] bool start();
 
         void stop();
 
     protected:
         bool internal_start();
+        void market_init();
 
     private:
         bool m_running = false;
 
-        std::vector<ClientSocket> m_tcp_clients;
+        std::vector<ClientSocket> m_clients;
 
-        OrderBook::EventQueue m_ob_event;
-        UdpInput m_udp_input;
-        NetToSerial m_nt_to_sr;
-        SerialToMarket m_sr_to_mk;
-        MarketToNet m_mk_to_nt;
-
-        OrderBook m_ob;
+        UdpInput m_q_udp;
+        NetToAction m_q_action;
+        MarketEntry m_q_markets;
+        MarketToNet m_q_tcp;
 
         pip::InNetwork<net::tcp::Socket, &net::tcp::processor, ClientSocket> m_innet;
         pip::Action m_action;
-        pip::Market m_market;
-        pip::OBEvent m_obevent;
+        std::map<std::string, MarketContainer> m_markets;
         pip::OutNetwork m_outnet;
         pip::UDPOutNetwork m_udp;
 };

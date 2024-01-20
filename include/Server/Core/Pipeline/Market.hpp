@@ -18,7 +18,7 @@ namespace pip
             /// @param _ob OrderBook reference.
             /// @param _input Input data queue.
             /// @param _output Output data queue.
-            Market(OrderBook &_ob, SerialToMarket &_input, MarketToNet &_output);
+            Market(const std::string &_name, OrderBook &_ob, ActionToMarket &_input, MarketToNet &_output);
             /// @brief Stop the pipeline and the destroy it.
             ~Market();
 
@@ -38,7 +38,9 @@ namespace pip
             bool runModify(MarketIn _data);
             bool runCancel(MarketIn _data);
 
-            SerialToMarket &m_input;        ///< Intput data queue.
+            const std::string m_name;
+
+            ActionToMarket &m_input;        ///< Intput data queue.
             MarketToNet &m_output;          ///< Output data queue.
 
             ThreadPool<TS_SIZE_OB> m_tp;    ///< Thread pool to run async processing.
