@@ -3,9 +3,9 @@
 
 #include <QMainWindow>
 #include <unordered_map>
-#include "Client/GUI/GestionnaireSocket.hpp"
-#include "Server/Core/Order.hpp"
-#include "Common/Network/Socket.hpp"
+#include "GestionnaireSocket.hpp"
+#include "../../Server/Core/Order.hpp"
+#include "../../Common/Network/Socket.hpp"
 
 #include <QStandardItemModel>
 

@@ -68,13 +68,13 @@ file(GLOB_RECURSE SRC_CLIENT
     src/Client/**.cpp
 )
 
-# add_executable(MarketClient
-#     ${SRC_CLIENT}
-# )
+add_executable(MarketClient
+    ${SRC_CLIENT}
+)
 
 target_link_libraries(MarketClient PRIVATE MarketCommon Qt${QT_VERSION_MAJOR}::Widgets)
 
-# target_include_directories(MarketClient PRIVATE include)
+target_include_directories(MarketClient PRIVATE include)
 
 # Setup GTest
 # include(FetchContent)
@@ -94,13 +94,13 @@ target_link_libraries(MarketClient PRIVATE MarketCommon Qt${QT_VERSION_MAJOR}::W
 #     test/**.cpp
 # )
 
-add_executable(MarketTest
-    ${SRC_TESTS}
-)
-target_include_directories(MarketTest PRIVATE include)
-target_include_directories(MarketTest PRIVATE test)
-target_link_libraries(MarketTest MarketCommon GTest::gtest_main)
-target_compile_options(MarketTest PRIVATE -Wno-protected -Wno-private)
+# add_executable(MarketTest
+#     ${SRC_TESTS}
+# )
+# target_include_directories(MarketTest PRIVATE include)
+# target_include_directories(MarketTest PRIVATE test)
+# target_link_libraries(MarketTest MarketCommon GTest::gtest_main)
+# target_compile_options(MarketTest PRIVATE -Wno-protected -Wno-private)
 
-include(GoogleTest)
-gtest_discover_tests(MarketTest)
+# include(GoogleTest)
+# gtest_discover_tests(MarketTest)

@@ -175,13 +175,15 @@ void MainWindow::slot_cancelOrder()
         fix::OrderCancelRequest orderCancel;
         QTableWidgetItem *item = m_ui->orderHistory->item(list.at(0)->row(), 1);
 
+        std::string side = (item->text() == "Bid") ? "3" : "4";
+
         orderCancel.header.set34_msgSeqNum(std::to_string(messageID));
         orderCancel.header.set49_SenderCompId("1");
         orderCancel.header.set56_TargetCompId("0");
         orderCancel.set11_clOrdID(m_ui->orderIDValue_OrderCancel->text().toStdString());
         orderCancel.set41_origClOrdID(std::to_string(orderID));
-        orderCancel.set54_side(item->text().toStdString().c_str());
-        orderCancel.set55_symbol("");
+        orderCancel.set54_side(side);
+        orderCancel.set55_symbol("3");
         orderCancel.set60_transactTime(getDate());
 
         m_gestionnaireSocket->sendTcpSocket(orderCancel.to_string());
@@ -206,12 +208,14 @@ void MainWindow::slot_modifyOrder()
         orderCancelReplace.header.set34_msgSeqNum(std::to_string(messageID));
         orderCancelReplace.header.set49_SenderCompId("1");
         orderCancelReplace.header.set56_TargetCompId("0");
-        orderCancelReplace.set11_clOrdID(m_ui->orderIDValue_OrderCancel->text().toStdString());
-        orderCancelReplace.set21_handlInst("");
-        orderCancelReplace.set40_ordType("");
-        orderCancelReplace.set41_origClOrdID(std::to_string(orderID));
-        orderCancelReplace.set54_side(item->text().toStdString().c_str());
-        orderCancelReplace.set55_symbol("");
+        orderCancelReplace.set11_clOrdID(m_ui->orderIDValue_OrderCancelReplace->text().toStdString());
+        orderCancelReplace.set21_handlInst("3");
+        orderCancelReplace.set38_orderQty(m_ui->quantityValue_OrderCancelReplace->text().toStdString());
+        orderCancelReplace.set40_ordType("2");
+        orderCancelReplace.set41_origClOrdID(m_ui->orderIDValue_OrderCancelReplace->text().toStdString());
+        orderCancelReplace.set44_price(m_ui->priceValue_OrderCancelReplace->text().toStdString());
+        orderCancelReplace.set54_side(std::to_string(m_ui->orderType_NewOrderSingle->currentIndex() + 3));
+        orderCancelReplace.set55_symbol("3");
         orderCancelReplace.set60_transactTime(getDate());
 
         m_gestionnaireSocket->sendTcpSocket(orderCancelReplace.to_string());
