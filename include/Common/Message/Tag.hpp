@@ -21,7 +21,7 @@ namespace fix
         constexpr const char HandlInst[] = "21";            ///< Tag [21](https://www.onixs.biz/fix-dictionary/4.2/tagNum_21.html).
         constexpr const char MsqSeqNum[] = "34";            ///< Tag [34](https://www.onixs.biz/fix-dictionary/4.2/tagNum_34.html).
         constexpr const char MsgType[] = "35";              ///< Tag [35](https://www.onixs.biz/fix-dictionary/4.2/tagNum_35.html).
-        constexpr const char OrderId[] = "37";              ///< Tag [37](https://www.onixs.biz/fix-dictionary/4.2/tagNum_37.html).
+        constexpr const char OrderID[] = "37";              ///< Tag [37](https://www.onixs.biz/fix-dictionary/4.2/tagNum_37.html).
         constexpr const char OrderQty[] = "38";             ///< Tag [38](https://www.onixs.biz/fix-dictionary/4.2/tagNum_38.html).
         constexpr const char OrdStatus[] = "39";            ///< Tag [39](https://www.onixs.biz/fix-dictionary/4.2/tagNum_39.html).
         constexpr const char OrdType[] = "40";              ///< Tag [40](https://www.onixs.biz/fix-dictionary/4.2/tagNum_40.html).

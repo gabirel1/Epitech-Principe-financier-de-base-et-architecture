@@ -28,7 +28,7 @@ namespace fix
             void set20_execTransType(const std::string &_val);
 
             /// @brief Set the reference order Id of the report [37](https://www.onixs.biz/fix-dictionary/4.2/tagNum_37.html).
-            /// @param _val Value assigned to it: int.
+            /// @param _val Value assigned to it: string.
             void set37_orderID(const std::string &_val);
 
             /// @brief Set the quantity order [38](https://www.onixs.biz/fix-dictionary/4.2/tagNum_38.html).

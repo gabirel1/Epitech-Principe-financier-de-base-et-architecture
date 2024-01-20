@@ -12,7 +12,7 @@ bool OrderBook::add(OrderType _type, Price _price, Order& _order)
 {
     if (has(_type, _order.orderId))
         return false;
-    add(_type, _price, _order, OrderStatus::Replaced);
+    add(_type, _price, _order, OrderStatus::New);
     return true;
 }
 
@@ -20,19 +20,15 @@ bool OrderBook::modify(OrderType _type, Price _price, Order &_order)
 {
     if (has(_type, _order.orderId))
         return false;
-    if (_type == OrderType::Ask)
-        (void)cancel<AskBook>(m_ask_id, _order.orderId, false);
-    else
-        (void)cancel<BidBook>(m_bid_id, _order.orderId, false);
     add(_type, _price, _order, OrderStatus::Replaced);
     return true;
 }
 
-bool OrderBook::cancel(OrderType _type, OrderId _orderId)
+bool OrderBook::cancel(OrderType _type, OrderId _orderId, bool _notif)
 {
     if (_type == OrderType::Ask)
-        return cancel<AskBook>(m_ask_id, _orderId, true);
-    return cancel<BidBook>(m_bid_id, _orderId, true);
+        return cancel<AskBook>(m_ask_id, _orderId, _notif);
+    return cancel<BidBook>(m_bid_id, _orderId, _notif);
 }
 
 bool OrderBook::has(OrderType _type, OrderId _orderId) const

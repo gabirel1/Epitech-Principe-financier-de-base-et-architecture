@@ -48,7 +48,7 @@ namespace pip
         report.set17_execID();
         report.set20_execTransType("1");
         report.set38_orderQty(std::to_string(_input.orgQty));
-        report.set37_orderID(std::to_string(_input.orderId));
+        report.set37_orderID(_input.orderId);
         report.set39_ordStatus(std::to_string(static_cast<uint8_t>(_input.status)));
         report.set40_ordType("2");
         report.set44_price(std::to_string(_input.price));

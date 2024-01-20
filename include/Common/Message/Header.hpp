@@ -38,11 +38,11 @@ namespace fix
             void set34_msgSeqNum(const size_t &_val);
 
             /// @brief Set the sender Id of the message [49](https://www.onixs.biz/fix-dictionary/4.2/tagNum_49.html).
-            /// @param _val Value assigned to it: int.
+            /// @param _val Value assigned to it: string.
             void set49_SenderCompId(const std::string &_val);
 
             /// @brief Set the receiver Id of the message [56](https://www.onixs.biz/fix-dictionary/4.2/tagNum_56.html).
-            /// @param _val Value assigned to it: int.
+            /// @param _val Value assigned to it: string.
             void set56_TargetCompId(const std::string &_val);
             [[nodiscard]] uint64_t getTargetCompId() const;
 

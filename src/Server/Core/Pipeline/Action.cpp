@@ -172,7 +172,8 @@ namespace pip
         data.Client = _input.Client;
         data.OrderData.action = OrderBook::Data::Action::Modify;
         data.OrderData.order.userId = _input.Client.User;
-        data.OrderData.order.orderId = utils::to<OrderId>(_input.Message.at(fix::Tag::OrigClOrdID));
+        data.OrderData.target = _input.Message.at(fix::Tag::OrigClOrdID);
+        data.OrderData.order.orderId = _input.Message.at(fix::Tag::ClOrdID);
         data.OrderData.order.quantity = utils::to<Quantity>(_input.Message.at(fix::Tag::OrderQty));
         data.OrderData.price = utils::to<Price>(_input.Message.at(fix::Tag::Price));
         data.OrderData.type = (_input.Message.at(fix::Tag::Side) == "3") ? OrderType::Bid : OrderType::Ask;

@@ -45,6 +45,7 @@ class OrderBook
             OrderType type;
             Price price;
             Price oprice;
+            OrderId target;
             Order order;
         };
 
@@ -55,7 +56,7 @@ class OrderBook
 
         [[nodiscard]] bool add(OrderType _type, Price _price, Order &_order);
         [[nodiscard]] bool modify(OrderType _type, Price _price, Order &_order);
-        [[nodiscard]] bool cancel(OrderType _type, OrderId _orderId);
+        [[nodiscard]] bool cancel(OrderType _type, OrderId _orderId, bool _event = true);
 
         // front only
         [[nodiscard]] std::vector<Price> getPrice(OrderType _type);

@@ -20,50 +20,25 @@ namespace fix
             /// @return If the first element is true then second is set, otherwise it rigly formated.
             static std::pair<bool, Reject> Verify(Serializer::AnonMessage &_msg);
 
-            /**
-             * Unique identifier of the order to cancel.
-             * @param _val
-             * Unique identifier of the order
-             * @brief ClOrdID <11> of the order to be canceled.
-             */
-            void set41_OrigClOrdID(const std::string &_val);
+            /// @brief Set the order Id [11](https://www.onixs.biz/fix-dictionary/4.2/tagNum_11.html).
+            /// @param _val Value assigned to it: string.
+            void set11_clOrdID(const std::string &_val);
 
-            /**
-             * Unique ID of cancel request as assigned by the institution.
-             * @param _val
-             * Unique identifier for Order as assigned by institution (identified by SenderCompID <49> or OnBehalfOfCompID <115> as appropriate).
-             */
-            void set11_ClOrdID(const std::string &_val);
+            /// @brief Set the targeted order Id [41](https://www.onixs.biz/fix-dictionary/4.2/tagNum_41.html).
+            /// @param _val Value assigned to it: string.
+            void set41_origClOrdID(const std::string &_val);
 
-            /**
-             * Ticker symbol
-             * @param _val
-             * Ticker symbol
-             */
-            void set55_Symbol(const std::string &_val);
+            /// @brief Set the symbol of the target market to trad on [55](https://www.onixs.biz/fix-dictionary/4.2/tagNum_21.html).
+            /// @param _val Value assigned to it: string.
+            void set55_symbol(const std::string &_val);
 
-            /**
-             * Side of order
-             * @param _val
-             * Valid values:
-             * 1 = Buy
-             * 2 = Sell
-             * 3 = Buy minus
-             * 4 = Sell plus
-             * 5 = Sell short
-             * 6 = Sell short exempt
-             * 7 = Undisclosed (valid for IOI and List Order messages only)
-             * 8 = Cross (orders where counterparty is an exchange, valid for all messages except IOIs)
-             * 9 = Cross short
-             */
-            void set54_Side(const std::string &_val);
+            /// @brief Set the strategy of buying/selling [54](https://www.onixs.biz/fix-dictionary/4.2/tagNum_54.html).
+            /// @param _val Value assigned ot it: (3 or 4).
+            void set54_side(const std::string &_val);
 
-            /**
-             * Time this order request was initiated/released by the trader or trading system.
-             * @param _val
-             * Time this order request was initiated/released by the trader or trading system.
-             */
-            void set60_TransactTime(const std::string &_val);
+            /// @brief Set the time of the transaction [60](https://www.onixs.biz/fix-dictionary/4.2/tagNum_60.html).
+            /// @param _val Value assigned to it: UTC timestamp.
+            void set60_transactTime(const std::string &_val);
 
             static constexpr const char MsgType[] = "F";         ///< Message type value as string.
             static constexpr const char cMsgType = MsgType[0];  ///< Message type value as char.
