@@ -14,6 +14,7 @@ namespace fix
         constexpr const char AvgPx[] = "6";                 ///< Tag [6](https://www.onixs.biz/fix-dictionary/4.2/tagNum_6.html).
         constexpr const char BeginString[] = "8";           ///< Tag [8](https://www.onixs.biz/fix-dictionary/4.2/tagNum_8.html).
         constexpr const char BodyLength[] = "9";            ///< Tag [9](https://www.onixs.biz/fix-dictionary/4.2/tagNum_9.html).
+        constexpr const char CheckSum[] = "10";             ///< Tag [10](https://www.onixs.biz/fix-dictionary/4.2/tagNum_10.html).
         constexpr const char ClOrdID[] = "11";              ///< Tag [11](https://www.onixs.biz/fix-dictionary/4.2/tagNum_11.html).
         constexpr const char CumQty[] = "14";               ///< Tag [14](https://www.onixs.biz/fix-dictionary/4.2/tagNum_14.html).
         constexpr const char ExecId[] = "17";               ///< Tag [17](https://www.onixs.biz/fix-dictionary/4.2/tagNum_17.html).

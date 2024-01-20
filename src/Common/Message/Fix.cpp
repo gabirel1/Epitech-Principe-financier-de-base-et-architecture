@@ -56,7 +56,7 @@ namespace fix
         return formated_checksum;
     }
 
-    static std::pair<bool, Reject> VerifyValid(Serializer::AnonMessage &_msg)
+    std::pair<bool, Reject> Message::VerifyValid(Serializer::AnonMessage &_msg)
     {
         std::pair<bool, Reject> reject = { false, {} };
 
