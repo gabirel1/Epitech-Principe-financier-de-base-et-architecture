@@ -14,6 +14,7 @@ namespace fix
         constexpr const char AvgPx[] = "6";                 ///< Tag [6](https://www.onixs.biz/fix-dictionary/4.2/tagNum_6.html).
         constexpr const char BeginString[] = "8";           ///< Tag [8](https://www.onixs.biz/fix-dictionary/4.2/tagNum_8.html).
         constexpr const char BodyLength[] = "9";            ///< Tag [9](https://www.onixs.biz/fix-dictionary/4.2/tagNum_9.html).
+        constexpr const char CheckSum[] = "10";             ///< Tag [10](https://www.onixs.biz/fix-dictionary/4.2/tagNum_10.html).
         constexpr const char ClOrdID[] = "11";              ///< Tag [11](https://www.onixs.biz/fix-dictionary/4.2/tagNum_11.html).
         constexpr const char CumQty[] = "14";               ///< Tag [14](https://www.onixs.biz/fix-dictionary/4.2/tagNum_14.html).
         constexpr const char ExecId[] = "17";               ///< Tag [17](https://www.onixs.biz/fix-dictionary/4.2/tagNum_17.html).
@@ -43,7 +44,6 @@ namespace fix
         constexpr const char RefTagId[] = "371";            ///< Tag [371](https://www.onixs.biz/fix-dictionary/4.2/tagNum_371.html).
         constexpr const char RefMsgType[] = "352";          ///< Tag [352](https://www.onixs.biz/fix-dictionary/4.2/tagNum_352.html).
         constexpr const char SessionRejectReason[] = "373"; ///< Tag [373](https://www.onixs.biz/fix-dictionary/4.2/tagNum_373.html).
-        constexpr const char CheckSum[] = "10";             ///< Tag [10](https://www.onixs.biz/fix-dictionary/4.2/tagNum_10.html).
     };
 
     /// @brief Verify the value of all the fix::Tag passed as template.
