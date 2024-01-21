@@ -24,7 +24,7 @@ namespace pip
 
     void OBEvent::loop()
     {
-        Logger::SetThreadName(THIS_THREAD_ID, "Order Book Event");
+        Logger::SetThreadName(THIS_THREAD_ID, "Order Book Event - " + m_name);
 
         OrderBook::Event input;
 
@@ -57,7 +57,7 @@ namespace pip
         report.header.set56_TargetCompId(_input.userId);
         report.set151_leavesQty(std::to_string(_input.quantity));
         m_tcp.append(NetIn{ {}, report });
-        Logger::Log("[OBEvent] (", m_name, ") {TCP} Report created: "); // todo log
+        Logger::Log("[OBEvent] (TCP) Report created: "); // todo log
         return true;
     }
 
@@ -76,7 +76,7 @@ namespace pip
         package.quantity = _input.quantity;
         package.price = _input.price;
         m_udp.append(package);
-        Logger::Log("[OBEvent] (", m_name, "){UDP} Report created: "); // todo log
+        Logger::Log("[OBEvent] (UDP) Report created: "); // todo log
         return true;
     }
 }

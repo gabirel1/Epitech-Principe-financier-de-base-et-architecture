@@ -87,7 +87,7 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
         if (add<AskBook, std::less_equal<Price>>(m_ask, _price, _order)) {
             std::lock_guard<std::mutex> guard(m_mutex);
 
-            Logger::Log("[OrderBook] (Add) New order in BID: ", _order, " at price: ", _price);
+            Logger::Log("[OrderBook] (", m_name, ") {Add} New order in BID: ", _order, " at price: ", _price);
             m_bid[_price].push_back(_order);
             m_bid_id.emplace(_order.orderId, std::make_pair(m_bid.find(_price), m_bid.at(_price).end() - 1));
             event.status = OrderStatus::PartiallyFilled;
@@ -97,7 +97,7 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
         if (add<BidBook, std::greater_equal<Price>>(m_bid, _price, _order)) {
             std::lock_guard<std::mutex> guard(m_mutex);
 
-            Logger::Log("[OrderBook] (Add) New order in ASK: ", _order, " at price: ", _price);
+            Logger::Log("[OrderBook] (", m_name, ") {Add} New order in ASK: ", _order, " at price: ", _price);
             m_ask[_price].push_back(_order);
             m_ask_id.emplace(_order.orderId, std::make_pair(m_ask.find(_price), m_ask.at(_price).end() - 1));
         }
@@ -109,7 +109,7 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
         event.status = OrderStatus::PartiallyFilled;
     else
         event.status = OrderStatus::Filled;
-    Logger::Log("[OrderBook] (Add) New order event: "); // todo log
+    Logger::Log("[OrderBook] (", m_name, ") {Add} New order event: "); // todo log
     m_output.append(event);
-    Logger::Log("[OrderBook] (Add) New order event send");
+    Logger::Log("[OrderBook] (", m_name, ") {Add} New order event send");
 }

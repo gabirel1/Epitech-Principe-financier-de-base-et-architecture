@@ -38,13 +38,13 @@ namespace pip
             {
                 input = m_input.pop_front();
                 // need more checking, more info inside the function
-                reject = fix::Message::VerifyValid(input.Message);
-                if (reject.first) {
-                    reject.second.header.set56_TargetCompId(input.Client.User);
-                    reject.second.header.set49_SenderCompId(input.Message.at(fix::Tag::TargetCompId));  // WARN: if the tag is missing?
-                    m_raw.push({ input.Client, reject.second });
-                    continue;
-                }
+                // reject = fix::Message::VerifyValid(input.Message);
+                // if (reject.first) {
+                //     reject.second.header.set56_TargetCompId(input.Client.User);
+                //     reject.second.header.set49_SenderCompId(input.Message.at(fix::Tag::TargetCompId));  // WARN: if the tag is missing?
+                //     m_raw.push({ input.Client, reject.second });
+                //     continue;
+                // }
                 reject = fix::Header::Verify(input.Message);
                 if (reject.first) {
                     Logger::Log("[Action] Incorect header received from client: ", input.Client.User);
@@ -62,8 +62,8 @@ namespace pip
                         break;
                     case fix::NewOrderSingle::cMsgType: (void)treatNewOrderSingle(input);
                         break;
-                    /*case 'F': (void)treatOrderCancelRequest(input);
-                        break;*/
+                    case fix::OrderCancelRequest::cMsgType: (void)treatOrderCancelRequest(input);
+                        break;
                     case fix::OrderCancelReplaceRequest::cMsgType: (void)treatOrderCancelReplaceRequest(input);
                         break;
                     case fix::Logout::cMsgType: (void)treatLogout(input);
@@ -124,7 +124,7 @@ namespace pip
 
     bool Action::treatNewOrderSingle(ActionIn &_input)
     {
-        SerialOut data;
+        ActionOut data;
         std::pair<bool, fix::Reject> verif = fix::NewOrderSingle::Verify(_input.Message);
         Logger::Log("[Action] (New Order Single) Treating message from: ", _input.Client.User);
 
@@ -148,7 +148,7 @@ namespace pip
 
     bool Action::treatOrderCancelRequest(ActionIn &_input)
     {
-        SerialOut data;
+        ActionOut data;
         std::pair<bool, fix::Reject> verif = fix::OrderCancelRequest::Verify(_input.Message);
 
         if (verif.first) {
@@ -166,7 +166,7 @@ namespace pip
 
     bool Action::treatOrderCancelReplaceRequest(ActionIn &_input)
     {
-        SerialOut data;
+        ActionOut data;
         std::pair<bool, fix::Reject> verif = fix::OrderCancelReplaceRequest::Verify(_input.Message);
         Logger::Log("[Action] (Order Cancel Replace) Treating message from: ", _input.Client.User);
 

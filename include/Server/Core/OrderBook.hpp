@@ -45,7 +45,7 @@ class OrderBook
 
         using EventQueue = ts::Queue<Event>;
 
-        OrderBook(EventQueue &_output);
+        OrderBook(const std::string &_name, EventQueue &_output);
         virtual ~OrderBook() = default;
 
         [[nodiscard]] bool add(OrderType _type, Price _price, Order &_order);
@@ -75,6 +75,8 @@ class OrderBook
         [[nodiscard]] std::vector<Price> inter_getPrice(const T &_book);
 
     private:
+        const std::string m_name;
+
         std::mutex m_mutex;
 
         OrderIdMap<BidBook> m_bid_id;

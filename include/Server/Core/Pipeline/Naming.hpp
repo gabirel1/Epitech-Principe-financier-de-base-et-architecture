@@ -79,4 +79,4 @@ using RawOutput = ts::Queue<NetIn>;
 using UdpInput = ts::Queue<data::UDPPackage>;
 
 /// @brief Map of market input ActionToMarket with as key the symbol of the market.
-using MarketEntry = std::unordered_map<std::string, ActionToMarket>;
+using MarketEntry = std::unordered_map<std::string, ActionToMarket &>;

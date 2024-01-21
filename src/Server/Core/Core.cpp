@@ -72,7 +72,7 @@ bool Core::internal_start()
         return false;
     }
     for (auto &[_name, _pip] : m_markets) {
-        if (_pip.start()) {
+        if (!_pip.start()) {
             Logger::Log("[Core] Failed to start MarketContainer pipeline: ", _name);
             stop();
             return false;
@@ -103,9 +103,9 @@ void Core::market_init()
     };
 
     for (std::string &_name : name) {
-        MarketContainer container(_name, m_q_udp, m_q_tcp);
-
-        m_markets.emplace(_name, std::move(container));
+        m_markets.emplace(std::piecewise_construct,
+            std::forward_as_tuple(_name),
+            std::forward_as_tuple(_name, m_q_udp, m_q_tcp));
         m_q_markets.emplace(_name, m_markets.at(_name).getInput());
     }
 }

@@ -9,7 +9,6 @@ class MarketContainer
 {
     public:
         MarketContainer(const std::string &_name, UdpInput &_udp, RawOutput &_tcp);
-        MarketContainer(const MarketContainer &&_mc) noexcept;
         ~MarketContainer();
 
         using ThreadStatus = std::tuple<std::future_status, std::future_status>;
