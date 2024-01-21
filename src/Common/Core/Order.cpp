@@ -1,4 +1,4 @@
-#include "Server/Core/Order.hpp"
+#include "Common/Core/Order.hpp"
 
 std::ostream &operator<<(std::ostream &_os, const Order &_order)
 {

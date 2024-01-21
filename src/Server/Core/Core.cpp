@@ -96,14 +96,16 @@ bool Core::internal_start()
 
 void Core::market_init()
 {
-    const std::vector<std::string> name{
+    std::vector<std::string> name{
         "Market1",
         "Market2",
         "Market3",
     };
 
-    for (const std::string &_name : name) {
-        m_markets.emplace(_name, std::move(MarketContainer{ _name, m_q_udp, m_q_tcp }));
+    for (std::string &_name : name) {
+        MarketContainer container(_name, m_q_udp, m_q_tcp);
+
+        m_markets.emplace(_name, std::move(container));
         m_q_markets.emplace(_name, m_markets.at(_name).getInput());
     }
 }
