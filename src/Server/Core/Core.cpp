@@ -96,11 +96,7 @@ bool Core::internal_start()
 
 void Core::market_init()
 {
-    std::vector<std::string> name{
-        "Market1",
-        "Market2",
-        "Market3",
-    };
+    std::vector<std::string> name{ MARKET_NAME };
 
     for (std::string &_name : name) {
         m_markets.emplace(std::piecewise_construct,

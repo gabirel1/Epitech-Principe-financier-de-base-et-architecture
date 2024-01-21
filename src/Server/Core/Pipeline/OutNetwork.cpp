@@ -37,7 +37,7 @@ namespace pip
                     std::vector<ClientSocket>::iterator it;
                     UserId userId = "";
 
-                    _input.Message.header.set49_SenderCompId("Market");
+                    _input.Message.header.set49_SenderCompId(PROVIDER_NAME);
                     Logger::Log("client list size: ", m_clients.size());
                     if (_input.Client.getSocket()) {
                         it = std::find_if(m_clients.begin(), m_clients.end(), [_socket = _input.Client.getSocket()] (const ClientSocket &_client) {

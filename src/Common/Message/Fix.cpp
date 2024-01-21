@@ -55,43 +55,4 @@ namespace fix
         formated_checksum += std::to_string(sum);
         return formated_checksum;
     }
-
-    std::pair<bool, Reject> Message::VerifyValid(Serializer::AnonMessage &_msg)
-    {
-        std::pair<bool, Reject> reject = { false, {} };
-
-        std::size_t supposed_length = utils::to<int>(_msg.at(Tag::BodyLength));
-        std::string supposed_checksum = _msg.at(Tag::CheckSum);
-
-        std::string msg_body_length = "";
-        std::string msg_checksum = "";
-
-        for (const auto &[_key, _val] : _msg)
-        {
-            if (_key == Tag::CheckSum)
-                continue;
-            if (_key != Tag::BodyLength && _key != Tag::BeginString)
-                msg_body_length += (_key + "=" + _val + (char)FIX_DELIMITER);
-            msg_checksum += (_key + "=" + _val + (char)FIX_DELIMITER);
-        }
-
-        std::cout << "supposed_length: " << supposed_length << std::endl;
-        std::cout << "supposed_checksum: " << supposed_checksum << std::endl;
-
-        if (supposed_length != Message::getBodyLength(msg_body_length)) {
-            reject.first = true;
-            reject.second.set371_refTagId(Tag::BodyLength);
-            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
-            reject.second.set58_text("Body length is not correct");
-        } else if (supposed_checksum != Message::getChecksum(msg_checksum)) {
-            reject.first = true;
-            reject.second.set371_refTagId(Tag::CheckSum);
-            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
-            reject.second.set58_text("Checksum is not correct");
-        } else {
-            reject.first = false;
-        }
-        return reject;
-    }
-
 }

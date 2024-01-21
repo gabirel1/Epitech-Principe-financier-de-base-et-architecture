@@ -28,7 +28,7 @@ namespace pip
 
     void Market::loop()
     {
-        Logger::SetThreadName(THIS_THREAD_ID, "Market");
+        Logger::SetThreadName(THIS_THREAD_ID, "Market - " + m_name);
         MarketIn input;
 
         while (m_running) {
@@ -41,7 +41,7 @@ namespace pip
 
     void Market::process(MarketIn &_data)
     {
-        Logger::Log("[Market] (", m_name ,") Processing new action: "); // todo log
+        Logger::Log("[Market] Processing new action: "); // todo log
 
         switch (_data.OrderData.action) {
             case OrderBook::Data::Action::Add:

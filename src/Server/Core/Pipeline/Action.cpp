@@ -37,19 +37,11 @@ namespace pip
             if (!m_input.empty())
             {
                 input = m_input.pop_front();
-                // need more checking, more info inside the function
-                // reject = fix::Message::VerifyValid(input.Message);
-                // if (reject.first) {
-                //     reject.second.header.set56_TargetCompId(input.Client.User);
-                //     reject.second.header.set49_SenderCompId(input.Message.at(fix::Tag::TargetCompId));  // WARN: if the tag is missing?
-                //     m_raw.push({ input.Client, reject.second });
-                //     continue;
-                // }
-                reject = fix::Header::Verify(input.Message);
+                reject = fix::Header::Verify(input.Message, input.Client.User, PROVIDER_NAME, input.Client.SeqNumber);
                 if (reject.first) {
                     Logger::Log("[Action] Incorect header received from client: ", input.Client.User);
                     reject.second.header.set56_TargetCompId(input.Client.User);
-                    reject.second.header.set49_SenderCompId(input.Message.at(fix::Tag::TargetCompId));  // WARN: if the tag is missing?
+                    reject.second.header.set49_SenderCompId(PROVIDER_NAME);
                     m_raw.push({ input.Client, reject.second });
                     continue;
                 }
