@@ -88,7 +88,7 @@ namespace pip
         _input.Client.SeqNumber = utils::to<size_t>(_input.Message.at(fix::Tag::MsqSeqNum));
         logon.set98_EncryptMethod("0");
         logon.set108_HeartBtInt(_input.Message.at(fix::Tag::HearBtInt));
-        Logger::Log("[Action] (Logon) Request from ", _input.Client.User, " sucessfuly handle: ");
+        Logger::Log("[Action] (Logon) Request from ", _input.Client.User, " sucessfuly handle");
         m_raw.push({ _input.Client, logon });
         return true;
     }

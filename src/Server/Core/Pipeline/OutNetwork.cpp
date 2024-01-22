@@ -49,12 +49,13 @@ namespace pip
                         it = std::find_if(m_clients.begin(), m_clients.end(), [userId = _input.Client.User] (const ClientSocket &_client) {
                             return _client.User == userId;
                         });
+                        userId = it->User;
                         Logger::Log("[OutNetwork] (Reply) Comming from an anonymous pipeline");
                     }
 
                     if (it != m_clients.end()) {
-                        userId = it->User;
-                        _input.Message.header.set34_msgSeqNum(std::to_string(it->SeqNumber));
+                        _input.Message.header.set34_msgSeqNum(std::to_string((it->SeqNumber)++));
+                        Logger::Log("Sending to target: ", userId);
                         _input.Message.header.set56_TargetCompId(userId);
                         std::string data = _input.Message.to_string();
 
@@ -62,6 +63,7 @@ namespace pip
                             it->getSocket()->send(reinterpret_cast<const uint8_t *>(data.c_str()), data.size());
                             Logger::Log("[OutNetwork] Data send successfuly: ", data);
                             it->Logged = _input.Client.Logged;
+                            it->User = _input.Client.User;
                             Logger::Log("[OutNetwork] New login status: ", it->Logged);
                             if (_input.Client.Disconnect) {
                                 it->getSocket()->close();
