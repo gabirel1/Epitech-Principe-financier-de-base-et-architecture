@@ -4,11 +4,11 @@ HOST = "localhost"
 PORT = 8080
 
 LOGON_MSG = f"8=FIX.4.2{chr(1)}9=70{chr(1)}35=A{chr(1)}49=CLIENT1{chr(1)}56=MyMarket{chr(1)}34=1{chr(1)}52=20240121-23:15:30.218{chr(1)}98=0{chr(1)}108=30{chr(1)}10=010{chr(1)}"
-NEW_ORDER_SINGLE_MSG = f"8=FIX.4.2{chr(1)}9=118{chr(1)}35=D{chr(1)}49=CLIENT1{chr(1)}56=MyMarket{chr(1)}34=2{chr(1)}52=20240121-23:15:30.218{chr(1)}11=1{chr(1)}55=GOLD/EURO{chr(1)}54=3{chr(1)}38=100{chr(1)}40=2{chr(1)}44=1000{chr(1)}21=3{chr(1)}60=20201010-10:10:100{chr(1)}10=115{chr(1)}"
-NEW_ORDER_SINGLE_MSG2 = f"8=FIX.4.2{chr(1)}9=128{chr(1)}35=D{chr(1)}49=CLIENT1{chr(1)}56=MyMarket{chr(1)}34=2{chr(1)}52=20240121-23:15:30.218{chr(1)}11=1{chr(1)}55=GOLD/EURO{chr(1)}54=3{chr(1)}38=100{chr(1)}40=2{chr(1)}44=1000{chr(1)}21=3{chr(1)}60=20201010-10:10:100{chr(1)}10=105{chr(1)}"
-NEW_ORDER_SINGLE_MSG_3 = f"8=FIX.4.2{chr(1)}9=123{chr(1)}35=D{chr(1)}49=Client1{chr(1)}56=MyMarket{chr(1)}34=2{chr(1)}52=20240122-12:01:31.223{chr(1)}11=1{chr(1)}21=3{chr(1)}40=2{chr(1)}44=100{chr(1)}54=3{chr(1)}55=GOLD/EURO{chr(1)}60=20201010-10:10:10.000{chr(1)}10=041{chr(1)}"
-NEW_ORDER_SINGLE_MSG_4 = f"8=FIX.4.2{chr(1)}9=127{chr(1)}35=D{chr(1)}49=Client1{chr(1)}56=MyMarket{chr(1)}34=2{chr(1)}52=20240122-12:01:31.223{chr(1)}11=1{chr(1)}21=3{chr(1)}38={chr(1)}40=2{chr(1)}44=100{chr(1)}54=3{chr(1)}55=GOLD/EURO{chr(1)}60=20201010-10:10:10.000{chr(1)}10=214{chr(1)}"
-NEW_ORDER_SINGLE_MSG_5 = f"8=FIX.4.2{chr(1)}9=128{chr(1)}35=D{chr(1)}49=Client1{chr(1)}56=MyMarket{chr(1)}34=2{chr(1)}52=20240122-12:01:31.223{chr(1)}11=1{chr(1)}21=3{chr(1)}38= {chr(1)}40=2{chr(1)}44=100{chr(1)}54=3{chr(1)}55=GOLD/EURO{chr(1)}60=20201010-10:10:10.000{chr(1)}10=247{chr(1)}"
+NEW_ORDER_SINGLE_MSG = f"8=FIX.4.2{chr(1)}9=116{chr(1)}35=D{chr(1)}49=Client1{chr(1)}56=MyMarket{chr(1)}34=2{chr(1)}52=20240122-13:58:48.962{chr(1)}11=1{chr(1)}21=3{chr(1)}38=100{chr(1)}40=2{chr(1)}44=1000{chr(1)}54=3{chr(1)}55=GOLD{chr(1)}60=20201010-10:10:10.000{chr(1)}10=075{chr(1)}"
+NEW_ORDER_SINGLE_MSG2 = f"8=FIX.4.2{chr(1)}9=126{chr(1)}35=D{chr(1)}49=Client1{chr(1)}56=MyMarket{chr(1)}34=2{chr(1)}52=20240122-13:58:48.962{chr(1)}11=1{chr(1)}21=3{chr(1)}38=100{chr(1)}40=2{chr(1)}44=1000{chr(1)}54=3{chr(1)}55=GOLD{chr(1)}60=20201010-10:10:10.000{chr(1)}10=175{chr(1)}"
+NEW_ORDER_SINGLE_MSG_3 = f"8=FIX.4.2{chr(1)}9=118{chr(1)}35=D{chr(1)}49=Client1{chr(1)}56=MyMarket{chr(1)}34=2{chr(1)}52=20240122-12:01:31.223{chr(1)}11=1{chr(1)}21=3{chr(1)}40=2{chr(1)}44=100{chr(1)}54=3{chr(1)}55=GOLD{chr(1)}60=20201010-10:10:10.000{chr(1)}10=217{chr(1)}"
+NEW_ORDER_SINGLE_MSG_4 = f"8=FIX.4.2{chr(1)}9=122{chr(1)}35=D{chr(1)}49=Client1{chr(1)}56=MyMarket{chr(1)}34=2{chr(1)}52=20240122-12:01:31.223{chr(1)}11=1{chr(1)}21=3{chr(1)}38={chr(1)}40=2{chr(1)}44=100{chr(1)}54=3{chr(1)}55=GOLD{chr(1)}60=20201010-10:10:10.000{chr(1)}10=125{chr(1)}"
+NEW_ORDER_SINGLE_MSG_5 = f"8=FIX.4.2{chr(1)}9=123{chr(1)}35=D{chr(1)}49=Client1{chr(1)}56=MyMarket{chr(1)}34=2{chr(1)}52=20240122-12:01:31.223{chr(1)}11=1{chr(1)}21=3{chr(1)}38= {chr(1)}40=2{chr(1)}44=100{chr(1)}54=3{chr(1)}55=GOLD{chr(1)}60=20201010-10:10:10.000{chr(1)}10=158{chr(1)}"
 LOGOUT_MSG = f"8=FIX.4.2{chr(1)}9=58{chr(1)}35=5{chr(1)}49=CLIENT1{chr(1)}56=MyMarket{chr(1)}34=3{chr(1)}52=20240121-23:15:30.218{chr(1)}10=237{chr(1)}"
 
 def decode_message(msg: str) -> dict:
