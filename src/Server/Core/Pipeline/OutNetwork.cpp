@@ -55,7 +55,7 @@ namespace pip
                     if (it != m_clients.end()) {
                         userId = it->User;
                         _input.Message.header.set34_msgSeqNum(std::to_string(it->SeqNumber));
-                        _input.Message.header.set56_TargetCompId(it->User);
+                        _input.Message.header.set56_TargetCompId(userId);
                         std::string data = _input.Message.to_string();
 
                         if (it->getSocket()) {
