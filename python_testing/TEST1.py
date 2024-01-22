@@ -4,7 +4,7 @@ HOST = "localhost"
 PORT = 8080
 
 LOGON_MSG = f"8=FIX.4.2{chr(1)}9=70{chr(1)}35=A{chr(1)}49=CLIENT1{chr(1)}56=MyMarket{chr(1)}34=1{chr(1)}52=20240121-23:15:30.218{chr(1)}98=0{chr(1)}108=30{chr(1)}10=010{chr(1)}"
-NEW_ORDER_SINGLE_MSG = f"8=FIX.4.2{chr(1)}9=128{chr(1)}35=D{chr(1)}49=CLIENT1{chr(1)}56=MyMarket{chr(1)}34=2{chr(1)}52=20240121-23:15:30.218{chr(1)}11=1{chr(1)}55=GOLD/EURO{chr(1)}54=3{chr(1)}38=100{chr(1)}40=2{chr(1)}44=1000{chr(1)}21=3{chr(1)}60=20201010-10:10:100{chr(1)}10=115{chr(1)}"
+NEW_ORDER_SINGLE_MSG = f"8=FIX.4.2{chr(1)}9=126{chr(1)}35=D{chr(1)}49=CLIENT1{chr(1)}56=MyMarket{chr(1)}34=2{chr(1)}52=20240122-14:11:23.995{chr(1)}11=1{chr(1)}21=3{chr(1)}38=100{chr(1)}40=2{chr(1)}44=1000{chr(1)}54=3{chr(1)}55=GOLD{chr(1)}60=20201010-10:10:10.000{chr(1)}10=160{chr(1)}"
 LOGOUT_MSG = f"8=FIX.4.2{chr(1)}9=58{chr(1)}35=5{chr(1)}49=CLIENT1{chr(1)}56=MyMarket{chr(1)}34=3{chr(1)}52=20240121-23:15:30.218{chr(1)}10=237{chr(1)}"
 
 def decode_message(msg: str) -> dict:
@@ -53,8 +53,8 @@ try:
     assert response["38"] == "100", "New Order Single message failed. Expected OrderQty = 100."
     assert response["39"] == "0", "New Order Single message failed. Expected OrdStatus = 0."
     assert response["40"] == "2", "New Order Single message failed. Expected OrdType = 2."
-    assert response["44"] == "1400", "New Order Single message failed. Expected Price = 1400."
-    assert response["54"] == "4", "New Order Single message failed. Expected Side = 4."
+    assert response["44"] == "1000", "New Order Single message failed. Expected Price = 1000."
+    assert response["54"] == "3", "New Order Single message failed. Expected Side = 3."
     assert response["55"] == "GOLD", "New Order Single message failed. Expected Symbol = GOLD."
     assert response["150"] == "0", "New Order Single message failed. Expected ExecType = 0."
     assert response["151"] == "100", "New Order Single message failed. Expected LeavesQty = 100."
