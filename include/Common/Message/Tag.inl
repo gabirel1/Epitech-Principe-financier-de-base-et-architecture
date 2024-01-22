@@ -63,7 +63,7 @@ namespace fix
         std::pair<bool, fix::Reject> reject = { false, {} };
 
         reject.second.set371_refTagId(Tag::BodyLength);
-        if (utils::is_numeric(_value)) {
+        if (!utils::is_numeric(_value)) {
             reject.first = true;
             reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
             reject.second.set58_text("Body length should be numeric");
