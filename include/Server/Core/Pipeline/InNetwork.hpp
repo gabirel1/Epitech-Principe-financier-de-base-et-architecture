@@ -32,7 +32,7 @@ namespace pip
             /// @param _output Output data queue of the pipeline.
             /// @param _error Error output directly connected to pip::OutNetwork
             /// @param _port Port on which the network will listen to, for connection and receive message.
-            InNetwork(std::vector<__T> &_clients, NetToSerial &_output, RawOutput &_error, uint32_t _port);
+            InNetwork(std::vector<__T> &_clients, NetToAction &_output, RawOutput &_error, uint32_t _port);
             /// @brief Disconnect from listening, stop the pipeline and the destroy it.
             ~InNetwork();
 
@@ -45,7 +45,7 @@ namespace pip
 
         private:
             std::vector<__T> &m_clients;            ///< Client list
-            NetToSerial &m_output;                  ///< Ouput data queue
+            NetToAction &m_output;                  ///< Ouput data queue
             RawOutput &m_error;                     ///< Output message queue directly to the pip::OutNetwork
 
             net::Acceptor<T> m_acceptor;            ///< Acceptor listening the the port passed as parameter.

@@ -3,6 +3,7 @@
 #include <utility>
 
 #include "Common/Message/Reject.hpp"
+#include "Common/Core/Order.hpp"
 
 #define UNUSED __attribute__((unused))
 
@@ -14,6 +15,7 @@ namespace fix
         constexpr const char AvgPx[] = "6";                 ///< Tag [6](https://www.onixs.biz/fix-dictionary/4.2/tagNum_6.html).
         constexpr const char BeginString[] = "8";           ///< Tag [8](https://www.onixs.biz/fix-dictionary/4.2/tagNum_8.html).
         constexpr const char BodyLength[] = "9";            ///< Tag [9](https://www.onixs.biz/fix-dictionary/4.2/tagNum_9.html).
+        constexpr const char CheckSum[] = "10";             ///< Tag [10](https://www.onixs.biz/fix-dictionary/4.2/tagNum_10.html).
         constexpr const char ClOrdID[] = "11";              ///< Tag [11](https://www.onixs.biz/fix-dictionary/4.2/tagNum_11.html).
         constexpr const char CumQty[] = "14";               ///< Tag [14](https://www.onixs.biz/fix-dictionary/4.2/tagNum_14.html).
         constexpr const char ExecId[] = "17";               ///< Tag [17](https://www.onixs.biz/fix-dictionary/4.2/tagNum_17.html).
@@ -21,7 +23,7 @@ namespace fix
         constexpr const char HandlInst[] = "21";            ///< Tag [21](https://www.onixs.biz/fix-dictionary/4.2/tagNum_21.html).
         constexpr const char MsqSeqNum[] = "34";            ///< Tag [34](https://www.onixs.biz/fix-dictionary/4.2/tagNum_34.html).
         constexpr const char MsgType[] = "35";              ///< Tag [35](https://www.onixs.biz/fix-dictionary/4.2/tagNum_35.html).
-        constexpr const char OrderId[] = "37";              ///< Tag [37](https://www.onixs.biz/fix-dictionary/4.2/tagNum_37.html).
+        constexpr const char OrderID[] = "37";              ///< Tag [37](https://www.onixs.biz/fix-dictionary/4.2/tagNum_37.html).
         constexpr const char OrderQty[] = "38";             ///< Tag [38](https://www.onixs.biz/fix-dictionary/4.2/tagNum_38.html).
         constexpr const char OrdStatus[] = "39";            ///< Tag [39](https://www.onixs.biz/fix-dictionary/4.2/tagNum_39.html).
         constexpr const char OrdType[] = "40";              ///< Tag [40](https://www.onixs.biz/fix-dictionary/4.2/tagNum_40.html).
@@ -43,7 +45,6 @@ namespace fix
         constexpr const char RefTagId[] = "371";            ///< Tag [371](https://www.onixs.biz/fix-dictionary/4.2/tagNum_371.html).
         constexpr const char RefMsgType[] = "352";          ///< Tag [352](https://www.onixs.biz/fix-dictionary/4.2/tagNum_352.html).
         constexpr const char SessionRejectReason[] = "373"; ///< Tag [373](https://www.onixs.biz/fix-dictionary/4.2/tagNum_373.html).
-
     };
 
     /// @brief Verify the value of all the fix::Tag passed as template.
@@ -55,19 +56,44 @@ namespace fix
     std::pair<bool, Reject> verify_all(Serializer::AnonMessage &_msg);
 
 
+    /// @brief Verify base function, it need to have a specialisation to compile.
+    /// @tparam T Tag of to verify
+    /// @param  _ Unknown parameters.
+    /// @return Assert error
     template<const char *T>
-    std::pair<bool, Reject> verify(const std::string &_value);
+    std::pair<bool, Reject> verify(const std::string &);
+    /// @brief Verify base function, it need to have a specialisation to compile.
+    /// @tparam T Tag of to verify
+    /// @param  _ Unknown parameters.
+    /// @param  _ Unknown parameters.
+    /// @return Assert error
+    template<const char *T>
+    std::pair<bool, Reject> verify(const std::string &, const std::string &);
+    /// @brief Verify base function, it need to have a specialisation to compile.
+    /// @tparam T Tag of to verify
+    /// @param  _ Unknown parameters.
+    /// @param  _ Unknown parameters.
+    /// @return Assert error
+    template<const char *T>
+    std::pair<bool, Reject> verify(const std::string &, size_t);
 
-    /// @brief Verify the value of Tag::EncryptMethod.
+    /// @brief Verify the value of Tag::BeginString.
     /// @param _value value of the tag.
     /// @return If the first element is true then second is set, otherwise it rigly formated.
     template<>
-    UNUSED std::pair<bool, Reject> verify<Tag::EncryptMethod>(const std::string &_value);
-    /// @brief Verify the value of Tag::HearBtInt.
+    UNUSED std::pair<bool, Reject> verify<Tag::BeginString>(const std::string &_value);
+    /// @brief Verify the value of Tag::BodyLength.
     /// @param _value value of the tag.
+    /// @param _len calculated body length.
     /// @return If the first element is true then second is set, otherwise it rigly formated.
     template<>
-    UNUSED std::pair<bool, Reject> verify<Tag::HearBtInt>(const std::string &_value);
+    UNUSED std::pair<bool, Reject> verify<Tag::BodyLength>(const std::string &_value, size_t _len);
+    /// @brief Verify the value of Tag::CheckSum.
+    /// @param _value value of the tag.
+    /// @param _len calculated checksum.
+    /// @return If the first element is true then second is set, otherwise it rigly formated.
+    template<>
+    UNUSED std::pair<bool, Reject> verify<Tag::CheckSum>(const std::string &_value, const std::string &_checksum);
     /// @brief Verify the value of Tag::ClOrdID.
     /// @param _value value of the tag.
     /// @return If the first element is true then second is set, otherwise it rigly formated.
@@ -78,6 +104,17 @@ namespace fix
     /// @return If the first element is true then second is set, otherwise it rigly formated.
     template<>
     UNUSED std::pair<bool, Reject> verify<Tag::HandlInst>(const std::string &_value);
+    /// @brief Verify the value of Tag::MsqSeqNum.
+    /// @param _value value of the tag.
+    /// @param _seqnum actual sequence number.
+    /// @return If the first element is true then second is set, otherwise it rigly formated.
+    template<>
+    UNUSED std::pair<bool, Reject> verify<Tag::MsqSeqNum>(const std::string &_value, size_t _seqnum);
+    /// @brief Verify the value of Tag::MsgType.
+    /// @param _value value of the tag.
+    /// @return If the first element is true then second is set, otherwise it rigly formated.
+    template<>
+    UNUSED std::pair<bool, Reject> verify<Tag::MsgType>(const std::string &_value);
     /// @brief Verify the value of Tag::OrderQty.
     /// @param _value value of the tag.
     /// @return If the first element is true then second is set, otherwise it rigly formated.
@@ -88,33 +125,60 @@ namespace fix
     /// @return If the first element is true then second is set, otherwise it rigly formated.
     template<>
     UNUSED std::pair<bool, Reject> verify<Tag::OrdType>(const std::string &_value);
+    /// @brief Verify the value of Tag::OrigClOrdID.
+    /// @param _value value of the tag.
+    /// @return If the first element is true then second is set, otherwise it rigly formated.
+    template<>
+    UNUSED std::pair<bool, Reject> verify<Tag::OrigClOrdID>(const std::string &_value);
     /// @brief Verify the value of Tag::Price.
     /// @param _value value of the tag.
     /// @return If the first element is true then second is set, otherwise it rigly formated.
     template<>
     UNUSED std::pair<bool, Reject> verify<Tag::Price>(const std::string &_value);
+    /// @brief Verify the value of Tag::SenderCompId.
+    /// @param _value value of the tag.
+    /// @param _sender valide sender Id.
+    /// @return If the first element is true then second is set, otherwise it rigly formated.
+    template<>
+    UNUSED std::pair<bool, Reject> verify<Tag::SenderCompId>(const std::string &_value, const UserId &_sender);
+    /// @brief Verify the value of Tag::SendingTime.
+    /// @param _value value of the tag.
+    /// @return If the first element is true then second is set, otherwise it rigly formated.
+    template<>
+    [[deprecated("Not implemented yet")]]
+    UNUSED std::pair<bool, Reject> verify<Tag::SendingTime>(const std::string &_value);
     /// @brief Verify the value of Tag::Side.
     /// @param _value value of the tag.
     /// @return If the first element is true then second is set, otherwise it rigly formated.
     template<>
     UNUSED std::pair<bool, Reject> verify<Tag::Side>(const std::string &_value);
+    /// @brief Verify the value of Tag::TargetCompId.
+    /// @param _value value of the tag.
+    /// @param _target valide target Id.
+    /// @return If the first element is true then second is set, otherwise it rigly formated.
+    template<>
+    UNUSED std::pair<bool, Reject> verify<Tag::TargetCompId>(const std::string &_value, const UserId &_target);
+    /// @brief Verify the value of Tag::Symbol.
+    /// @param _value value of the tag.
+    /// @return If the first element is true then second is set, otherwise it rigly formated.
+    template<>
+    UNUSED std::pair<bool, Reject> verify<Tag::Symbol>(const std::string &_value);
     /// @brief Verify the value of Tag::TransactTime.
     /// @param _value value of the tag.
     /// @return If the first element is true then second is set, otherwise it rigly formated.
     template<>
     [[deprecated("Not implemented yet")]]
     UNUSED std::pair<bool, Reject> verify<Tag::TransactTime>(const std::string &_value);
-    /// @brief Verify the value of Tag::Symbol.
+    /// @brief Verify the value of Tag::EncryptMethod.
     /// @param _value value of the tag.
     /// @return If the first element is true then second is set, otherwise it rigly formated.
     template<>
-    [[deprecated("Not implemented yet")]]
-    UNUSED std::pair<bool, Reject> verify<Tag::Symbol>(const std::string &_value);
-    /// @brief Verify the value of Tag::OrigClOrdID.
+    UNUSED std::pair<bool, Reject> verify<Tag::EncryptMethod>(const std::string &_value);
+    /// @brief Verify the value of Tag::HearBtInt.
     /// @param _value value of the tag.
     /// @return If the first element is true then second is set, otherwise it rigly formated.
     template<>
-    UNUSED std::pair<bool, Reject> verify<Tag::OrigClOrdID>(const std::string &_value);
+    UNUSED std::pair<bool, Reject> verify<Tag::HearBtInt>(const std::string &_value);
 
 #pragma GCC diagnostic pop
 

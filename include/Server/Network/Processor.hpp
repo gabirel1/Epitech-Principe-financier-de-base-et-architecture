@@ -10,11 +10,6 @@ namespace net
 {
     namespace tcp
     {
-        [[nodiscard]] bool processor(ClientSocket &_socket, NetToSerial &_serial, RawOutput &_error);
-    }
-
-    namespace udp
-    {
-        [[nodiscard]] bool processor(std::shared_ptr<net::udp::Socket> _socket);
+        [[nodiscard]] bool processor(ClientSocket &_socket, NetToAction &_serial, RawOutput &_error);
     }
 }

@@ -10,6 +10,8 @@ namespace fix
             ExecutionReport();
             ~ExecutionReport() = default;
 
+            /// @brief Calculated average price of all fills on this order.
+            /// @param _val Value assigned to it: double.
             void set6_avgPx(const std::string &_val);
 
             /// @brief Quantity sold/bought after the execution of the order [14](https://www.onixs.biz/fix-dictionary/4.2/tagNum_14.html).
@@ -28,7 +30,7 @@ namespace fix
             void set20_execTransType(const std::string &_val);
 
             /// @brief Set the reference order Id of the report [37](https://www.onixs.biz/fix-dictionary/4.2/tagNum_37.html).
-            /// @param _val Value assigned to it: int.
+            /// @param _val Value assigned to it: string.
             void set37_orderID(const std::string &_val);
 
             /// @brief Set the quantity order [38](https://www.onixs.biz/fix-dictionary/4.2/tagNum_38.html).
@@ -68,7 +70,7 @@ namespace fix
             void set151_leavesQty(const std::string &_val);
 
 
-            static inline size_t ExecId = 0;                    ///< Auto incremented [execution id](https://www.onixs.biz/fix-dictionary/4.2/tagNum_14.html).
+            static inline size_t ExecId = 1;                    ///< Auto incremented [execution id](https://www.onixs.biz/fix-dictionary/4.2/tagNum_14.html).
 
             static constexpr const char MsgType[] = "8";        ///< Message type value as string.
             static constexpr const char cMsgType = MsgType[0];  ///< Message type value as char.

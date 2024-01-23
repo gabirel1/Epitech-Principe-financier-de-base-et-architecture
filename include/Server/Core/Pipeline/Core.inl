@@ -32,8 +32,8 @@ std::future_status Pipeline<T>::stop()
 template<class T>
 void Pipeline<T>::tstart(T *_pipeline)
 {
-    m_running = true;
-    m_futur = std::async(std::launch::async, &T::loop, _pipeline);
+    _pipeline->m_running = true;
+    _pipeline->m_futur = std::async(std::launch::async, &T::loop, _pipeline);
 }
 
 template<class T>

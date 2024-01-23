@@ -4,8 +4,8 @@
 #include <iostream>
 #include <vector>
 
-using UserId = uint64_t;
-using OrderId = uint64_t;
+using UserId = std::string;
+using OrderId = std::string;
 using Quantity = uint64_t;
 using Side = uint8_t;
 
@@ -29,4 +29,10 @@ enum OrderStatus {
     Canceld = 4,
     Replaced,
     Pending
+};
+
+enum class OrderType
+{
+    Bid,
+    Ask
 };

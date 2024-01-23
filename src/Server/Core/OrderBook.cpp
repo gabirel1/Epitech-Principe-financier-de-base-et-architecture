@@ -1,10 +1,11 @@
 #include <numeric>
 
+#include "Server/Core/OrderBook.hpp"
 #include "Common/Message/ExecutionReport.hpp"
 #include "Server/Core/Pipeline/Naming.hpp"
 
-OrderBook::OrderBook(EventQueue &_output)
-    : m_output(_output)
+OrderBook::OrderBook(const std::string &_name, EventQueue &_output)
+    : m_name(_name), m_output(_output)
 {
 }
 
@@ -12,7 +13,7 @@ bool OrderBook::add(OrderType _type, Price _price, Order& _order)
 {
     if (has(_type, _order.orderId))
         return false;
-    add(_type, _price, _order, OrderStatus::Replaced);
+    add(_type, _price, _order, OrderStatus::New);
     return true;
 }
 
@@ -20,19 +21,15 @@ bool OrderBook::modify(OrderType _type, Price _price, Order &_order)
 {
     if (has(_type, _order.orderId))
         return false;
-    if (_type == OrderType::Ask)
-        (void)cancel<AskBook>(m_ask_id, _order.orderId, false);
-    else
-        (void)cancel<BidBook>(m_bid_id, _order.orderId, false);
     add(_type, _price, _order, OrderStatus::Replaced);
     return true;
 }
 
-bool OrderBook::cancel(OrderType _type, OrderId _orderId)
+bool OrderBook::cancel(OrderType _type, OrderId _orderId, bool _notif)
 {
     if (_type == OrderType::Ask)
-        return cancel<AskBook>(m_ask_id, _orderId, true);
-    return cancel<BidBook>(m_bid_id, _orderId, true);
+        return cancel<AskBook>(m_ask_id, _orderId, _notif);
+    return cancel<BidBook>(m_bid_id, _orderId, _notif);
 }
 
 bool OrderBook::has(OrderType _type, OrderId _orderId) const
@@ -84,6 +81,7 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
 
     event.orderId = _order.orderId;
     event.orgQty = _order.quantity;
+    event.userId = _order.userId;
     event.price = _price;
     event.side = _type;
     event.sold = false;
@@ -91,7 +89,7 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
         if (add<AskBook, std::less_equal<Price>>(m_ask, _price, _order)) {
             std::lock_guard<std::mutex> guard(m_mutex);
 
-            Logger::Log("[OrderBook] (Add) New order in BID: ", _order, " at price: ", _price);
+            Logger::Log("[OrderBook] (", m_name, ") {Add} New order in BID: ", _order, " at price: ", _price);
             m_bid[_price].push_back(_order);
             m_bid_id.emplace(_order.orderId, std::make_pair(m_bid.find(_price), m_bid.at(_price).end() - 1));
             event.status = OrderStatus::PartiallyFilled;
@@ -101,7 +99,7 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
         if (add<BidBook, std::greater_equal<Price>>(m_bid, _price, _order)) {
             std::lock_guard<std::mutex> guard(m_mutex);
 
-            Logger::Log("[OrderBook] (Add) New order in ASK: ", _order, " at price: ", _price);
+            Logger::Log("[OrderBook] (", m_name, ") {Add} New order in ASK: ", _order, " at price: ", _price);
             m_ask[_price].push_back(_order);
             m_ask_id.emplace(_order.orderId, std::make_pair(m_ask.find(_price), m_ask.at(_price).end() - 1));
         }
@@ -113,7 +111,7 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
         event.status = OrderStatus::PartiallyFilled;
     else
         event.status = OrderStatus::Filled;
-    Logger::Log("[OrderBook] (Add) New order event: "); // todo log
+    Logger::Log("[OrderBook] (", m_name, ") {Add} New order event: "); // todo log
     m_output.append(event);
-    Logger::Log("[OrderBook] (Add) New order event send");
+    Logger::Log("[OrderBook] (", m_name, ") {Add} New order event send");
 }

@@ -3,6 +3,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
+#include <netinet/ip.h>
 
 #include "Common/Core/Logger.hpp"
 #include "Common/Network/Socket.hpp"
@@ -89,7 +90,10 @@ namespace net
         {
             int enable = 1;
 
-            c_create();
+            if (is_open())
+                close();
+            if (!c_create())
+                return false;
             if (setsockopt(raw(), SOL_SOCKET, SO_BROADCAST, &enable, sizeof(enable)) == -1) {
                 Logger::Log("[udp::Socket] Failed to set the broadcast flag: ", strerror(errno));
                 close();

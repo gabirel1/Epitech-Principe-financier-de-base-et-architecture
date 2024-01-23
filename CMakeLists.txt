@@ -22,11 +22,12 @@ add_library(MarketCommon SHARED
 
 target_include_directories(MarketCommon PRIVATE include)
 
-add_compile_definitions(MarketCommon PRIVATE MAX_EVENT_EPOLL=30)        # Maximum of event handle by epoll at once
-add_compile_definitions(MarketCommon PRIVATE MAX_SOCKET=30)             # Maximum of socket handle by epoll/socket at once
-add_compile_definitions(MarketCommon PRIVATE N_THREAD_TP=1)             # Default number of thread in a thread pool
-add_compile_definitions(MarketCommon PRIVATE LOG_DFT_FILE="./default.log") # Default log file
-add_compile_definitions(MarketCommon PRIVATE MAX_RECV_SIZE=2048)        # Maximum of data received bu a socket            # Default number of thread in a thread pool
+add_compile_definitions(MAX_EVENT_EPOLL=30)            # Maximum of event handle by epoll at once
+add_compile_definitions(MAX_SOCKET=30)                 # Maximum of socket handle by epoll/socket at once
+add_compile_definitions(N_THREAD_TP=1)                 # Default number of thread in a thread pool
+add_compile_definitions(LOG_DFT_FILE="./default.log")  # Default log file
+add_compile_definitions(MAX_RECV_SIZE=2048)            # Maximum of data received bu a socket
+add_compile_definitions(MARKET_NAME="GOLD","EURO","USD")    # Server name (used for TargetCompId from client)
 
 # Server
 
@@ -44,9 +45,11 @@ target_link_libraries(MarketServer PRIVATE MarketCommon)
 
 target_include_directories(MarketServer PRIVATE include)
 
-target_compile_definitions(MarketServer PRIVATE TS_SIZE_OB=1)             # Thread Pool size from Order Book
-target_compile_definitions(MarketServer PRIVATE TS_SIZE_ON=1)             # Thread Pool size from Output network
-target_compile_definitions(MarketServer PRIVATE NET_RECV_SIZE=4096)       # Package max read size
+target_compile_definitions(MarketServer PRIVATE TS_SIZE_OB=1)                       # Thread Pool size from Order Book
+target_compile_definitions(MarketServer PRIVATE TS_SIZE_ON=1)                       # Thread Pool size from Output network
+target_compile_definitions(MarketServer PRIVATE NET_RECV_SIZE=4096)                 # Package max read size
+target_compile_definitions(MarketServer PRIVATE PROVIDER_NAME="MyMarket")           # Server name (used for TargetCompId from client)
+target_compile_definitions(MarketServer PRIVATE MARKET_NAME="GOLD","EURO","USD")    # Server name (used for TargetCompId from client)
 
 # Client
 

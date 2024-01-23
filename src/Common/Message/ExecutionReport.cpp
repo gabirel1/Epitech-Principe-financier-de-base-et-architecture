@@ -35,7 +35,7 @@ namespace fix
 
     void ExecutionReport::set37_orderID(const std::string &_val)
     {
-        m_params.emplace({ Tag::OrderId, _val });
+        m_params.emplace({ Tag::OrderID, _val });
     }
 
     void ExecutionReport::set38_orderQty(const std::string &_val)

@@ -4,18 +4,12 @@
 #include <map>
 #include <unordered_map>
 
-#include "Server/Core/Order.hpp"
+#include "Common/Core/Order.hpp"
 #include "Server/Core/meta.hpp"
 #include "Common/Thread/Queue.hpp"
 
 using AskBook = std::map<Price, OrderList, std::greater<Price>>;
 using BidBook = std::map<Price, OrderList, std::less<Price>>;
-
-enum class OrderType
-{
-    Bid,
-    Ask
-};
 
 class OrderBook
 {
@@ -45,17 +39,18 @@ class OrderBook
             OrderType type;
             Price price;
             Price oprice;
+            OrderId target;
             Order order;
         };
 
         using EventQueue = ts::Queue<Event>;
 
-        OrderBook(EventQueue &_output);
+        OrderBook(const std::string &_name, EventQueue &_output);
         virtual ~OrderBook() = default;
 
         [[nodiscard]] bool add(OrderType _type, Price _price, Order &_order);
         [[nodiscard]] bool modify(OrderType _type, Price _price, Order &_order);
-        [[nodiscard]] bool cancel(OrderType _type, OrderId _orderId);
+        [[nodiscard]] bool cancel(OrderType _type, OrderId _orderId, bool _event = true);
 
         // front only
         [[nodiscard]] std::vector<Price> getPrice(OrderType _type);
@@ -80,6 +75,8 @@ class OrderBook
         [[nodiscard]] std::vector<Price> inter_getPrice(const T &_book);
 
     private:
+        const std::string m_name;
+
         std::mutex m_mutex;
 
         OrderIdMap<BidBook> m_bid_id;
