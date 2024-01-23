@@ -31,12 +31,12 @@ try:
     print(f"[TEST_1] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
-    assert response["35"] == "A", "Logon message failed (Didn't receive a Logon)."
-    assert response["49"] == "MyMarket", "Logon message failed. Expected senderCompID(49) = MyMarket."
-    assert response["56"] == "CLIENT1", "Logon message failed. Expected targetCompID(56) = CLIENT1."
-    assert response["34"] == "1", "Logon message failed. Expected MsgSeqNum(34) = 1."
-    assert response["108"] == "30", "Logon message failed. Expected HeartBtInt = 30."
-    print("[TEST_1] Logon message passed.", "\n\n")
+    assert response["35"] == "A", f"Logon message failed (Didn't receive a Logon)."
+    assert response["49"] == "MyMarket", f"Logon message failed. Expected senderCompID(49) = MyMarket."
+    assert response["56"] == "CLIENT1", f"Logon message failed. Expected targetCompID(56) = CLIENT1."
+    assert response["34"] == "1", f"Logon message failed. Expected MsgSeqNum(34) = 1."
+    assert response["108"] == "30", f"Logon message failed. Expected HeartBtInt = 30."
+    print("[TEST_1] Logon message passed.", f"\n\n")
 
     print("[TEST_1] sending message: new_order_single\n")
     socket.sendall(NEW_ORDER_SINGLE_MSG.encode())
@@ -44,14 +44,14 @@ try:
     print(f"[TEST_1] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
-    assert response["35"] == "3", "New Order Single message failed (Didn't receive an Execution Report)."
-    assert response["49"] == "MyMarket", "New Order Single message failed. Expected senderCompID(49) = MyMarket."
-    assert response["56"] == "CLIENT1", "New Order Single message failed. Expected targetCompID(56) = CLIENT1."
-    assert response["34"] == "2", "New Order Single message failed. Expected MsgSeqNum(34) = 2."
-    # assert response["45"] == "2", "New Order Single message failed. Expected RefSeqNum(45) = 2."
-    assert response["371"] == "9", "New Order Single message failed. Expected RefTagID(371) = 9."
-    # assert response["372"] == "D", "New Order Single message failed. Expected RefMsgType(372) = D."
-    # assert response["35"] == "8", "New Order Single message failed (Didn't receive an Execution Report)."
+    assert response["35"] == "3", f"New Order Single message failed (Didn't receive an Execution Report)."
+    assert response["49"] == "MyMarket", f"New Order Single message failed. Expected senderCompID(49) = MyMarket."
+    assert response["56"] == "CLIENT1", f"New Order Single message failed. Expected targetCompID(56) = CLIENT1."
+    assert response["34"] == "2", f"New Order Single message failed. Expected MsgSeqNum(34) = 2."
+    # assert response["45"] == "2", f"New Order Single message failed. Expected RefSeqNum(45) = 2."
+    assert response["371"] == "9", f"New Order Single message failed. Expected RefTagID(371) = 9."
+    # assert response["372"] == "D", f"New Order Single message failed. Expected RefMsgType(372) = D."
+    # assert response["35"] == "8", f"New Order Single message failed (Didn't receive an Execution Report)."
 
     print("[TEST_1] New Order Single message passed.", "\n\n")
 
@@ -61,10 +61,10 @@ try:
     print(f"[TEST_1] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
-    assert response["35"] == "5", "Logout message failed (Didn't receive a Logout)."
-    assert response["49"] == "MyMarket", "Logout message failed. Expected senderCompID(49) = MyMarket."
-    assert response["56"] == "CLIENT1", "Logout message failed. Expected targetCompID(56) = CLIENT1."
-    assert response["34"] == "3", "Logout message failed. Expected MsgSeqNum(34) = 3."
+    assert response["35"] == "5", f"Logout message failed (Didn't receive a Logout). expected MsgType(35) = 5. Instead received: {response['35']}"
+    assert response["49"] == "MyMarket", f"Logout message failed. Expected senderCompID(49) = MyMarket. Instead received: {response['49']}"
+    assert response["56"] == "CLIENT1", f"Logout message failed. Expected targetCompID(56) = CLIENT1. Instead received: {response['56']}"
+    assert response["34"] == "3", f"Logout message failed. Expected MsgSeqNum(34) = 3. Instead received: {response['34']}"
 
     print("[TEST_1] Logout message passed.", "\n\n")
     socket.close()
@@ -78,11 +78,11 @@ try:
     print(f"[TEST_2] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
-    assert response["35"] == "A", "Logon message failed (Didn't receive a Logon)."
-    assert response["49"] == "MyMarket", "Logon message failed. Expected senderCompID(49) = MyMarket."
-    assert response["56"] == "CLIENT1", "Logon message failed. Expected targetCompID(56) = CLIENT1."
-    assert response["34"] == "1", "Logon message failed. Expected MsgSeqNum(34) = 1."
-    assert response["108"] == "30", "Logon message failed. Expected HeartBtInt = 30."
+    assert response["35"] == "A", f"Logon message failed (Didn't receive a Logon). Expected MsgType(35) = A. Instead received: {response['35']}"
+    assert response["49"] == "MyMarket", f"Logon message failed. Expected senderCompID(49) = MyMarket. Instead received: {response['49']}"
+    assert response["56"] == "CLIENT1", f"Logon message failed. Expected targetCompID(56) = CLIENT1. Instead received: {response['56']}"
+    assert response["34"] == "1", f"Logon message failed. Expected MsgSeqNum(34) = 1. Instead received: {response['34']}"
+    assert response["108"] == "30", f"Logon message failed. Expected HeartBtInt = 30. Instead received: {response['108']}"
     print("[TEST_2] Logon message passed.", "\n\n")
 
     print("[TEST_2] sending message: new_order_single\n")
@@ -91,13 +91,13 @@ try:
     print(f"[TEST_2] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
-    assert response["35"] == "3", "New Order Single message failed (Didn't receive an Execution Report)."
-    assert response["49"] == "MyMarket", "New Order Single message failed. Expected senderCompID(49) = MyMarket."
-    assert response["56"] == "CLIENT1", "New Order Single message failed. Expected targetCompID(56) = CLIENT1."
-    assert response["34"] == "2", "New Order Single message failed. Expected MsgSeqNum(34) = 2."
-    # assert response["45"] == "2", "New Order Single message failed. Expected RefSeqNum(45) = 2."
-    assert response["371"] == "10", "New Order Single message failed. Expected RefTagID(371) = 10."
-    # assert response["372"] == "D", "New Order Single message failed. Expected RefMsgType(372) = D."
+    assert response["35"] == "3", f"New Order Single message failed (Didn't receive an Execution Report). Expected MsgType(35) = 3. Instead received: {response['35']}"
+    assert response["49"] == "MyMarket", f"New Order Single message failed. Expected senderCompID(49) = MyMarket. Instead received: {response['49']}"
+    assert response["56"] == "CLIENT1", f"New Order Single message failed. Expected targetCompID(56) = CLIENT1. Instead received: {response['56']}"
+    assert response["34"] == "2", f"New Order Single message failed. Expected MsgSeqNum(34) = 2. Instead received: {response['34']}"
+    # assert response["45"] == "2", f"New Order Single message failed. Expected RefSeqNum(45) = 2. Instead received: {response['45']}"
+    assert response["371"] == "10", f"New Order Single message failed. Expected RefTagID(371) = 10. Instead received: {response['371']}"
+    # assert response["372"] == "D", f"New Order Single message failed. Expected RefMsgType(372) = D. Instead received: {response['372']}"
 
     print("[TEST_2] New Order Single message passed.", "\n\n")
 
@@ -107,10 +107,10 @@ try:
     print(f"[TEST_2] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
-    assert response["35"] == "5", "Logout message failed (Didn't receive a Logout)."
-    assert response["49"] == "MyMarket", "Logout message failed. Expected senderCompID(49) = MyMarket."
-    assert response["56"] == "CLIENT1", "Logout message failed. Expected targetCompID(56) = CLIENT1."
-    assert response["34"] == "3", "Logout message failed. Expected MsgSeqNum(34) = 3."
+    assert response["35"] == "5", f"Logout message failed (Didn't receive a Logout). Expected MsgType(35) = 5. Instead received: {response['35']}"
+    assert response["49"] == "MyMarket", f"Logout message failed. Expected senderCompID(49) = MyMarket. Instead received: {response['49']}"
+    assert response["56"] == "CLIENT1", f"Logout message failed. Expected targetCompID(56) = CLIENT1. Instead received: {response['56']}"
+    assert response["34"] == "3", f"Logout message failed. Expected MsgSeqNum(34) = 3. Instead received: {response['34']}"
 
     print("[TEST_2] Logout message passed.", "\n\n")
     socket.close()
@@ -124,11 +124,11 @@ try:
     print(f"[TEST_3] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
-    assert response["35"] == "A", "Logon message failed (Didn't receive a Logon)."
-    assert response["49"] == "MyMarket", "Logon message failed. Expected senderCompID(49) = MyMarket."
-    assert response["56"] == "CLIENT1", "Logon message failed. Expected targetCompID(56) = CLIENT1."
-    assert response["34"] == "1", "Logon message failed. Expected MsgSeqNum(34) = 1."
-    assert response["108"] == "30", "Logon message failed. Expected HeartBtInt = 30."
+    assert response["35"] == "A", f"Logon message failed (Didn't receive a Logon). Expected MsgType(35) = A. Instead received: {response['35']}"
+    assert response["49"] == "MyMarket", f"Logon message failed. Expected senderCompID(49) = MyMarket. Instead received: {response['49']}"
+    assert response["56"] == "CLIENT1", f"Logon message failed. Expected targetCompID(56) = CLIENT1. Instead received: {response['56']}"
+    assert response["34"] == "1", f"Logon message failed. Expected MsgSeqNum(34) = 1. Instead received: {response['34']}"
+    assert response["108"] == "30", f"Logon message failed. Expected HeartBtInt = 30. Instead received: {response['108']}"
     print("[TEST_3] Logon message passed.", "\n\n")
 
     print("[TEST_3] sending message: new_order_single\n")
@@ -137,11 +137,11 @@ try:
     print(f"[TEST_3] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
-    assert response["35"] == "3", "New Order Single message failed (Didn't receive an Execution Report)."
-    assert response["49"] == "MyMarket", "New Order Single message failed. Expected senderCompID(49) = MyMarket."
-    assert response["56"] == "CLIENT1", "New Order Single message failed. Expected targetCompID(56) = CLIENT1."
-    assert response["34"] == "2", "New Order Single message failed. Expected MsgSeqNum(34) = 2."
-    assert response["371"] == "38", "New Order Single message failed. Expected RefTagID(371) = 38."
+    assert response["35"] == "3", f"New Order Single message failed (Didn't receive an Execution Report). Expected MsgType(35) = 3. Instead received: {response['35']}"
+    assert response["49"] == "MyMarket", f"New Order Single message failed. Expected senderCompID(49) = MyMarket. Instead received: {response['49']}"
+    assert response["56"] == "CLIENT1", f"New Order Single message failed. Expected targetCompID(56) = CLIENT1. Instead received: {response['56']}"
+    assert response["34"] == "2", f"New Order Single message failed. Expected MsgSeqNum(34) = 2. Instead received: {response['34']}"
+    assert response["371"] == "38", f"New Order Single message failed. Expected RefTagID(371) = 38. Instead received: {response['371']}"
 
     print("[TEST_3] New Order Single message passed.", "\n\n")
 
@@ -151,10 +151,10 @@ try:
     print(f"[TEST_3] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
-    assert response["35"] == "5", "Logout message failed (Didn't receive a Logout)."
-    assert response["49"] == "MyMarket", "Logout message failed. Expected senderCompID(49) = MyMarket."
-    assert response["56"] == "CLIENT1", "Logout message failed. Expected targetCompID(56) = CLIENT1."
-    assert response["34"] == "3", "Logout message failed. Expected MsgSeqNum(34) = 3."
+    assert response["35"] == "5", f"Logout message failed (Didn't receive a Logout). Expected MsgType(35) = 5. Instead received: {response['35']}"
+    assert response["49"] == "MyMarket", f"Logout message failed. Expected senderCompID(49) = MyMarket. Instead received: {response['49']}"
+    assert response["56"] == "CLIENT1", f"Logout message failed. Expected targetCompID(56) = CLIENT1. Instead received: {response['56']}"
+    assert response["34"] == "3", f"Logout message failed. Expected MsgSeqNum(34) = 3. Instead received: {response['34']}"
 
     print("[TEST_3] Logout message passed.", "\n\n")
     socket.close()
@@ -168,11 +168,11 @@ try:
     print(f"[TEST_4] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
-    assert response["35"] == "A", "Logon message failed (Didn't receive a Logon)."
-    assert response["49"] == "MyMarket", "Logon message failed. Expected senderCompID(49) = MyMarket."
-    assert response["56"] == "CLIENT1", "Logon message failed. Expected targetCompID(56) = CLIENT1."
-    assert response["34"] == "1", "Logon message failed. Expected MsgSeqNum(34) = 1."
-    assert response["108"] == "30", "Logon message failed. Expected HeartBtInt = 30."
+    assert response["35"] == "A", f"Logon message failed (Didn't receive a Logon). Expected MsgType(35) = A. Instead received: {response['35']}"
+    assert response["49"] == "MyMarket", f"Logon message failed. Expected senderCompID(49) = MyMarket. Instead received: {response['49']}"
+    assert response["56"] == "CLIENT1", f"Logon message failed. Expected targetCompID(56) = CLIENT1. Instead received: {response['56']}"
+    assert response["34"] == "1", f"Logon message failed. Expected MsgSeqNum(34) = 1. Instead received: {response['34']}"
+    assert response["108"] == "30", f"Logon message failed. Expected HeartBtInt = 30. Instead received: {response['108']}"
     print("[TEST_4] Logon message passed.", "\n\n")
 
     print("[TEST_4] sending message: new_order_single\n")
@@ -181,11 +181,11 @@ try:
     print(f"[TEST_4] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
-    assert response["35"] == "3", "New Order Single message failed (Didn't receive an Execution Report)."
-    assert response["49"] == "MyMarket", "New Order Single message failed. Expected senderCompID(49) = MyMarket."
-    assert response["56"] == "CLIENT1", "New Order Single message failed. Expected targetCompID(56) = CLIENT1."
-    assert response["34"] == "2", "New Order Single message failed. Expected MsgSeqNum(34) = 2."
-    assert response["371"] == "38", "New Order Single message failed. Expected RefTagID(371) = 38."
+    assert response["35"] == "3", f"New Order Single message failed (Didn't receive an Execution Report). Expected MsgType(35) = 3. Instead received: {response['35']}"
+    assert response["49"] == "MyMarket", f"New Order Single message failed. Expected senderCompID(49) = MyMarket. Instead received: {response['49']}"
+    assert response["56"] == "CLIENT1", f"New Order Single message failed. Expected targetCompID(56) = CLIENT1. Instead received: {response['56']}"
+    assert response["34"] == "2", f"New Order Single message failed. Expected MsgSeqNum(34) = 2. Instead received: {response['34']}"
+    assert response["371"] == "38", f"New Order Single message failed. Expected RefTagID(371) = 38. Instead received: {response['371']}"
 
     print("[TEST_4] New Order Single message passed.", "\n\n")
 
@@ -195,10 +195,10 @@ try:
     print(f"[TEST_4] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
-    assert response["35"] == "5", "Logout message failed (Didn't receive a Logout)."
-    assert response["49"] == "MyMarket", "Logout message failed. Expected senderCompID(49) = MyMarket."
-    assert response["56"] == "CLIENT1", "Logout message failed. Expected targetCompID(56) = CLIENT1."
-    assert response["34"] == "3", "Logout message failed. Expected MsgSeqNum(34) = 3."
+    assert response["35"] == "5", f"Logout message failed (Didn't receive a Logout). Expected MsgType(35) = 5. Instead received: {response['35']}"
+    assert response["49"] == "MyMarket", f"Logout message failed. Expected senderCompID(49) = MyMarket. Instead received: {response['49']}"
+    assert response["56"] == "CLIENT1", f"Logout message failed. Expected targetCompID(56) = CLIENT1. Instead received: {response['56']}"
+    assert response["34"] == "3", f"Logout message failed. Expected MsgSeqNum(34) = 3. Instead received: {response['34']}"
 
     print("[TEST_4] Logout message passed.", "\n\n")
     socket.close()
@@ -212,12 +212,12 @@ try:
     print(f"[TEST_5] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
-    assert response["35"] == "A", "Logon message failed (Didn't receive a Logon)."
-    assert response["49"] == "MyMarket", "Logon message failed. Expected senderCompID(49) = MyMarket."
-    assert response["56"] == "CLIENT1", "Logon message failed. Expected targetCompID(56) = CLIENT1."
-    assert response["34"] == "1", "Logon message failed. Expected MsgSeqNum(34) = 1."
-    assert response["108"] == "30", "Logon message failed. Expected HeartBtInt = 30."
-    print("[TEST_5] Logon message passed.", "\n\n")
+    assert response["35"] == "A", f"Logon message failed (Didn't receive a Logon). Expected MsgType(35) = A. Instead received: {response['35']}"
+    assert response["49"] == "MyMarket", f"Logon message failed. Expected senderCompID(49) = MyMarket. Instead received: {response['49']}"
+    assert response["56"] == "CLIENT1", f"Logon message failed. Expected targetCompID(56) = CLIENT1. Instead received: {response['56']}"
+    assert response["34"] == "1", f"Logon message failed. Expected MsgSeqNum(34) = 1. Instead received: {response['34']}"
+    assert response["108"] == "30", f"Logon message failed. Expected HeartBtInt = 30. Instead received: {response['108']}"
+    print("[TEST_5] Logon message passed.", f"\n\n")
 
     print("[TEST_5] sending message: new_order_single\n")
     socket.sendall(NEW_ORDER_SINGLE_MSG_5.encode())
@@ -225,26 +225,26 @@ try:
     print(f"[TEST_5] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
-    assert response["35"] == "3", "New Order Single message failed (Didn't receive an Execution Report)."
-    assert response["49"] == "MyMarket", "New Order Single message failed. Expected senderCompID(49) = MyMarket."
-    assert response["56"] == "CLIENT1", "New Order Single message failed. Expected targetCompID(56) = CLIENT1."
-    assert response["34"] == "2", "New Order Single message failed. Expected MsgSeqNum(34) = 2."
-    assert response["371"] == "38", "New Order Single message failed. Expected RefTagID(371) = 38."
+    assert response["35"] == "3", f"New Order Single message failed (Didn't receive an Execution Report). Expected MsgType(35) = 3. Instead received: {response['35']}"
+    assert response["49"] == "MyMarket", f"New Order Single message failed. Expected senderCompID(49) = MyMarket. Instead received: {response['49']}"
+    assert response["56"] == "CLIENT1", f"New Order Single message failed. Expected targetCompID(56) = CLIENT1. Instead received: {response['56']}"
+    assert response["34"] == "2", f"New Order Single message failed. Expected MsgSeqNum(34) = 2. Instead received: {response['34']}"
+    assert response["371"] == "38", f"New Order Single message failed. Expected RefTagID(371) = 38. Instead received: {response['371']}"
 
-    print("[TEST_5] New Order Single message passed.", "\n\n")
+    print("[TEST_5] New Order Single message passed.", f"\n\n")
 
     print("[TEST_5] sending message: logout\n")
     socket.sendall(LOGOUT_MSG.encode())
     data = socket.recv(1024).decode()
-    print(f"[TEST_5] Received message from server: '{data}'", "\n\n")
+    print(f"[TEST_5] Received message from server: '{data}'", f"\n\n")
     response = decode_message(data)
 
-    assert response["35"] == "5", "Logout message failed (Didn't receive a Logout)."
-    assert response["49"] == "MyMarket", "Logout message failed. Expected senderCompID(49) = MyMarket."
-    assert response["56"] == "CLIENT1", "Logout message failed. Expected targetCompID(56) = CLIENT1."
-    assert response["34"] == "3", "Logout message failed. Expected MsgSeqNum(34) = 3."
+    assert response["35"] == "5", f"Logout message failed (Didn't receive a Logout). Expected MsgType(35) = 5. Instead received: {response['35']}"
+    assert response["49"] == "MyMarket", f"Logout message failed. Expected senderCompID(49) = MyMarket. Instead received: {response['49']}"
+    assert response["56"] == "CLIENT1", f"Logout message failed. Expected targetCompID(56) = CLIENT1. Instead received: {response['56']}"
+    assert response["34"] == "3", f"Logout message failed. Expected MsgSeqNum(34) = 3. Instead received: {response['34']}"
 
-    print("[TEST_5] Logout message passed.", "\n\n")
+    print("[TEST_5] Logout message passed.", f"\n\n")
     socket.close()
 
 

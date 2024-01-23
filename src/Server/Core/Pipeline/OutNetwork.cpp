@@ -66,7 +66,7 @@ namespace pip
                             Logger::Log("[OutNetwork] Data send successfuly: ", data);
                             it->Logged = _input.Client.Logged;
                             it->User = _input.Client.User;
-                            Logger::Log("[OutNetwork] New login status: ", it->Logged);
+                            Logger::Log("[OutNetwork] New login status: ", (it->Logged == false) ? "False" : "True");
                             logTiming(it);
                             if (_input.Client.Disconnect) {
                                 it->getSocket()->close();
