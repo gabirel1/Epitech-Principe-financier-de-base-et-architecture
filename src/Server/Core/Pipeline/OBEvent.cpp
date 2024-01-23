@@ -48,15 +48,16 @@ namespace pip
         client.User = _input.userId;
         report.set14_cumQty(std::to_string(_input.orgQty - _input.quantity));
         report.set17_execID();
-        report.set20_execTransType("1");
+        report.set20_execTransType("0");
         report.set38_orderQty(std::to_string(_input.orgQty));
         report.set37_orderID(_input.orderId);
         report.set39_ordStatus(std::to_string(static_cast<uint8_t>(_input.status)));
         report.set40_ordType("2");
         report.set44_price(std::to_string(_input.price));
-        report.set54_side((_input.side == OrderType::Ask) ? "3" : "4");
+        report.set54_side((_input.side == OrderType::Ask) ? "4" : "3");
         report.set55_symbol(m_name);
         report.set151_leavesQty(std::to_string(_input.quantity));
+        report.set150_execType(std::to_string(static_cast<uint8_t>(_input.status)));
         m_tcp.append(client, report);
         Logger::Log("[OBEvent] (TCP) Report created: "); // todo log
         return true;

@@ -108,6 +108,7 @@ namespace pip
         }
         _input.Client.Logged = false;
         _input.Client.Disconnect = true;
+        logout.header.set56_TargetCompId(_input.Client.User);
         _input.Client.User = "";
         Logger::Log("[Action] (Logout) Request from: ", _input.Client.User, ", sucessfuly handle");
         m_raw.push({ _input.Client, logout });
