@@ -22,12 +22,12 @@ def decode_message(msg: str) -> dict:
     return msg_dict
 
 try:
-    socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    socket.connect((HOST, PORT))
+    _socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    _socket.connect((HOST, PORT))
 
     print("[TEST_1] sending message: logon\n")
-    socket.sendall(LOGON_MSG.encode())
-    data = socket.recv(1024).decode()
+    _socket.sendall(LOGON_MSG.encode())
+    data = _socket.recv(1024).decode()
     print(f"[TEST_1] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
@@ -39,8 +39,8 @@ try:
     print("[TEST_1] Logon message passed.", f"\n\n")
 
     print("[TEST_1] sending message: new_order_single\n")
-    socket.sendall(NEW_ORDER_SINGLE_MSG.encode())
-    data = socket.recv(1024).decode()
+    _socket.sendall(NEW_ORDER_SINGLE_MSG.encode())
+    data = _socket.recv(1024).decode()
     print(f"[TEST_1] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
@@ -56,8 +56,8 @@ try:
     print("[TEST_1] New Order Single message passed.", "\n\n")
 
     print("[TEST_1] sending message: logout\n")
-    socket.sendall(LOGOUT_MSG.encode())
-    data = socket.recv(1024).decode()
+    _socket.sendall(LOGOUT_MSG.encode())
+    data = _socket.recv(1024).decode()
     print(f"[TEST_1] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
@@ -67,14 +67,14 @@ try:
     assert response["34"] == "3", f"Logout message failed. Expected MsgSeqNum(34) = 3. Instead received: {response['34']}"
 
     print("[TEST_1] Logout message passed.", "\n\n")
-    socket.close()
+    _socket.close()
 
-    socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    socket.connect((HOST, PORT))
+    _socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    _socket.connect((HOST, PORT))
 
     print("[TEST_2] sending message: logon\n")
-    socket.sendall(LOGON_MSG.encode())
-    data = socket.recv(1024).decode()
+    _socket.sendall(LOGON_MSG.encode())
+    data = _socket.recv(1024).decode()
     print(f"[TEST_2] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
@@ -86,8 +86,8 @@ try:
     print("[TEST_2] Logon message passed.", "\n\n")
 
     print("[TEST_2] sending message: new_order_single\n")
-    socket.sendall(NEW_ORDER_SINGLE_MSG2.encode())
-    data = socket.recv(1024).decode()
+    _socket.sendall(NEW_ORDER_SINGLE_MSG2.encode())
+    data = _socket.recv(1024).decode()
     print(f"[TEST_2] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
@@ -102,8 +102,8 @@ try:
     print("[TEST_2] New Order Single message passed.", "\n\n")
 
     print("[TEST_2] sending message: logout\n")
-    socket.sendall(LOGOUT_MSG.encode())
-    data = socket.recv(1024).decode()
+    _socket.sendall(LOGOUT_MSG.encode())
+    data = _socket.recv(1024).decode()
     print(f"[TEST_2] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
@@ -113,14 +113,14 @@ try:
     assert response["34"] == "3", f"Logout message failed. Expected MsgSeqNum(34) = 3. Instead received: {response['34']}"
 
     print("[TEST_2] Logout message passed.", "\n\n")
-    socket.close()
+    _socket.close()
 
-    socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    socket.connect((HOST, PORT))
+    _socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    _socket.connect((HOST, PORT))
 
     print("[TEST_3] sending message: logon\n")
-    socket.sendall(LOGON_MSG.encode())
-    data = socket.recv(1024).decode()
+    _socket.sendall(LOGON_MSG.encode())
+    data = _socket.recv(1024).decode()
     print(f"[TEST_3] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
@@ -132,8 +132,8 @@ try:
     print("[TEST_3] Logon message passed.", "\n\n")
 
     print("[TEST_3] sending message: new_order_single\n")
-    socket.sendall(NEW_ORDER_SINGLE_MSG_3.encode())
-    data = socket.recv(1024).decode()
+    _socket.sendall(NEW_ORDER_SINGLE_MSG_3.encode())
+    data = _socket.recv(1024).decode()
     print(f"[TEST_3] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
@@ -146,8 +146,8 @@ try:
     print("[TEST_3] New Order Single message passed.", "\n\n")
 
     print("[TEST_3] sending message: logout\n")
-    socket.sendall(LOGOUT_MSG.encode())
-    data = socket.recv(1024).decode()
+    _socket.sendall(LOGOUT_MSG.encode())
+    data = _socket.recv(1024).decode()
     print(f"[TEST_3] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
@@ -157,14 +157,14 @@ try:
     assert response["34"] == "3", f"Logout message failed. Expected MsgSeqNum(34) = 3. Instead received: {response['34']}"
 
     print("[TEST_3] Logout message passed.", "\n\n")
-    socket.close()
+    _socket.close()
 
-    socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    _socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     socket.connect((HOST, PORT))
 
     print("[TEST_4] sending message: logon\n")
-    socket.sendall(LOGON_MSG.encode())
-    data = socket.recv(1024).decode()
+    _socket.sendall(LOGON_MSG.encode())
+    data = _socket.recv(1024).decode()
     print(f"[TEST_4] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
@@ -176,8 +176,8 @@ try:
     print("[TEST_4] Logon message passed.", "\n\n")
 
     print("[TEST_4] sending message: new_order_single\n")
-    socket.sendall(NEW_ORDER_SINGLE_MSG_4.encode())
-    data = socket.recv(1024).decode()
+    _socket.sendall(NEW_ORDER_SINGLE_MSG_4.encode())
+    data = _socket.recv(1024).decode()
     print(f"[TEST_4] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
@@ -190,8 +190,8 @@ try:
     print("[TEST_4] New Order Single message passed.", "\n\n")
 
     print("[TEST_4] sending message: logout\n")
-    socket.sendall(LOGOUT_MSG.encode())
-    data = socket.recv(1024).decode()
+    _socket.sendall(LOGOUT_MSG.encode())
+    data = _socket.recv(1024).decode()
     print(f"[TEST_4] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
@@ -201,14 +201,14 @@ try:
     assert response["34"] == "3", f"Logout message failed. Expected MsgSeqNum(34) = 3. Instead received: {response['34']}"
 
     print("[TEST_4] Logout message passed.", "\n\n")
-    socket.close()
+    _socket.close()
 
-    socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    _socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     socket.connect((HOST, PORT))
 
     print("[TEST_5] sending message: logon\n")
-    socket.sendall(LOGON_MSG.encode())
-    data = socket.recv(1024).decode()
+    _socket.sendall(LOGON_MSG.encode())
+    data = _socket.recv(1024).decode()
     print(f"[TEST_5] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
@@ -220,8 +220,8 @@ try:
     print("[TEST_5] Logon message passed.", f"\n\n")
 
     print("[TEST_5] sending message: new_order_single\n")
-    socket.sendall(NEW_ORDER_SINGLE_MSG_5.encode())
-    data = socket.recv(1024).decode()
+    _socket.sendall(NEW_ORDER_SINGLE_MSG_5.encode())
+    data = _socket.recv(1024).decode()
     print(f"[TEST_5] Received message from server: '{data}'", "\n\n")
     response = decode_message(data)
 
@@ -234,8 +234,8 @@ try:
     print("[TEST_5] New Order Single message passed.", f"\n\n")
 
     print("[TEST_5] sending message: logout\n")
-    socket.sendall(LOGOUT_MSG.encode())
-    data = socket.recv(1024).decode()
+    _socket.sendall(LOGOUT_MSG.encode())
+    data = _socket.recv(1024).decode()
     print(f"[TEST_5] Received message from server: '{data}'", f"\n\n")
     response = decode_message(data)
 
@@ -245,9 +245,9 @@ try:
     assert response["34"] == "3", f"Logout message failed. Expected MsgSeqNum(34) = 3. Instead received: {response['34']}"
 
     print("[TEST_5] Logout message passed.", f"\n\n")
-    socket.close()
+    _socket.close()
 
 
 except Exception as e:
     print(e)
-    socket.close()
+    _socket.close()
