@@ -12,6 +12,9 @@ namespace net::c
     Socket::Socket(int _dom, int _type, int _proto)
         : m_dom(_dom), m_type(_type), m_proto(_proto)
     {
+
+        std::cout << "CONSTRUCTEUR SOCKET " << "dom => " <<_dom<<" || type => " <<_type<<" || _proto => "<<_proto<<std::endl;
+
         (void)c_create();
     }
 
@@ -22,6 +25,8 @@ namespace net::c
 
     int Socket::create(int _dom, int _type, int _proto)
     {
+        std::cout << "CREATION SOCKET " << "dom => " <<_dom<<" || type => " <<_type<<" || _proto => "<<_proto<<std::endl;
+
         return socket(_dom, _type, _proto);
     }
 
@@ -39,7 +44,10 @@ namespace net::c
     {
         std::unique_ptr<uint8_t []> data(new uint8_t[_size]);
 
+        std::cout << "fd => " << _fd << " || data => " << data.get() << " || size => " << _size << std::endl;
+
         _error = ::recv(_fd, data.get(), _size, 0);
+        std::cout << "error => " << _error <<std::endl;
         return data.release();
     }
 

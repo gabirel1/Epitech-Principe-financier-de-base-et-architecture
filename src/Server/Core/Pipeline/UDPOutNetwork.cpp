@@ -8,6 +8,8 @@ namespace pip
     UDPOutNetwork::UDPOutNetwork(UdpInput &_input, uint32_t _port)
         : m_input(_input)
     {
+        std::cout << "[UDPOutNetwork] Port => " << _port << std::endl;
+
         if (!m_socket.broadcastOn(_port))
             Logger::Log("[UDPOutNetwork] Failed to setup broadcast, crashing after first action");
     }

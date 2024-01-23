@@ -99,16 +99,21 @@ namespace net
                 close();
                 return false;
             }
+
+            std::cout << "PORT BROADCAST => "<< _port << std::endl;
             std::memset(&m_broad_addr, 0, sizeof(m_broad_addr));
             m_broad_addr.sin_family = AF_INET;
-            m_broad_addr.sin_port = htons(_port);
-            m_broad_addr.sin_addr.s_addr = INADDR_BROADCAST;
+            m_broad_addr.sin_port = _port;
+            std::cout << "PORT BROADCAST => "<< m_broad_addr.sin_port << std::endl;
+            m_broad_addr.sin_addr.s_addr = INADDR_LOOPBACK;
             m_broadcast = true;
+
             return true;
         }
 
         bool Socket::broadcast(const uint8_t *_data, size_t _size)
         {
+            std::cout << "fd => " << raw() << " || data => " << _data << " || size => " << _size << " || m_broad_addr => " << m_broad_addr.sin_addr.s_addr << ":" << m_broad_addr.sin_port << std::endl; 
             if (sendto(raw(), _data, _size, 0, (struct sockaddr*)&m_broad_addr, sizeof(m_broad_addr)) == -1) {
                 Logger::Log("[udp::Socket] Failed to send the data on the broadcast: ", strerror(errno));
                 return false;

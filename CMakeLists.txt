@@ -53,19 +53,31 @@ target_compile_definitions(MarketServer PRIVATE MARKET_NAME="GOLD","EURO","USD")
 
 # Client
 
-# file(GLOB_RECURSE SRC_CLIENT
-#     include/Client/**.hpp
-#     include/Client/**.inl
-#     src/Client/**.cpp
-# )
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
 
-# add_executable(MarketClient
-#     ${SRC_CLIENT}
-# )
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 
-# target_link_libraries(MarketClient PRIVATE MarketCommon)
 
-# target_include_directories(MarketClient PRIVATE include)
+find_package(Qt5 REQUIRED COMPONENTS Core)
+
+file(GLOB_RECURSE SRC_CLIENT
+    include/Client/GUI/**.ui
+    include/Client/**.h
+    include/Client/**.hpp
+    include/Client/**.inl
+    src/Client/**.cpp
+)
+
+add_executable(MarketClient
+    ${SRC_CLIENT}
+)
+
+target_link_libraries(MarketClient PRIVATE MarketCommon Qt${QT_VERSION_MAJOR}::Widgets)
+
+target_include_directories(MarketClient PRIVATE include)
 
 # Setup GTest
 # include(FetchContent)
@@ -91,6 +103,7 @@ target_compile_definitions(MarketServer PRIVATE MARKET_NAME="GOLD","EURO","USD")
 # target_include_directories(MarketTest PRIVATE include)
 # target_include_directories(MarketTest PRIVATE test)
 # target_link_libraries(MarketTest MarketCommon GTest::gtest_main)
+# target_compile_options(MarketTest PRIVATE -Wno-protected -Wno-private)
 
 # include(GoogleTest)
 # gtest_discover_tests(MarketTest)

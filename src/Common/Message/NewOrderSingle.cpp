@@ -57,6 +57,7 @@ namespace fix
     {
         m_params.emplace({ Tag::Symbol, _val });
     }
+    
 
     void NewOrderSingle::set60_transactTime(const std::string &_val)
     {
