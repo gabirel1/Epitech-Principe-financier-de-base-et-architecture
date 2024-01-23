@@ -99,7 +99,7 @@ namespace pip
         std::pair<bool, fix::Reject> reject = fix::Logout::Verify(_input.Message);
         Logger::Log("[Action] (Logout) Treating message from: ", _input.Client.User);
 
-        if (_input.Client.Logged) {
+        if (_input.Client.Logged == false) {
             Logger::Log("[Action] (Logout) Request verification failed: "); // todo log
             reject.second.set45_refSeqNum(_input.Message.at(fix::Tag::MsqSeqNum));
             reject.second.set58_text("Client not connected");
