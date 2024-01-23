@@ -26,7 +26,7 @@ class Pipeline
     protected:
         /// @brief Setup and start the pipeline in an other thread and the member function `loop` of the parameter.
         /// @param _pipeline Pipeline with an `loop` member function implementation.
-        void tstart(T *_pipeline);
+        static void tstart(T *_pipeline);
 
         /// @brief Try to fetch the status of the thread, It throw the exception if the thread stoped because of one.
         /// @param _to Timeout of the status request (in millisecond) 

@@ -4,16 +4,12 @@
 
 namespace fix
 {
-    /**
-     * @brief Order Cancel Request
-     * The Order Cancel Request <F> message requests the cancelation of all of the remaining quantity of an existing order.
-     * Note that the Order Cancel/Replace Request <G> should be used to partially cancel (reduce) an order.
-     */
+    /// @brief Fix [Order Cancel Request](https://www.onixs.biz/fix-dictionary/4.2/msgType_9_9.html) class.
     class OrderCancelRequest : public Message
     {
         public:
             OrderCancelRequest();
-            ~OrderCancelRequest();
+            ~OrderCancelRequest() = default;
 
             /// @brief Verify if the logon message receive is correctly formated.
             /// @param _msg Message to check.

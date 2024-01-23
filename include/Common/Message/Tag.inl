@@ -1,3 +1,6 @@
+#include <string>
+
+#include "Common/Message/Message.hpp"
 #include "Common/Message/Tag.hpp"
 #include "Common/Core/Utils.hpp"
 
@@ -24,31 +27,89 @@ namespace fix
         return { true,  {} };
     }
 
+    template<const char *T>
+    std::pair<bool, Reject> verify(const std::string &, const std::string &)
+    {
+        // the definition of the specialization are made after the static_assert(false), so it need to be calculated to have the instance of the specialization
+        static_assert(std::is_same_v<bool, float>, "No specialization for the verification of this tag");
+        return { true,  {} };
+    }
+
+    template<const char *T>
+    std::pair<bool, Reject> verify(const std::string &, size_t)
+    {
+        // the definition of the specialization are made after the static_assert(false), so it need to be calculated to have the instance of the specialization
+        static_assert(std::is_same_v<bool, float>, "No specialization for the verification of this tag");
+        return { true,  {} };
+    }
+
     template<>
-    std::pair<bool, Reject> verify<Tag::EncryptMethod>(const std::string &_value)
+    std::pair<bool, Reject> verify<Tag::BeginString>(const std::string &_value)
     {
         std::pair<bool, fix::Reject> reject = { false, {} };
 
-        if (_value != "0") {
+        if (_value != "FIX.4.2") {
             reject.first = true;
-            reject.second.set371_refTagId(Tag::EncryptMethod);
-            reject.second.set373_sessionRejectReason(Reject::DecryptionIssue);
-            reject.second.set58_text("Not supported encryption method");
+            reject.second.set371_refTagId(Tag::BeginString);
+            reject.second.set373_sessionRejectReason(Reject::ValueOORange);
+            reject.second.set58_text("Supported version is FIX.4.2");
         }
         return reject;
     }
 
     template<>
-    std::pair<bool, Reject> verify<Tag::HearBtInt>(const std::string &_value)
+    std::pair<bool, Reject> verify<Tag::BodyLength>(const std::string &_value, size_t _len)
     {
         std::pair<bool, fix::Reject> reject = { false, {} };
 
+        reject.second.set371_refTagId(Tag::BodyLength);
         if (!utils::is_numeric(_value)) {
             reject.first = true;
-            reject.second.set371_refTagId(Tag::HearBtInt);
             reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
-            reject.second.set58_text("Heart beat should be a numerical value");
+            reject.second.set58_text("Body length should be numeric");
+        } else if (utils::to<size_t>(_value) != _len) {
+            reject.first = true;
+            reject.second.set373_sessionRejectReason(Reject::ValueOORange);
+            reject.second.set58_text("Body length is not correct");
         }
+        return reject;
+    }
+
+    template<>
+    std::pair<bool, Reject> verify<Tag::CheckSum>(const std::string &_value, const std::string &_checksum)
+    {
+        std::pair<bool, fix::Reject> reject = { false, {} };
+
+        if (_checksum != _value) {
+            reject.first = true;
+            reject.second.set371_refTagId(Tag::CheckSum);
+            reject.second.set373_sessionRejectReason(Reject::ValueOORange);
+            reject.second.set58_text("Checksum is not correct");
+        }
+        return reject;
+    }
+
+    template<>
+    std::pair<bool, Reject> verify<Tag::MsgType>(const std::string &_value)
+    {
+        constexpr const char type[] = {
+            Logon::cMsgType,
+            HeartBeat::cMsgType,
+            NewOrderSingle::cMsgType,
+            OrderCancelRequest::cMsgType,
+            OrderCancelReplaceRequest::cMsgType,
+            Logout::cMsgType
+        };
+        constexpr const size_t size_type = 6;
+        std::pair<bool, fix::Reject> reject = { false, {} };
+
+        for (size_t i = 0; i < size_type; i++)
+            if (type[i] == _value[0])
+                return reject;
+        reject.first = true;
+        reject.second.set371_refTagId(Tag::MsgType);
+        reject.second.set373_sessionRejectReason(Reject::NotSupporType);
+        reject.second.set58_text("Not supported message type");
         return reject;
     }
 
@@ -76,6 +137,24 @@ namespace fix
             reject.second.set371_refTagId(Tag::HandlInst);
             reject.second.set373_sessionRejectReason(Reject::ValueOORange);
             reject.second.set58_text("Not supported order Id");
+        }
+        return reject;
+    }
+
+    template<>
+    std::pair<bool, Reject> verify<Tag::MsqSeqNum>(const std::string &_value, size_t _seqnum)
+    {
+        std::pair<bool, fix::Reject> reject = { false, {} };
+
+        reject.second.set371_refTagId(Tag::MsqSeqNum);
+        if (!utils::is_numeric(_value)) {
+            reject.first = true;
+            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
+            reject.second.set58_text("Sequence number should be numeric");
+        } else if (utils::to<size_t>(_value) != _seqnum) {
+            reject.first = true;
+            reject.second.set373_sessionRejectReason(Reject::ValueOORange);
+            reject.second.set58_text("Sequence number is not correct");
         }
         return reject;
     }
@@ -123,6 +202,28 @@ namespace fix
     }
 
     template<>
+    std::pair<bool, Reject> verify<Tag::SenderCompId>(const std::string &_value, const UserId &_sender)
+    {
+        std::pair<bool, fix::Reject> reject = { false, {} };
+
+        if (_value != _sender) {
+            reject.first = true;
+            reject.second.set371_refTagId(Tag::SenderCompId);
+            reject.second.set373_sessionRejectReason(Reject::ValueOORange);
+            reject.second.set58_text("Wrong sender Id");
+        }
+        return reject;
+    }
+
+    template<>
+    std::pair<bool, Reject> verify<Tag::SendingTime>(const std::string &_value)
+    {
+        std::ignore = _value;
+
+        return { false, {} };
+    }
+
+    template<>
     std::pair<bool, Reject> verify<Tag::Side>(const std::string &_value)
     {
         std::pair<bool, fix::Reject> reject = { false, {} };
@@ -137,6 +238,21 @@ namespace fix
     }
 
     template<>
+    std::pair<bool, Reject> verify<Tag::TargetCompId>(const std::string &_value, const UserId &_target)
+    {
+        std::pair<bool, fix::Reject> reject = { false, {} };
+
+        if (_value != _target) {
+            reject.first = true;
+            reject.second.set371_refTagId(Tag::SenderCompId);
+            reject.second.set373_sessionRejectReason(Reject::ValueOORange);
+            reject.second.set58_text("Wrong target Id");
+        }
+        return reject;
+    }
+
+
+    template<>
     std::pair<bool, Reject> verify<Tag::TransactTime>(const std::string &_value)
     {
         std::ignore = _value;
@@ -147,9 +263,19 @@ namespace fix
     template<>
     std::pair<bool, Reject> verify<Tag::Symbol>(const std::string &_value)
     {
-        std::ignore = _value;
+        const std::vector<std::string> sym{ MARKET_NAME };
+        std::pair<bool, fix::Reject> reject = { false, {} };
+        auto it = std::find_if(sym.begin(), sym.end(), [_value] (const std::string &_sym) {
+            return _value == _sym;
+        });
 
-        return { false, {} };
+        if (it == sym.end()) {
+            reject.first = true;
+            reject.second.set371_refTagId(Tag::Symbol);
+            reject.second.set373_sessionRejectReason(Reject::ValueOORange);
+            reject.second.set58_text("Not supported symbol");
+        }
+        return reject;
     }
 
     template<>
@@ -162,6 +288,34 @@ namespace fix
             reject.second.set371_refTagId(Tag::OrigClOrdID);
             reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
             reject.second.set58_text("The origin Id should be numerical");
+        }
+        return reject;
+    }
+
+    template<>
+    std::pair<bool, Reject> verify<Tag::EncryptMethod>(const std::string &_value)
+    {
+        std::pair<bool, fix::Reject> reject = { false, {} };
+
+        if (_value != "0") {
+            reject.first = true;
+            reject.second.set371_refTagId(Tag::EncryptMethod);
+            reject.second.set373_sessionRejectReason(Reject::DecryptionIssue);
+            reject.second.set58_text("Not supported encryption method");
+        }
+        return reject;
+    }
+
+    template<>
+    std::pair<bool, Reject> verify<Tag::HearBtInt>(const std::string &_value)
+    {
+        std::pair<bool, fix::Reject> reject = { false, {} };
+
+        if (!utils::is_numeric(_value)) {
+            reject.first = true;
+            reject.second.set371_refTagId(Tag::HearBtInt);
+            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
+            reject.second.set58_text("Heart beat should be a numerical value");
         }
         return reject;
     }

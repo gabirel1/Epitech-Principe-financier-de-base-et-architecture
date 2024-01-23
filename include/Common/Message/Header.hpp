@@ -2,6 +2,7 @@
 
 #include <string>
 #include "Common/Message/Serializer.hpp"
+#include "Common/Core/Order.hpp"
 
 namespace fix
 {
@@ -17,7 +18,7 @@ namespace fix
             /// @brief Verify if the header receive is correctly formated.
             /// @param _msg Message to check.
             /// @return If the first element is true then second is set, otherwise it rigly formated.
-            static std::pair<bool, Reject> Verify(Serializer::AnonMessage &_msg);
+            static std::pair<bool, Reject> Verify(Serializer::AnonMessage &_msg, const UserId &_sender, const UserId &_target, size_t _seqnum);
 
             /// @brief Set the body length of the message [9](https://www.onixs.biz/fix-dictionary/4.2/tagNum_9.html).
             /// @param _val Value assigned to it: int.

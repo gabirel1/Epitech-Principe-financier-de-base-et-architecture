@@ -4,8 +4,8 @@
 
 namespace pip
 {
-    OBEvent::OBEvent(OrderBook::EventQueue &_input, UdpInput &_udp, RawOutput &_tcp)
-        : m_input(_input), m_udp(_udp), m_tcp(_tcp)
+    OBEvent::OBEvent(const std::string &_name, OrderBook::EventQueue &_input, UdpInput &_udp, RawOutput &_tcp)
+        : m_name(_name), m_input(_input), m_udp(_udp), m_tcp(_tcp)
     {
     }
 
@@ -24,7 +24,7 @@ namespace pip
 
     void OBEvent::loop()
     {
-        Logger::SetThreadName(THIS_THREAD_ID, "Order Book Event");
+        Logger::SetThreadName(THIS_THREAD_ID, "Order Book Event - " + m_name);
 
         OrderBook::Event input;
 
@@ -32,35 +32,40 @@ namespace pip
             if (!m_input.empty()) {
                 input = m_input.pop_front();
                 Logger::Log("[OBEvent] New event from the OderBook: "); // todo log
-                m_tp.enqueue([this, input] () {
-                    createUdp(input);
-                    createTcp(input);
+                m_tp.enqueue([this, _data = std::move(input)] () {
+                    createUdp(_data);
+                    createTcp(_data);
                 });
             }
         }
     }
 
-    bool OBEvent::createTcp(OrderBook::Event _input)
+    bool OBEvent::createTcp(const OrderBook::Event &_input)
     {
         fix::ExecutionReport report;
+        ClientSocket client{};
 
+        client.User = _input.userId;
+        client.Logged = true;
+        client.Disconnect = false;
         report.set14_cumQty(std::to_string(_input.orgQty - _input.quantity));
         report.set17_execID();
-        report.set20_execTransType("1");
+        report.set20_execTransType("0");
         report.set38_orderQty(std::to_string(_input.orgQty));
         report.set37_orderID(_input.orderId);
         report.set39_ordStatus(std::to_string(static_cast<uint8_t>(_input.status)));
         report.set40_ordType("2");
         report.set44_price(std::to_string(_input.price));
-        report.set54_side((_input.side == OrderType::Ask) ? "3" : "4");
-        report.header.set56_TargetCompId(_input.userId);
+        report.set54_side((_input.side == OrderType::Ask) ? "4" : "3");
+        report.set55_symbol(m_name);
         report.set151_leavesQty(std::to_string(_input.quantity));
-        m_tcp.append(NetIn{ {}, report });
+        report.set150_execType(std::to_string(static_cast<uint8_t>(_input.status)));
+        m_tcp.append(std::move(client), std::move(report));
         Logger::Log("[OBEvent] (TCP) Report created: "); // todo log
         return true;
     }
 
-    bool OBEvent::createUdp(OrderBook::Event _input)
+    bool OBEvent::createUdp(const OrderBook::Event &_input)
     {
         data::UDPPackage package;
 

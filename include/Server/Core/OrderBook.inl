@@ -33,20 +33,20 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
             event.orgQty = order.quantity;
             std::cout << "here" << std::endl;
             if (order.quantity == _order.quantity) {
-                Logger::Log("[OrderBook] (Add) Filled the order: ", order, ", price: ", _key);
-                Logger::Log("[OrderBook] (Add-Incoming) Filled the order: ", _order);
+                Logger::Log("[OrderBook] (", m_name, ") {Add} Filled the order: ", order, ", price: ", _key);
+                Logger::Log("[OrderBook] (", m_name, ") {Add-Incoming} Filled the order: ", _order);
                 _val.erase(_val.begin() + i);
                 m_output.append(event);
                 return false;
             } else if (order.quantity < _order.quantity) {
-                Logger::Log("[OrderBook] (Add) Filled the order: ", order, ", price: ", _key);
-                Logger::Log("[OrderBook] (Add-Incoming) Partially filled the order: ", _order, ", new quantity: ", _order.quantity - order.quantity);
+                Logger::Log("[OrderBook] (", m_name, ") {Add} Filled the order: ", order, ", price: ", _key);
+                Logger::Log("[OrderBook] (", m_name, ") {Add-Incoming} Partially filled the order: ", _order, ", new quantity: ", _order.quantity - order.quantity);
                 _order.quantity -= order.quantity;
                 _val.erase(_val.begin() + i);
                 m_output.append(event);
             } else {
-                Logger::Log("[OrderBook] (Add) Partially sold the order: ", order, ", new quantity: ", order.quantity - _order.quantity, ", price: ", _key);
-                Logger::Log("[OrderBook] (Add-Incoming) Filled the order: ", _order);
+                Logger::Log("[OrderBook] (", m_name, ") {Add} Partially sold the order: ", order, ", new quantity: ", order.quantity - _order.quantity, ", price: ", _key);
+                Logger::Log("[OrderBook] (", m_name, ") {Add-Incoming} Filled the order: ", _order);
                 order.quantity -= _order.quantity;
                 event.quantity = order.quantity;
                 event.status = OrderStatus::PartiallyFilled;
@@ -79,10 +79,10 @@ bool OrderBook::cancel(OrderIdMap<T> &_mapId, OrderId _orderId, bool _event)
             event.quantity = it->second.second->quantity;
             event.orgQty = it->second.second->quantity;
             event.sold = false;
-            Logger::Log("[OrderBook] (Cancel) Sended event: "); // todo log
+            Logger::Log("[OrderBook] (", m_name, ") {Cancel} Sended event: "); // todo log
             m_output.append(event);
         }
-        Logger::Log("[OrderBook] (Cancel) Sucefully canceled the order: ", _orderId);
+        Logger::Log("[OrderBook] (", m_name, ") {Cancel} Sucefully canceled the order: ", _orderId);
         it->second.first->second.erase(it->second.second);
         _mapId.erase(it);
         return true;

@@ -8,8 +8,8 @@
 
 namespace pip
 {
-    Market::Market(OrderBook &_ob, SerialToMarket &_input, MarketToNet &_output)
-        : m_input(_input), m_output(_output), m_ob(_ob)
+    Market::Market(const std::string &_name, OrderBook &_ob, ActionToMarket &_input, MarketToNet &_output)
+        : m_name(_name), m_input(_input), m_output(_output), m_ob(_ob)
     {
     }
 
@@ -22,13 +22,13 @@ namespace pip
     {
         if (!m_running)
             tstart(this);
-        Logger::Log("[Market] Running: ", m_running);
+        Logger::Log("[Market] (", m_name ,") Running: ", m_running);
         return m_running;
     }
 
     void Market::loop()
     {
-        Logger::SetThreadName(THIS_THREAD_ID, "Market");
+        Logger::SetThreadName(THIS_THREAD_ID, "Market - " + m_name);
         MarketIn input;
 
         while (m_running) {
@@ -45,18 +45,18 @@ namespace pip
 
         switch (_data.OrderData.action) {
             case OrderBook::Data::Action::Add:
-                m_tp.enqueue([this, _data] () {
-                    runAdd(_data);
+                m_tp.enqueue([this, data = std::move(_data)] () mutable {
+                    runAdd(data);
                 });
                 break;
             case OrderBook::Data::Action::Modify:
-                m_tp.enqueue([this, _data] () {
-                    runModify(_data);
+                m_tp.enqueue([this, data = std::move(_data)] () mutable {
+                    runModify(data);
                 });
                 break;
             case OrderBook::Data::Action::Cancel:
-                m_tp.enqueue([this, _data] () {
-                    runCancel(_data);
+                m_tp.enqueue([this, data = std::move(_data)] () mutable {
+                    runCancel(data);
                 });
                 break;
             default:
@@ -65,12 +65,13 @@ namespace pip
         }
     }
 
-    bool Market::runAdd(MarketIn _data)
+    bool Market::runAdd(const MarketIn &_data)
     {
         fix::ExecutionReport report;
+        Order order = _data.OrderData.order;
 
         Logger::Log("[Market] (New) request: "); // todo log
-        if (!m_ob.add(_data.OrderData.type, _data.OrderData.price, _data.OrderData.order)) {
+        if (!m_ob.add(_data.OrderData.type, _data.OrderData.price, order)) {
             Logger::Log("[Market] (New) Reject: Order ID already used: ", _data.OrderData.order.orderId);
             report.set14_cumQty("0");
             report.set17_execID();
@@ -83,16 +84,17 @@ namespace pip
             report.set54_side((_data.OrderData.type == OrderType::Ask) ? "3" : "4");
             report.set58_text("Order Id already used");
             report.set151_leavesQty("0");
-            m_output.append(data::MarketToNet{ _data.Client, report });
+            m_output.append(std::move(_data.Client), std::move(report));
             return false;
         }
-        Logger::Log("[Market] (New) Order executaded sucefully: ", _data.OrderData.order, ", price: ", _data.OrderData.price);
+        Logger::Log("[Market] (New) Order executaded sucefully: ", order, ", price: ", _data.OrderData.price);
         return true;
     }
 
-    bool Market::runModify(MarketIn _data)
+    bool Market::runModify(const MarketIn &_data)
     {
         fix::OrderCancelReject report;
+        Order order = _data.OrderData.order;
 
         Logger::Log("[Market] (Modify) Request: "); // todo log
         report.set37_orderID(_data.OrderData.target);
@@ -102,19 +104,20 @@ namespace pip
             report.set39_ordStatus("8");
             report.set58_text("Order ID doesn't exist");
             Logger::Log("[Market] (Modify-Cancel) Reject: Order ID already exist: ", _data.OrderData.target);
+            m_output.append(std::move(_data.Client), std::move(report));
             return false;
-        } else if (!m_ob.modify(_data.OrderData.type, _data.OrderData.price, _data.OrderData.order)) {
+        } else if (!m_ob.modify(_data.OrderData.type, _data.OrderData.price, order)) {
             report.set39_ordStatus("4");
             report.set58_text("Order ID already exist, target got canceled");
             Logger::Log("[Market] (Modify-Add) Reject: Order ID already exist: ", _data.OrderData.order.orderId);
-            m_output.append(data::MarketToNet{ _data.Client, report });
+            m_output.append(std::move(_data.Client), std::move(report));
             return false;
         }
-        Logger::Log("[Market] (Modify) Order modify sucessfully: ", _data.OrderData.target, " -> ", _data.OrderData.order);
+        Logger::Log("[Market] (Modify) Order modify sucessfully: ", _data.OrderData.target, " -> ", order);
         return true;
     }
 
-    bool Market::runCancel(MarketIn _data)
+    bool Market::runCancel(const MarketIn &_data)
     {
         fix::OrderCancelReject report;
 
@@ -126,10 +129,10 @@ namespace pip
             report.set41_origClOrdID(_data.OrderData.order.orderId);
             report.set434_cxlRejReason("8");
             report.set58_text("Order ID doesn't exist");
-            m_output.append(data::MarketToNet{ _data.Client, report });
+            m_output.append(std::move(_data.Client), std::move(report));
             return false;
         }
-        Logger::Log("[Market] (Cancel) Sucessfuly executed on: ", _data.OrderData.order.orderId);
+        Logger::Log("[Market] (Cancel) Successfully executed on: ", _data.OrderData.order.orderId);
         return true;
     }
 }

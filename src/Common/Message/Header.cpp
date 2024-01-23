@@ -10,40 +10,43 @@
 
 namespace fix
 {
-    std::pair<bool, Reject> Header::Verify(Serializer::AnonMessage &_msg)
+    std::pair<bool, Reject> Header::Verify(Serializer::AnonMessage &_msg, const UserId &_sender, const UserId &_target, size_t _seqnum)
     {
         // need to verify sending time
         std::pair<bool, Reject> reject = utils::Has<Tag::BeginString, Tag::BodyLength, Tag::MsqSeqNum, Tag::MsgType, Tag::SenderCompId, Tag::SendingTime, Tag::TargetCompId>(_msg);
+        std::string body_len{};
+        std::string checksum{};
 
-        if (reject.first) {
-            return reject;
-        } else if (_msg.at(Tag::BeginString) != "FIX.4.2") {
-            reject.second.set371_refTagId(Tag::BeginString);
-            reject.second.set373_sessionRejectReason(Reject::ValueOORange);
-            reject.second.set58_text("Fix protocl version not supported");
-        } else if (!utils::is_numeric(_msg.at(Tag::BodyLength))) {                  // Need more test on Body Length: correspond?
-            reject.second.set371_refTagId(Tag::BodyLength);
-            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
-            reject.second.set58_text("Body length isn't a number");
-        } else if (!utils::is_numeric(_msg.at(Tag::MsqSeqNum))) {                   // Need more test on Msg sequence number: correspond?
-            reject.second.set371_refTagId(Tag::MsqSeqNum);
-            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
-            reject.second.set58_text("Sequence number isn't a number");
-        } else if (_msg.at(Tag::MsgType).size() != 1) {
-            reject.second.set371_refTagId(Tag::MsgType);
-            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
-            reject.second.set58_text("Wrong message type format");
-        } else if (!utils::is_numeric(_msg.at(Tag::SenderCompId))) {                // Need more test on Sender comp Id: correspond?
-            reject.second.set371_refTagId(Tag::SenderCompId);
-            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
-            reject.second.set58_text("Sender Id should be numerical");
-        } else if (!utils::is_numeric(_msg.at(Tag::TargetCompId))) {                // Need more test on Target comp Id: correspond?
-            reject.second.set371_refTagId(Tag::TargetCompId);
-            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
-            reject.second.set58_text("Target Id should be numerical");
-        } else {
-            reject.first = false;
+        for (const auto &[_key, _val] : _msg)
+        {
+            if (_key == Tag::CheckSum)
+                continue;
+            if (_key != Tag::BodyLength && _key != Tag::BeginString)
+                body_len += (_key + "=" + _val + (char)FIX_DELIMITER);
+            checksum += (_key + "=" + _val + (char)FIX_DELIMITER);
         }
+        if (reject.first)
+            return reject;
+        reject = verify_all<Tag::BeginString, Tag::MsgType, Tag::SendingTime>(_msg);
+        if (reject.first)
+            return reject;
+        reject = verify<Tag::BodyLength>(_msg.at(Tag::BodyLength), Message::getBodyLength(body_len)); // calculate body length
+        if (reject.first)
+            return reject;
+        if (!_sender.empty()) {
+            reject = verify<Tag::SenderCompId>(_msg.at(Tag::SenderCompId), _sender);
+            if (reject.first)
+                return reject;
+            reject = verify<Tag::MsqSeqNum>(_msg.at(Tag::MsqSeqNum), _seqnum);
+            if (reject.first)
+                return reject;
+        }
+        reject = verify<Tag::TargetCompId>(_msg.at(Tag::TargetCompId), _target);
+        if (reject.first)
+            return reject;
+        reject = verify<Tag::CheckSum>(_msg.at(Tag::CheckSum), Message::getChecksum(checksum));
+        if (reject.first)
+            return reject;
         return reject;
     }
 

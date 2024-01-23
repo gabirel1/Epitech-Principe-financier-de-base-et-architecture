@@ -4,14 +4,12 @@
 #include "Server/Core/Core.hpp"
 
 Core::Core(uint32_t _tcp_port, uint32_t _udp_port)
-    : m_ob(m_ob_event),
-        m_innet(m_tcp_clients, m_nt_to_sr, m_mk_to_nt, _tcp_port),
-        m_action(m_nt_to_sr, m_sr_to_mk, m_mk_to_nt),
-        m_market(m_ob, m_sr_to_mk, m_mk_to_nt),
-        m_obevent(m_ob_event, m_udp_input, m_mk_to_nt),
-        m_outnet(m_mk_to_nt, m_tcp_clients),
-        m_udp(m_udp_input, _udp_port)
+    : m_innet(m_clients, m_q_action, m_q_tcp, _tcp_port),
+        m_action(m_q_action, m_q_markets, m_q_tcp),
+        m_outnet(m_q_tcp, m_clients),
+        m_udp(m_q_udp, _udp_port)
 {
+    market_init();
 }
 
 Core::~Core()
@@ -19,18 +17,19 @@ Core::~Core()
     stop();
 }
 
-void Core::start()
+bool Core::start()
 {
     Logger::Log("[Core] Starting...");
     m_running = true;
     if (!internal_start())
-        return;
+        return false;
     while (m_running)
     {
         try {
             m_udp.status();
             m_innet.status();
-            m_market.status();
+            for (auto &[_, _pip] : m_markets)
+                _pip.status();
             m_action.status();
             m_outnet.status();
         } catch (std::future_error &_e) {
@@ -39,6 +38,7 @@ void Core::start()
         }
     }
     stop();
+    return true;
 }
 
 void Core::stop()
@@ -46,17 +46,18 @@ void Core::stop()
     if (m_running) {
         m_running = false;
         Logger::Log("[Core] Stoping...");
-        while (m_udp.stop() != std::future_status::deferred)
+        while (m_udp.stop() != std::future_status::deferred) {}
         Logger::Log("[Core] UDP broadcast network exited");
-        while (m_innet.stop() != std::future_status::deferred)
+        while (m_innet.stop() != std::future_status::deferred) {}
         Logger::Log("[Core] Input TCP network exited");
-        while (m_action.stop() != std::future_status::deferred)
+        while (m_action.stop() != std::future_status::deferred) {}
         Logger::Log("[Core] Action pipeline exited");
-        while (m_market.stop() != std::future_status::deferred)
-        Logger::Log("[Core] Market exited");
-        while (m_obevent.stop() != std::future_status::deferred)
-        Logger::Log("[Core] OrderBook event pipeline exited");
-        while (m_outnet.stop() != std::future_status::deferred)
+        for (auto &[_name, _pip] : m_markets) {
+            for (MarketContainer::ThreadStatus status; std::get<1>(status) != std::future_status::deferred
+                && std::get<1>(status) != std::future_status::deferred; status = _pip.stop()) {}
+            Logger::Log("[Core] Market container exited, name: ", _name);
+        }
+        while (m_outnet.stop() != std::future_status::deferred) {}
         Logger::Log("[Core] Output network exited");
         Logger::Log("[Core] All pipeline are stoped");
     }
@@ -68,13 +69,16 @@ bool Core::internal_start()
     if (!m_outnet.start()) {
         Logger::Log("[Core] Failed to start output network");
         stop();
-    } else if (!m_obevent.start()) {
-        Logger::Log("[Core] Failed to start OrderBook Event");
-        stop();
-    } else if (!m_market.start()) {
-        Logger::Log("[Core] Failed to start market");
-        stop();
-    } else if (!m_action.start()) {
+        return false;
+    }
+    for (auto &[_name, _pip] : m_markets) {
+        if (!_pip.start()) {
+            Logger::Log("[Core] Failed to start MarketContainer pipeline: ", _name);
+            stop();
+            return false;
+        }
+    }
+    if (!m_action.start()) {
         Logger::Log("[Core] Failed to start action pipeline");
         stop();
     } else if (!m_udp.start()) {
@@ -88,4 +92,16 @@ bool Core::internal_start()
         return true;
     }
     return false;
+}
+
+void Core::market_init()
+{
+    std::vector<std::string> name{ MARKET_NAME };
+
+    for (std::string &_name : name) {
+        m_markets.emplace(std::piecewise_construct,
+            std::forward_as_tuple(_name),
+            std::forward_as_tuple(_name, m_q_udp, m_q_tcp));
+        m_q_markets.emplace(_name, m_markets.at(_name).getInput());
+    }
 }
