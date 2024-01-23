@@ -86,7 +86,7 @@ namespace pip
             m_output.append(data::MarketToNet{ _data.Client, report });
             return false;
         }
-        Logger::Log("[Market] (New) Order executaded sucefully: ", _data.OrderData.order, ", price: ", _data.OrderData.price);
+        Logger::Log("[Market] (New) Order executed successfully: ", _data.OrderData.order, ", price: ", _data.OrderData.price);
         return true;
     }
 
@@ -110,7 +110,7 @@ namespace pip
             m_output.append(data::MarketToNet{ _data.Client, report });
             return false;
         }
-        Logger::Log("[Market] (Modify) Order modify sucessfully: ", _data.OrderData.target, " -> ", _data.OrderData.order);
+        Logger::Log("[Market] (Modify) Order modified successfully: ", _data.OrderData.target, " -> ", _data.OrderData.order);
         return true;
     }
 
@@ -129,7 +129,7 @@ namespace pip
             m_output.append(data::MarketToNet{ _data.Client, report });
             return false;
         }
-        Logger::Log("[Market] (Cancel) Sucessfuly executed on: ", _data.OrderData.order.orderId);
+        Logger::Log("[Market] (Cancel) Successfully executed on: ", _data.OrderData.order.orderId);
         return true;
     }
 }

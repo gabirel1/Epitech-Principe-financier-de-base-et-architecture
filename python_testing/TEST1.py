@@ -76,5 +76,10 @@ try:
     socket.close()
 
 except Exception as e:
-    print(e)
+    # print(f"e.args[0]: {e.args[0]}\n")
+    # print(e)
+    if len(e.args[0]) == 1:
+        print(f"Error: tag '{e.args[0]}' is missing.")
+    else:
+        print(e)
     socket.close()
