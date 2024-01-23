@@ -26,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     orderID = 0;
 
     setupValidator();
+    m_ui->messageTypeWidgetList->setEnabled(false);
 
     m_gestionnaireSocket = new GestionnaireSocket("127.0.0.1", 8080, 8081);
     m_gestionnaireSocket->startThread();
@@ -180,8 +181,8 @@ void MainWindow::slot_cancelOrder()
         orderCancel.header.set34_msgSeqNum(std::to_string(messageID));
         orderCancel.header.set49_SenderCompId("1");
         orderCancel.header.set56_TargetCompId("0");
-        orderCancel.set11_clOrdID(m_ui->orderIDValue_OrderCancel->text().toStdString());
-        orderCancel.set41_origClOrdID(std::to_string(orderID));
+        orderCancel.set11_clOrdID(std::to_string(orderID));
+        orderCancel.set41_origClOrdID(m_ui->orderIDValue_OrderCancel->text().toStdString());
         orderCancel.set54_side(side);
         orderCancel.set55_symbol("3");
         orderCancel.set60_transactTime(getDate());

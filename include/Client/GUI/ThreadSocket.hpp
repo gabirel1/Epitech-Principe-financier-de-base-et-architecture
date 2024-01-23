@@ -19,7 +19,7 @@ class ThreadSocket : public QThread {
     Q_OBJECT
 
     public:
-        ThreadSocket(net::udp::Socket p_udp);
+        ThreadSocket();
         ~ThreadSocket();
         
         void stop();

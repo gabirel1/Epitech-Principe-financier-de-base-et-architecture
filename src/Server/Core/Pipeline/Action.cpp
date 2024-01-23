@@ -55,8 +55,8 @@ namespace pip
                         break;
                     case fix::NewOrderSingle::cMsgType: (void)treatNewOrderSingle(input);
                         break;
-                    /*case 'F': (void)treatOrderCancelRequest(input);
-                        break;*/
+                    case fix::OrderCancelRequest::cMsgType: (void)treatOrderCancelRequest(input);
+                        break;
                     case fix::OrderCancelReplaceRequest::cMsgType: (void)treatOrderCancelReplaceRequest(input);
                         break;
                     case fix::Logout::cMsgType: (void)treatLogout(input);
@@ -144,6 +144,8 @@ namespace pip
         SerialOut data;
         std::pair<bool, fix::Reject> verif = fix::OrderCancelRequest::Verify(_input.Message);
 
+        std::cout << "CHECK VERIF => " << verif.first << std::endl;
+    
         if (verif.first) {
             m_raw.push({ _input.Client, verif.second });
             return false;
