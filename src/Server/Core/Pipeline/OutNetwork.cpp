@@ -40,14 +40,17 @@ namespace pip
                     _input.Message.header.set49_SenderCompId(PROVIDER_NAME);
                     Logger::Log("client list size: ", m_clients.size());
                     if (_input.Client.getSocket()) {
+                        std::cout << "there" << std::endl;
                         it = std::find_if(m_clients.begin(), m_clients.end(), [_socket = _input.Client.getSocket()] (const ClientSocket &_client) {
                             return _client.getSocket() == _socket;
                         });
+                        std::cout << "here" << std::endl;
                         userId = _input.Client.User;
                         Logger::Log("[OutNetwork] (Reply) Comming from an Action pipeline");
                     } else {
-                        it = std::find_if(m_clients.begin(), m_clients.end(), [userId = _input.Client.User] (const ClientSocket &_client) {
-                            return _client.User == userId;
+                        Logger::Log("Client give by the pipeline: ", _input.Client.User);
+                        it = std::find_if(m_clients.begin(), m_clients.end(), [_userId = _input.Client.User] (const ClientSocket &_client) {
+                            return _client.User == _userId;
                         });
                         if (it != m_clients.end())
                             userId = it->User;
@@ -65,9 +68,10 @@ namespace pip
                             it->getSocket()->send(reinterpret_cast<const uint8_t *>(data.c_str()), data.size());
                             Logger::Log("[OutNetwork] Data send successfuly: ", data);
                             it->Logged = _input.Client.Logged;
-                            it->User = _input.Client.User;
-                            Logger::Log("[OutNetwork] New login status: ", (it->Logged == false) ? "False" : "True");
+                            it->User = userId;
+                            it->Disconnect = _input.Client.Disconnect;
                             logTiming(it);
+                            Logger::Log("[OutNetwork] Updated client status: "); // todo log
                             if (_input.Client.Disconnect) {
                                 it->getSocket()->close();
                                 Logger::Log("[OutNetwork] Client has been disconnected: ", userId);

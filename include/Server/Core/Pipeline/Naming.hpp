@@ -13,10 +13,10 @@ namespace data
     struct NetToAction
     {
         NetToAction() = default;
-        NetToAction(const NetToAction &_data);
-        NetToAction(const ClientSocket &_client, const fix::Serializer::AnonMessage &_message);
+        NetToAction(const NetToAction &&_data) noexcept;
+        NetToAction(const ClientSocket &_client, const fix::Serializer::AnonMessage &&_message) noexcept;
 
-        NetToAction &operator=(const NetToAction &_data);
+        NetToAction &operator=(NetToAction &&_data) noexcept;
 
         ClientSocket Client{};                      ///< Sender client information.
         fix::Serializer::AnonMessage Message{};     ///< Undefined message data.
@@ -26,9 +26,11 @@ namespace data
     struct ActionToMarket
     {
         ActionToMarket() = default;
+        ActionToMarket(const ActionToMarket &&_data) noexcept;
         ActionToMarket(const ActionToMarket &_data);
+        ActionToMarket(const ClientSocket &&_client) noexcept;
 
-        ActionToMarket &operator=(const ActionToMarket &_data);
+        ActionToMarket &operator=(ActionToMarket &&_data) noexcept;
 
         ClientSocket Client{};                              ///< Sender client information.
         OrderBook::Data OrderData{};                        ///< Action to apply to the OrderBook.
@@ -38,10 +40,12 @@ namespace data
     struct MarketToNet
     {
         MarketToNet() = default;
+        MarketToNet(const MarketToNet &&_data) noexcept;
         MarketToNet(const MarketToNet &_data);
+        MarketToNet(const ClientSocket &&_client, const fix::Message &&_msg) noexcept;
         MarketToNet(const ClientSocket &_client, const fix::Message &_msg);
 
-        MarketToNet &operator=(const MarketToNet &_data);
+        MarketToNet &operator=(MarketToNet &&_data) noexcept;
 
         ClientSocket Client{};                      ///< Sender client information.
         fix::Message Message{};                     ///< Final message send to the client.

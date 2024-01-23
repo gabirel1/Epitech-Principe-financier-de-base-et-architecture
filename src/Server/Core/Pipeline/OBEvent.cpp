@@ -32,18 +32,18 @@ namespace pip
             if (!m_input.empty()) {
                 input = m_input.pop_front();
                 Logger::Log("[OBEvent] New event from the OderBook: "); // todo log
-                m_tp.enqueue([this, input] () {
-                    createUdp(input);
-                    createTcp(input);
+                m_tp.enqueue([this, _data = std::move(input)] () {
+                    createUdp(_data);
+                    createTcp(_data);
                 });
             }
         }
     }
 
-    bool OBEvent::createTcp(OrderBook::Event _input)
+    bool OBEvent::createTcp(const OrderBook::Event &_input)
     {
         fix::ExecutionReport report;
-        ClientSocket client;
+        ClientSocket client{};
 
         client.User = _input.userId;
         report.set14_cumQty(std::to_string(_input.orgQty - _input.quantity));
@@ -58,12 +58,12 @@ namespace pip
         report.set55_symbol(m_name);
         report.set151_leavesQty(std::to_string(_input.quantity));
         report.set150_execType(std::to_string(static_cast<uint8_t>(_input.status)));
-        m_tcp.append(client, report);
+        m_tcp.append(std::move(client), std::move(report));
         Logger::Log("[OBEvent] (TCP) Report created: "); // todo log
         return true;
     }
 
-    bool OBEvent::createUdp(OrderBook::Event _input)
+    bool OBEvent::createUdp(const OrderBook::Event &_input)
     {
         data::UDPPackage package;
 

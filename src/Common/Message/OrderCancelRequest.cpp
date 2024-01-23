@@ -10,11 +10,8 @@ namespace fix
         header.set35_MsgType(MsgType);
     }
 
-    OrderCancelRequest::~OrderCancelRequest() {}
-
     std::pair<bool, Reject> OrderCancelRequest::Verify(Serializer::AnonMessage &_msg)
     {
-        // need to verify transaction time, symbol
         std::pair<bool, Reject> reject = utils::Has<Tag::ClOrdID, Tag::OrigClOrdID, Tag::Side, Tag::Symbol, Tag::TransactTime>(_msg);
 
         if (reject.first)

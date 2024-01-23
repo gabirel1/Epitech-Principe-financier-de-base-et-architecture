@@ -29,8 +29,8 @@ namespace pip
             void loop();
 
         protected:
-            bool createTcp(OrderBook::Event _input);
-            bool createUdp(OrderBook::Event _input);
+            bool createTcp(const OrderBook::Event &_input);
+            bool createUdp(const OrderBook::Event &_input);
 
         private:
             const std::string m_name;

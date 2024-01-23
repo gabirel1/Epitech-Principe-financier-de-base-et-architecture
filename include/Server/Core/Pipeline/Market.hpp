@@ -34,9 +34,9 @@ namespace pip
             /// @param _data Data to build and run action on the OrderBook.
             void process(MarketIn &_data);
 
-            bool runAdd(MarketIn _data);
-            bool runModify(MarketIn _data);
-            bool runCancel(MarketIn _data);
+            bool runAdd(const MarketIn &_data);
+            bool runModify(const MarketIn &_data);
+            bool runCancel(const MarketIn &_data);
 
             const std::string m_name;
 

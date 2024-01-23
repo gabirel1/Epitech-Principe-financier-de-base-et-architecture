@@ -11,6 +11,8 @@ class ClientSocket
 {
     public:
         ClientSocket(std::shared_ptr<net::tcp::Socket> _socket = nullptr);
+        ClientSocket(const ClientSocket &_client);
+        ClientSocket(const ClientSocket &&_client) noexcept;
         ~ClientSocket() = default;
 
         [[nodiscard]] std::shared_ptr<net::tcp::Socket> getSocket() const;
@@ -23,6 +25,8 @@ class ClientSocket
         void newRequest();
         [[nodiscard]] bool hasRequest(size_t _seqNumber) const;
         std::chrono::system_clock::time_point getRequest(size_t _seqNumber);
+
+        ClientSocket &operator=(ClientSocket &&_client) noexcept;
 
         bool operator==(const ClientSocket &_client) const;
         operator bool() const;

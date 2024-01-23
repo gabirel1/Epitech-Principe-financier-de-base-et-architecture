@@ -56,10 +56,24 @@ namespace fix
     std::pair<bool, Reject> verify_all(Serializer::AnonMessage &_msg);
 
 
+    /// @brief Verify base function, it need to have a specialisation to compile.
+    /// @tparam T Tag of to verify
+    /// @param  _ Unknown parameters.
+    /// @return Assert error
     template<const char *T>
     std::pair<bool, Reject> verify(const std::string &);
+    /// @brief Verify base function, it need to have a specialisation to compile.
+    /// @tparam T Tag of to verify
+    /// @param  _ Unknown parameters.
+    /// @param  _ Unknown parameters.
+    /// @return Assert error
     template<const char *T>
     std::pair<bool, Reject> verify(const std::string &, const std::string &);
+    /// @brief Verify base function, it need to have a specialisation to compile.
+    /// @tparam T Tag of to verify
+    /// @param  _ Unknown parameters.
+    /// @param  _ Unknown parameters.
+    /// @return Assert error
     template<const char *T>
     std::pair<bool, Reject> verify(const std::string &, size_t);
 

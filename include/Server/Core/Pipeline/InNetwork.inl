@@ -63,7 +63,7 @@ namespace pip
                     (void)_client->close();
                     Logger::Log("[InNetwork] Unable to find the client's information: "); // todo log
                     // build reject
-                    m_error.push(ErrorMsg(ClientSocket(_client), reject));
+                    m_error.append(ClientSocket(_client), std::move(reject));
                     continue;
                 } else if (_T(*client, m_output, m_error)) {
                     Logger::Log("[InNetwork] Disconnecting client: "); // todo log
