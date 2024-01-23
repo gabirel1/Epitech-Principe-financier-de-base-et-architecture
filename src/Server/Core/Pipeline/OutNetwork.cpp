@@ -34,51 +34,32 @@ namespace pip
 
                 Logger::Log("[OutNetwork] New message message to send: ", input.Message.to_string());
                 m_tp.enqueue([this, _input = std::move(input)] () mutable {
-                    std::vector<ClientSocket>::iterator it;
-                    UserId userId = "";
+                    auto [client, userId] = getClientInfo(_input);
 
                     _input.Message.header.set49_SenderCompId(PROVIDER_NAME);
-                    Logger::Log("client list size: ", m_clients.size());
-                    if (_input.Client.getSocket()) {
-                        std::cout << "there" << std::endl;
-                        it = std::find_if(m_clients.begin(), m_clients.end(), [_socket = _input.Client.getSocket()] (const ClientSocket &_client) {
-                            return _client.getSocket() == _socket;
-                        });
-                        std::cout << "here" << std::endl;
-                        userId = _input.Client.User;
-                        Logger::Log("[OutNetwork] (Reply) Comming from an Action pipeline");
-                    } else {
-                        Logger::Log("Client give by the pipeline: ", _input.Client.User);
-                        it = std::find_if(m_clients.begin(), m_clients.end(), [_userId = _input.Client.User] (const ClientSocket &_client) {
-                            return _client.User == _userId;
-                        });
-                        if (it != m_clients.end())
-                            userId = it->User;
-                        Logger::Log("[OutNetwork] (Reply) Comming from an anonymous pipeline");
-                    }
-
-                    if (it != m_clients.end()) {
-                        _input.Message.header.set34_msgSeqNum(std::to_string((it->SeqNumber)++));
-                        Logger::Log("Sending to target: ", userId);
+                    if (client != m_clients.end()) {
+                        _input.Message.header.set34_msgSeqNum(std::to_string((client->SeqNumber)++));
                         if (userId != "")
                             _input.Message.header.set56_TargetCompId(userId);
                         std::string data = _input.Message.to_string();
 
-                        if (it->getSocket()) {
-                            it->getSocket()->send(reinterpret_cast<const uint8_t *>(data.c_str()), data.size());
-                            Logger::Log("[OutNetwork] Data send successfuly: ", data);
-                            it->Logged = _input.Client.Logged;
-                            it->User = userId;
-                            it->Disconnect = _input.Client.Disconnect;
-                            logTiming(it);
+                        if (client->getSocket()) {
+                            if (client->getSocket()->send(reinterpret_cast<const uint8_t *>(data.c_str()), data.size()) == data.size())
+                                Logger::Log("[OutNetwork] Data send successfuly: ", data);
+                            else
+                                Logger::Log("[OutNetwork] Error occured when sending data");
+                            client->Logged = _input.Client.Logged;
+                            client->User = userId;
+                            client->Disconnect = _input.Client.Disconnect;
+                            logTiming(client);
                             Logger::Log("[OutNetwork] Updated client status: "); // todo log
                             if (_input.Client.Disconnect) {
-                                it->getSocket()->close();
+                                client->getSocket()->close();
                                 Logger::Log("[OutNetwork] Client has been disconnected: ", userId);
                             }
                         } else {
                             Logger::Log("[OutNetwork] Client not connected: ", userId);
-                            m_clients.erase(it);
+                            m_clients.erase(client);
                         }
                     } else {
                         Logger::Log("[OutNetwork] Client not found: ", userId);
@@ -86,6 +67,29 @@ namespace pip
                 });
             }
         }
+    }
+
+    OutNetwork::ClientInfo OutNetwork::getClientInfo(const NetIn &_input) const
+    {
+        std::vector<ClientSocket>::iterator it;
+        UserId userId = "";
+
+        if (_input.Client.getSocket()) {
+            it = std::find_if(m_clients.begin(), m_clients.end(), [_socket = _input.Client.getSocket()] (const ClientSocket &_client) {
+                return _client.getSocket() == _socket;
+            });
+            userId = _input.Client.User;
+            Logger::Log("[OutNetwork] (Reply) Comming from an Action pipeline");
+        } else {
+            Logger::Log("Client give by the pipeline: ", _input.Client.User);
+            it = std::find_if(m_clients.begin(), m_clients.end(), [_userId = _input.Client.User] (const ClientSocket &_client) {
+                return _client.User == _userId;
+            });
+            if (it != m_clients.end())
+                userId = it->User;
+            Logger::Log("[OutNetwork] (Reply) Comming from an anonymous pipeline");
+        }
+        return ClientInfo(it, userId);
     }
 
     void OutNetwork::logTiming(std::vector<ClientSocket>::iterator _it)

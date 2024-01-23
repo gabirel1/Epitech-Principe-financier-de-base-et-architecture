@@ -32,6 +32,10 @@ namespace pip
             void loop();
 
         protected:
+            using ClientInfo = std::tuple<std::vector<ClientSocket>::iterator, std::string>;
+
+            ClientInfo getClientInfo(const NetIn &_input) const;
+
             void logTiming(std::vector<ClientSocket>::iterator _it);
 
 
