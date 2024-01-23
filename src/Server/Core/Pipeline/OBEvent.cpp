@@ -43,7 +43,9 @@ namespace pip
     bool OBEvent::createTcp(OrderBook::Event _input)
     {
         fix::ExecutionReport report;
+        ClientSocket client;
 
+        client.User = _input.userId;
         report.set14_cumQty(std::to_string(_input.orgQty - _input.quantity));
         report.set17_execID();
         report.set20_execTransType("1");
@@ -54,9 +56,8 @@ namespace pip
         report.set44_price(std::to_string(_input.price));
         report.set54_side((_input.side == OrderType::Ask) ? "3" : "4");
         report.set55_symbol(m_name);
-        report.header.set56_TargetCompId(_input.userId);
         report.set151_leavesQty(std::to_string(_input.quantity));
-        m_tcp.append(NetIn{ {}, report });
+        m_tcp.append(client, report);
         Logger::Log("[OBEvent] (TCP) Report created: "); // todo log
         return true;
     }

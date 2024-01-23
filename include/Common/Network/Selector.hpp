@@ -51,7 +51,7 @@ namespace net
             [[nodiscard]] size_t size() const;
 
         private:
-            std::map<int, Client> m_clients;    ///< Number of client, with the key is the file descriptor of the client.
+            std::map<int, Client> m_clients;    ///< Number of client, with the key as the file descriptor of the client.
 
             float m_to;                         ///< Timeout of the function net::Selector<T>::pull.
     };

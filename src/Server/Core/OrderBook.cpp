@@ -1,5 +1,6 @@
 #include <numeric>
 
+#include "Server/Core/OrderBook.hpp"
 #include "Common/Message/ExecutionReport.hpp"
 #include "Server/Core/Pipeline/Naming.hpp"
 
@@ -80,6 +81,7 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
 
     event.orderId = _order.orderId;
     event.orgQty = _order.quantity;
+    event.userId = _order.userId;
     event.price = _price;
     event.side = _type;
     event.sold = false;

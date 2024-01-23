@@ -49,7 +49,8 @@ namespace pip
                         it = std::find_if(m_clients.begin(), m_clients.end(), [userId = _input.Client.User] (const ClientSocket &_client) {
                             return _client.User == userId;
                         });
-                        userId = it->User;
+                        if (it != m_clients.end())
+                            userId = it->User;
                         Logger::Log("[OutNetwork] (Reply) Comming from an anonymous pipeline");
                     }
 
@@ -65,12 +66,11 @@ namespace pip
                             it->Logged = _input.Client.Logged;
                             it->User = _input.Client.User;
                             Logger::Log("[OutNetwork] New login status: ", it->Logged);
+                            logTiming(it);
                             if (_input.Client.Disconnect) {
                                 it->getSocket()->close();
-                                m_clients.erase(it);
                                 Logger::Log("[OutNetwork] Client has been disconnected: ", userId);
                             }
-                            logTiming(it);
                         } else {
                             Logger::Log("[OutNetwork] Client not connected: ", userId);
                             m_clients.erase(it);
