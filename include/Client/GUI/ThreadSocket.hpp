@@ -2,17 +2,10 @@
 #define THREADSOCKET_HPP_
 
 #include <QThread>
-#include "../../Common/Network/Socket.hpp"
-#include "../../Server/Core/Order.hpp"
 
-struct UDPPackage
-{
-    uint32_t time;
-    uint64_t id;
-    uint8_t flag;
-    Quantity quantity;
-    Price price;
-};
+#include "Common/Network/Socket.hpp"
+#include "Common/Core/Order.hpp"
+#include "Common/Network/UDPPackage.hpp"
 
 class ThreadSocket : public QThread {
 
@@ -21,12 +14,12 @@ class ThreadSocket : public QThread {
     public:
         ThreadSocket();
         ~ThreadSocket();
-        
+
         void stop();
 
     protected:
         void run();
-    
+
     private:
         bool m_running = false;
         net::udp::Socket m_udp;

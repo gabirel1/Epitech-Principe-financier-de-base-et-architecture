@@ -1,19 +1,11 @@
-#include "Client/GUI/mainwindow.hpp"
-#include "Client/GUI/ui_FinanceUI.h"
-
-#include "Common/Message/Logon.hpp"
-#include "Common/Message/Logout.hpp"
-#include "Common/Message/NewOrderSingle.hpp"
-#include "Common/Message/OrderCancelRequest.hpp"
-#include "Common/Message/OrderCancelReplaceRequest.hpp"
-#include "Common/Message/OrderStatusRequest.hpp"
-#include "Common/Message/MarketDataRequest.hpp"
-#include "Common/Message/HeartBeat.hpp"
-
 #include <iostream>
 
 #include <QDateTime>
 #include <QDebug>
+
+#include "Client/GUI/mainwindow.hpp"
+#include "Client/GUI/ui_FinanceUI.h"
+#include "Common/Message/Message.hpp"
 
 MainWindow::MainWindow(QWidget *parent)
     : m_gestionnaireSocket(nullptr)
@@ -44,10 +36,10 @@ void MainWindow::setupValidator()
 {
     m_ui->priceValue_NewOrderSingle->setValidator(new QDoubleValidator);
     m_ui->quantityValue_NewOrderSingle->setValidator(new QDoubleValidator);
-    
+
     m_ui->priceValue_NewOrderList->setValidator(new QDoubleValidator);
     m_ui->quantityValue_NewOrderList->setValidator(new QDoubleValidator);
-    
+
     m_ui->orderIDValue_OrderCancel->setValidator(new QIntValidator);
 
     m_ui->orderIDValue_OrderCancelReplace->setValidator(new QIntValidator);
@@ -59,7 +51,7 @@ void MainWindow::slot_log()
 {
     if (m_ui->btn_log->text() == "Log On") {
         fix::Logon logon;
-    
+
         logon.header.set34_msgSeqNum(std::to_string(messageID));
         logon.header.set49_SenderCompId("1");
         logon.header.set56_TargetCompId("0");

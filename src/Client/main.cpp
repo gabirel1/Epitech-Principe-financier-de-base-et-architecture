@@ -1,7 +1,7 @@
+#include <QApplication>
+
 #include "Client/GUI/GestionnaireSocket.hpp"
 #include "Client/GUI/mainwindow.hpp"
-#include "Client/Core/Core.hpp"
-#include <QApplication>
 
 
 int main(int _ac, char **_av)

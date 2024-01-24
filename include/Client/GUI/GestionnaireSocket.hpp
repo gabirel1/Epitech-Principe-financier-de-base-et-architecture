@@ -1,7 +1,7 @@
 #ifndef GESTIONNAIRESOCKET_HPP_
 #define GESTIONNAIRESOCKET_HPP_
 
-#include "../../Common/Network/Socket.hpp"
+#include "Common/Network/Socket.hpp"
 #include "ThreadSocket.hpp"
 
 class GestionnaireSocket

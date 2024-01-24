@@ -1,13 +1,15 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
 #include <unordered_map>
-#include "GestionnaireSocket.hpp"
-#include "../../Server/Core/Order.hpp"
-#include "../../Common/Network/Socket.hpp"
 
+#include <QMainWindow>
 #include <QStandardItemModel>
+
+#include "Client/GUI/GestionnaireSocket.hpp"
+#include "Common/Core/Order.hpp"
+#include "Common/Network/Socket.hpp"
+
 
 static int orderID;
 static int messageID;
@@ -27,7 +29,7 @@ private:
 
     GestionnaireSocket *m_gestionnaireSocket;
     Ui::MainWindow *m_ui;
-    
+
     std::unordered_map<int, std::pair<Order, Price>> m_orderList; // Real Need with the orderHistory ? 
 
     std::string getDate();
@@ -44,6 +46,6 @@ private slots:
     void slot_modifyOrder();
     void slot_sendNewOrderSingle();
     void slot_messageTypeLayout(int p_index);
-
 };
+
 #endif // MAINWINDOW_H
