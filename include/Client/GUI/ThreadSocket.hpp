@@ -3,7 +3,7 @@
 
 #include <QThread>
 #include "../../Common/Network/Socket.hpp"
-#include "../../Server/Core/Order.hpp"
+#include "../../Common/Core/Order.hpp"
 
 struct UDPPackage
 {

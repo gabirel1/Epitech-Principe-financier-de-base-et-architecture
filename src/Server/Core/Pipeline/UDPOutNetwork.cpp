@@ -31,6 +31,8 @@ namespace pip
     {
         Logger::SetThreadName(THIS_THREAD_ID, "UDP Network Output");
 
+        std::cout << "TEST LOOP CALLED" <<std::endl;
+
         while (m_running) {
             auto now = std::chrono::steady_clock::now();
 

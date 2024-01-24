@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     m_ui->setupUi(this);
 
-    messageID = 0;
+    messageID = 1;
     orderID = 0;
 
     setupValidator();
@@ -59,10 +59,10 @@ void MainWindow::slot_log()
 {
     if (m_ui->btn_log->text() == "Log On") {
         fix::Logon logon;
-    
+
         logon.header.set34_msgSeqNum(std::to_string(messageID));
-        logon.header.set49_SenderCompId("1");
-        logon.header.set56_TargetCompId("0");
+        logon.header.set49_SenderCompId("Lorenzo");
+        logon.header.set56_TargetCompId("MyMarket");
         logon.set98_EncryptMethod("0");
         logon.set108_HeartBtInt("30");
 
@@ -75,8 +75,8 @@ void MainWindow::slot_log()
         fix::Logout logout;
 
         logout.header.set34_msgSeqNum(std::to_string(messageID));
-        logout.header.set49_SenderCompId("1");
-        logout.header.set56_TargetCompId("0");
+        logout.header.set49_SenderCompId("Lorenzo");
+        logout.header.set56_TargetCompId("MyMarket");
 
         m_gestionnaireSocket->sendTcpSocket(logout.to_string());
 
@@ -121,16 +121,18 @@ void MainWindow::slot_sendNewOrderSingle()
 {
     fix::NewOrderSingle newOrderSingle;
 
+    std::cout << messageID <<std::endl;
+
     newOrderSingle.header.set34_msgSeqNum(std::to_string(messageID));
-    newOrderSingle.header.set49_SenderCompId("1");
-    newOrderSingle.header.set56_TargetCompId("0");
+    newOrderSingle.header.set49_SenderCompId("Lorenzo");
+    newOrderSingle.header.set56_TargetCompId("MyMarket");
     newOrderSingle.set11_clOrdID(std::to_string(orderID));
     newOrderSingle.set21_handlInst("3");
     newOrderSingle.set38_orderQty(m_ui->quantityValue_NewOrderSingle->text().toStdString());
     newOrderSingle.set40_ordType("2");
     newOrderSingle.set44_price(m_ui->priceValue_NewOrderSingle->text().toStdString());
     newOrderSingle.set54_side(std::to_string(m_ui->orderType_NewOrderSingle->currentIndex() + 3));
-    newOrderSingle.set55_symbol("3");
+    newOrderSingle.set55_symbol(m_ui->symbolType_NewOrderSingle->currentText().toStdString());
     newOrderSingle.set60_transactTime(getDate());
 
     m_gestionnaireSocket->sendTcpSocket(newOrderSingle.to_string());
@@ -179,8 +181,8 @@ void MainWindow::slot_cancelOrder()
         std::string side = (item->text() == "Bid") ? "3" : "4";
 
         orderCancel.header.set34_msgSeqNum(std::to_string(messageID));
-        orderCancel.header.set49_SenderCompId("1");
-        orderCancel.header.set56_TargetCompId("0");
+        orderCancel.header.set49_SenderCompId("Lorenzo");
+        orderCancel.header.set56_TargetCompId("MyMarket");
         orderCancel.set11_clOrdID(std::to_string(orderID));
         orderCancel.set41_origClOrdID(m_ui->orderIDValue_OrderCancel->text().toStdString());
         orderCancel.set54_side(side);
@@ -207,8 +209,8 @@ void MainWindow::slot_modifyOrder()
         fix::OrderCancelReplaceRequest orderCancelReplace;
 
         orderCancelReplace.header.set34_msgSeqNum(std::to_string(messageID));
-        orderCancelReplace.header.set49_SenderCompId("1");
-        orderCancelReplace.header.set56_TargetCompId("0");
+        orderCancelReplace.header.set49_SenderCompId("Lorenzo");
+        orderCancelReplace.header.set56_TargetCompId("MyMarket");
         orderCancelReplace.set11_clOrdID(m_ui->orderIDValue_OrderCancelReplace->text().toStdString());
         orderCancelReplace.set21_handlInst("3");
         orderCancelReplace.set38_orderQty(m_ui->quantityValue_OrderCancelReplace->text().toStdString());
