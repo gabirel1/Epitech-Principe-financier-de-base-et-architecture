@@ -55,9 +55,9 @@ namespace pip
         report.set37_orderID(_input.orderId);
         report.set39_ordStatus(std::to_string(static_cast<uint8_t>(_input.status)));
         report.set40_ordType("2");
-        if (_input.status == OrderStatus::Replaced
-            || _input.status == OrderStatus::Canceld)
-            report.set41_origClOrdID(_input.orderId);
+        // if (_input.status == OrderStatus::Replaced
+        //     || _input.status == OrderStatus::Canceld)
+        //     report.set41_origClOrdID(_input.orderId);
         report.set44_price(std::to_string(_input.price));
         report.set54_side((_input.side == OrderType::Ask) ? "4" : "3");
         report.set55_symbol(m_name);
