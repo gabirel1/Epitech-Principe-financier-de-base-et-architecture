@@ -53,6 +53,8 @@ namespace net
                 /// @return The data receive (it should be delete using delete[])
                 [[nodiscard]] static const uint8_t *receive(int _fd, size_t _size, int &_error);
 
+                [[nodiscard]] const uint8_t *receiveUDP(int _fd, size_t _size, int &_error);
+
                 /// @brief Set a file descriptor as blocking or not.
                 /// @param _fd File descriptor to modify
                 /// @param _block If true the file descriptor will be blocking otherwise it will be non-blocking.
@@ -133,6 +135,8 @@ namespace net
                 /// @param _error Error code return by underlined C function recv.
                 /// @return The list of bytes receives.
                 [[nodiscard]] const uint8_t *c_receive(size_t _size, int &_error);
+
+                [[nodiscard]] const uint8_t *c_receiveUDP(size_t _size, int &_error);
 
                 /// @brief Set the socket blocking policy.
                 /// @param _block True if the socket should be blocking else false.

@@ -5,6 +5,7 @@
 #include "../../Common/Network/Socket.hpp"
 #include "../../Common/Core/Order.hpp"
 
+#pragma pack (push, 1)
 struct UDPPackage
 {
     uint32_t time;
@@ -13,13 +14,14 @@ struct UDPPackage
     Quantity quantity;
     Price price;
 };
+#pragma pack (pop)
 
 class ThreadSocket : public QThread {
 
     Q_OBJECT
 
     public:
-        ThreadSocket();
+        ThreadSocket(const net::Ip &_ip);
         ~ThreadSocket();
         
         void stop();
@@ -30,6 +32,7 @@ class ThreadSocket : public QThread {
     private:
         bool m_running = false;
         net::udp::Socket m_udp;
+        net::Ip m_ip;
 };
 
 #endif /* !THREADSOCKET_HPP_ */

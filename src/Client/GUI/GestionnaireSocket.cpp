@@ -6,8 +6,10 @@ GestionnaireSocket::GestionnaireSocket(const net::Ip &_ip, uint32_t _tcp, uint32
 {
     std::cout << "GestionnaireSOcket => " << _udp <<std::endl;
     m_tcp.connect(_ip, _tcp);
+    std::cout << "Port TCP => " << m_tcp.getPort() <<std::endl;
 
-    m_thread_udp = new ThreadSocket();
+    m_thread_udp = new ThreadSocket(_ip);
+    startThread();
 }
 
 GestionnaireSocket::~GestionnaireSocket()
@@ -23,5 +25,6 @@ void GestionnaireSocket::sendTcpSocket(const std::string &p_data)
 
 void GestionnaireSocket::startThread()
 {
+    std::cout << "START m_thread_udp" << std::endl;
     m_thread_udp->start();
 }

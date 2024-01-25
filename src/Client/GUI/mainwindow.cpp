@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_ui->messageTypeWidgetList->setEnabled(false);
 
     m_gestionnaireSocket = new GestionnaireSocket("127.0.0.1", 8080, 8081);
-    m_gestionnaireSocket->startThread();
+    // m_gestionnaireSocket.startThread();
 
     connect(m_ui->messageType, SIGNAL(currentIndexChanged(int)), this, SLOT(slot_messageTypeLayout(int)));
     connect(m_ui->btn_log, SIGNAL(pressed()), this, SLOT(slot_log()));
