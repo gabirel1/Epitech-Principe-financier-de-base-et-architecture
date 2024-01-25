@@ -105,4 +105,7 @@ except Exception as e:
         print(f"Error: tag '{e.args[0]}' is missing.")
     else:
         print(e)
+        print(f"\nResponse: \n")
+        for key, value in response.items():
+            print(f"{key}: {value}")
     _socket.close()

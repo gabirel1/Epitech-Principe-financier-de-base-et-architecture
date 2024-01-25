@@ -21,6 +21,7 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
             break;
 
         event.price = _key;
+        std::cout << "event side: " << ((event.side == OrderType::Bid) ? "Bid" : "Ask") << "\n\n\n\n" <<std::endl;
         for (size_t i = 0; i < _val.size(); i++) {
             Order &order = _val.at(i);
 
@@ -36,6 +37,7 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
                 Logger::Log("[OrderBook] (", m_name, ") {Add} Filled the order: ", order, ", price: ", _key);
                 Logger::Log("[OrderBook] (", m_name, ") {Add-Incoming} Filled the order: ", _order);
                 _val.erase(_val.begin() + i);
+                _order.quantity = 0;
                 m_output.append(event);
                 return false;
             } else if (order.quantity < _order.quantity) {
