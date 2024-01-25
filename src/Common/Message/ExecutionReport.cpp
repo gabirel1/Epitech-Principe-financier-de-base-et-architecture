@@ -53,6 +53,11 @@ namespace fix
         m_params.emplace({ Tag::OrdType, _val });
     }
 
+    void ExecutionReport::set41_origClOrdID(const std::string &_val)
+    {
+        m_params.emplace({ Tag::OrigClOrdID, _val });
+    }
+
     void ExecutionReport::set44_price(const std::string &_val)
     {
         m_params.emplace({ Tag::Price, _val });
