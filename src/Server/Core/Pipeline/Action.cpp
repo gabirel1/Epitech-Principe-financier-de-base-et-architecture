@@ -37,7 +37,7 @@ namespace pip
             if (!m_input.empty())
             {
                 input = m_input.pop_front();
-                reject = fix::Header::Verify(input.Message, input.Client.User, PROVIDER_NAME, input.Client.SeqNumber);
+                reject = fix::Header::Verify(input.Message, input.Client.User, PROVIDER_NAME, input.Client.ClientSeqNumber - 1);
                 if (reject.first) {
                     Logger::Log("[Action] Incorect header received from client: ", input.Client.User);
                     reject.second.header.set56_TargetCompId(input.Client.User);

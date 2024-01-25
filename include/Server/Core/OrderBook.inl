@@ -12,9 +12,9 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
     Event event;
 
     if constexpr (std::is_same_v<T, BidBook>)
-        event.side = OrderType::Ask;
-    else
         event.side = OrderType::Bid;
+    else
+        event.side = OrderType::Ask;
     event.sold = true;
     for (auto &[_key, _val] : _book) {
         if (cmp(_key, _price))
@@ -30,6 +30,7 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
             event.orderId = order.orderId;
             event.status = OrderStatus::Filled;
             event.userId = order.userId;
+            std::cout << "\n\n\n\nUSER_ID (ORDERBOOK) == " << order.userId << "\n\n\n\n" << std::endl;
             event.quantity = 0;
             event.orgQty = order.quantity;
             std::cout << "here" << std::endl;

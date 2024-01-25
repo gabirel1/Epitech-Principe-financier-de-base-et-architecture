@@ -155,6 +155,7 @@ namespace fix
             reject.first = true;
             reject.second.set373_sessionRejectReason(Reject::ValueOORange);
             reject.second.set58_text("Sequence number is not correct");
+            std::cout << "seqnum: '" << _seqnum << "' != '" << _value << "'" << std::endl;
         }
         return reject;
     }

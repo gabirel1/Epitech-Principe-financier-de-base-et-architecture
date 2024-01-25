@@ -84,7 +84,9 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
     event.userId = _order.userId;
     event.price = _price;
     event.side = _type;
-    std::cout << "\n\n\n\n\nEVENT.SIDE == " << ((event.side == OrderType::Ask) ? "ASK (4)" : "BID (3)") << "\n\n\n\n\n"; 
+    std::cout << "\n\n\n\n\nEVENT.SIDE == " << ((event.side == OrderType::Ask) ? "ASK (4)" : "BID (3)") << "\n"; 
+    std::cout << "_TYPE == " << ((_type == OrderType::Ask) ? "ASK (4)" : "BID (3)") << "\n";
+    std::cout << "_price == " << _price << "\n\n\n\n\n";
     event.sold = false;
     if (_type == OrderType::Bid) {
         if (add<AskBook, std::greater_equal<Price>>(m_ask, _price, _order)) {

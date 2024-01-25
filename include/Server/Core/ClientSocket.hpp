@@ -21,6 +21,7 @@ class ClientSocket
         bool Disconnect = false;
         UserId User = "";
         size_t SeqNumber = 1;
+        size_t ClientSeqNumber = 1;
 
         void newRequest();
         [[nodiscard]] bool hasRequest(size_t _seqNumber) const;

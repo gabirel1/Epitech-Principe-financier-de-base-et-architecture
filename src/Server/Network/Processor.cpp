@@ -34,6 +34,7 @@ namespace net
             }
             Logger::Log("[Processor] Porcessing request from the client: "); // todo log
             _client.newRequest();
+            _client.ClientSeqNumber += 1;
             _serial.append(_client, std::move(msg));
             return false;
         }
