@@ -16,10 +16,11 @@ namespace fix
         std::pair<bool, Reject> reject = utils::Has<Tag::ClOrdID, Tag::HandlInst,
             Tag::OrderQty, Tag::OrdType, Tag::OrigClOrdID, Tag::Price, Tag::Side, Tag::Symbol, Tag::TransactTime>(_msg);
 
-        if (!reject.first)
-            reject = verify_all<Tag::ClOrdID, Tag::HandlInst, Tag::OrderQty, Tag::OrdType,
-                Tag::OrigClOrdID, Tag::Price, Tag::Side, Tag::Symbol, Tag::TransactTime>(_msg);
         reject.second.set45_refSeqNum(OrderCancelReplaceRequest::MsgType);
+        if (reject.first)
+            return reject;
+        reject = verify_all<Tag::ClOrdID, Tag::HandlInst, Tag::OrderQty, Tag::OrdType,
+            Tag::OrigClOrdID, Tag::Price, Tag::Side, Tag::Symbol, Tag::TransactTime>(_msg);
         return reject;
     }
 
