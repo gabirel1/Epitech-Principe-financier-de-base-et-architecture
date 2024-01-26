@@ -39,7 +39,7 @@ namespace pip
                 input = m_input.pop_front();
                 reject = fix::Header::Verify(input.Message, input.Client.User, PROVIDER_NAME, input.Client.ClientSeqNumber - 1);
                 if (reject.first) {
-                    Logger::Log("[Action] Incorect header received from client: ", input.Client.User);
+                    Logger::Log("[Action] Incorrect header received from client: ", input.Client.User);
                     reject.second.header.set56_TargetCompId(input.Client.User);
                     reject.second.header.set49_SenderCompId(PROVIDER_NAME);
                     m_raw.append(std::move(input.Client), std::move(reject.second));
