@@ -51,9 +51,9 @@ struct OutNetworkInput
 
 struct NotifNetworkInput
 {
-    std::string Symbol;
-    uint8_t SubType;
     fix::Message Message;
+    std::shared_ptr<net::tcp::Socket> Socket;
+    UserId User;
 };
 
 struct MarketDataInput

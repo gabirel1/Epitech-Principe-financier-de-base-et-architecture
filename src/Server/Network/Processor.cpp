@@ -113,8 +113,8 @@ namespace net::tcp
                     return true;
                 }
             } else {
-                return false;
                 Logger::Log("[Responce] Client not found: ", userId);
+                return false;
             }
             return false;
         }
@@ -129,21 +129,28 @@ namespace net::tcp
             Logger::Log("[Responce] Send respond after: ", diff.count(), " ms");
         }
 
-        bool Notify::run(NotifNetworkInput &_input, std::vector<ClientSocket> &_clients)
+        bool Notify::run(NotifNetworkInput &_data, std::vector<ClientSocket> &_clients)
         {
+            auto [client, userId] = priv::getClientInfo(_data.User, _clients);
 
-            _input.Message.header.set49_SenderCompId(PROVIDER_NAME);
-            for (auto &_client : _clients) {
-                if (_client.isSubscribe(_input.Symbol, _input.SubType))
-                    _input.Message.header.set56_TargetCompId(_client.User);
-                _input.Message.header.set34_msgSeqNum(std::to_string((_client.SeqNumber)++));
+            if (client == _clients.end()) {
+                _data.Message.header.set34_msgSeqNum(std::to_string((client->SeqNumber)++));
+                _data.Message.header.set49_SenderCompId(PROVIDER_NAME);
+                if (client->getSocket()) {
+                    std::string data = _data.Message.to_string();
 
-                const std::string data = _input.Message.to_string();
-
-                if (_client.getSocket()->send(reinterpret_cast<const uint8_t *>(data.c_str()), data.size()) == data.size())
-                    Logger::Log("[Notify] Data send successfuly: ", data);
-                else
-                    Logger::Log("[Notify] Error occured when sending data");
+                    if (client->getSocket()->send(reinterpret_cast<const uint8_t *>(data.c_str()), data.size()) == data.size())
+                        Logger::Log("[Notify] Data send successfuly: ", data);
+                    else
+                        Logger::Log("[Notify] Error occured when sending data");
+                } else {
+                    Logger::Log("[Notify] Client not connected: ", userId);
+                    _clients.erase(client);
+                    return true;
+                }
+            } else {
+                Logger::Log("[Responce] Client not found: ", userId);
+                return false;
             }
             return true;
         }

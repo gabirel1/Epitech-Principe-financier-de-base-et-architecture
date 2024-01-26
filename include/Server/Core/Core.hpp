@@ -37,7 +37,6 @@ class Core
         std::map<std::string, MarketContainer> m_markets;
 
         pip::OutNetwork<net::tcp::Socket, net::tcp::out::Response, InOutNetwork, ClientSocket> m_outnet;
-        pip::OutNetwork<net::tcp::Socket, net::tcp::out::Notify, InNotifNetwork, ClientSocket> m_notify;
 
         pip::UDPOutNetwork m_udp;
 };
