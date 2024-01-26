@@ -8,7 +8,7 @@
 class MarketContainer
 {
     public:
-        MarketContainer(const std::string &_name, UdpInput &_udp, RawOutput &_tcp);
+        MarketContainer(const std::string &_name, InUDP &_udp, InOutNetwork &_tcp);
         ~MarketContainer();
 
         using ThreadStatus = std::tuple<std::future_status, std::future_status>;
@@ -20,13 +20,14 @@ class MarketContainer
         bool status(float _to = 1.f);
 
         [[nodiscard]] const std::string &getName() const;
-        [[nodiscard]] ActionToMarket &getInput();
+        [[nodiscard]] MarketContainerQueue getInput();
 
     private:
         const std::string m_name;
 
         OrderBook::EventQueue m_q_event;
-        ActionToMarket m_q_action;
+        InMarket m_q_action;
+        InMarketData m_q_data;
 
         OrderBook m_ob;
 

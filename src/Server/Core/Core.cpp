@@ -6,7 +6,8 @@
 Core::Core(uint32_t _tcp_port, uint32_t _udp_port)
     : m_innet(m_clients, m_q_action, m_q_tcp, _tcp_port),
         m_action(m_q_action, m_q_markets, m_q_tcp),
-        m_outnet(m_q_tcp, m_clients),
+        m_outnet(m_clients, m_q_tcp),
+        m_notify(m_clients, m_q_notif),
         m_udp(m_q_udp, _udp_port)
 {
     market_init();
@@ -32,6 +33,7 @@ bool Core::start()
                 _pip.status();
             m_action.status();
             m_outnet.status();
+            m_notify.status();
         } catch (std::future_error &_e) {
             Logger::Log("[Core] Pipeline have crash: ", _e.what(), "\n\t> with the code: ", _e.code());
             stop();
@@ -57,6 +59,8 @@ void Core::stop()
                 && std::get<1>(status) != std::future_status::deferred; status = _pip.stop()) {}
             Logger::Log("[Core] Market container exited, name: ", _name);
         }
+        while (m_notify.stop() != std::future_status::deferred) {}
+        Logger::Log("[Core] Output network exited");
         while (m_outnet.stop() != std::future_status::deferred) {}
         Logger::Log("[Core] Output network exited");
         Logger::Log("[Core] All pipeline are stoped");
@@ -68,6 +72,10 @@ bool Core::internal_start()
     Logger::Log("[Core] Starting pipeline...");
     if (!m_outnet.start()) {
         Logger::Log("[Core] Failed to start output network");
+        stop();
+        return false;
+    } else if (!m_notify.start()) {
+        Logger::Log("[Core] Failed to start Notify pipeline");
         stop();
         return false;
     }

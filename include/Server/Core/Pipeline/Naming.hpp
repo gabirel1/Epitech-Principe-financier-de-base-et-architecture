@@ -7,80 +7,87 @@
 #include "Server/Core/ClientSocket.hpp"
 #include "Common/Network/UDPPackage.hpp"
 
-namespace data
+/// @brief Data transfered from the pip::InNetwork pipeline to the pip::Action pipeline.
+struct ActionInput
 {
-    /// @brief Data transfered from the pip::InNetwork pipeline to the pip::Action pipeline.
-    struct NetToAction
-    {
-        NetToAction() = default;
-        NetToAction(const NetToAction &&_data) noexcept;
-        NetToAction(const ClientSocket &_client, const fix::Serializer::AnonMessage &&_message) noexcept;
+    ActionInput() = default;
+    ActionInput(const ActionInput &&_data) noexcept;
+    ActionInput(const ClientSocket &_client, const fix::Serializer::AnonMessage &&_message) noexcept;
 
-        NetToAction &operator=(NetToAction &&_data) noexcept;
+    ActionInput &operator=(ActionInput &&_data) noexcept;
 
-        ClientSocket Client{};                      ///< Sender client information.
-        fix::Serializer::AnonMessage Message{};     ///< Undefined message data.
-    };
+    ClientSocket Client{};                      ///< Sender client information.
+    fix::Serializer::AnonMessage Message{};     ///< Undefined message data.
+};
 
-    /// @brief Data transfered from the pip::Action pipeline to the pip::Market pipeline
-    struct ActionToMarket
-    {
-        ActionToMarket() = default;
-        ActionToMarket(const ActionToMarket &&_data) noexcept;
-        ActionToMarket(const ActionToMarket &_data);
-        ActionToMarket(const ClientSocket &&_client) noexcept;
+/// @brief Data transfered from the pip::Action pipeline to the pip::Market pipeline
+struct MarketInput
+{
+    MarketInput() = default;
+    MarketInput(const MarketInput &&_data) noexcept;
+    MarketInput(const MarketInput &_data);
+    MarketInput(const ClientSocket &&_client) noexcept;
 
-        ActionToMarket &operator=(ActionToMarket &&_data) noexcept;
+    MarketInput &operator=(MarketInput &&_data) noexcept;
 
-        ClientSocket Client{};                              ///< Sender client information.
-        OrderBook::Data OrderData{};                        ///< Action to apply to the OrderBook.
-    };
+    ClientSocket Client{};                              ///< Sender client information.
+    OrderBook::Data OrderData{};                        ///< Action to apply to the OrderBook.
+};
 
-    /// @brief Data transfered from the pip::Market pipeline to the pip::OutNetwork pipeline
-    struct MarketToNet
-    {
-        MarketToNet() = default;
-        MarketToNet(const MarketToNet &&_data) noexcept;
-        MarketToNet(const MarketToNet &_data);
-        MarketToNet(const ClientSocket &&_client, const fix::Message &&_msg) noexcept;
-        MarketToNet(const ClientSocket &_client, const fix::Message &_msg);
+/// @brief Data transfered from the pip::Market pipeline to the pip::OutNetwork pipeline
+struct OutNetworkInput
+{
+    OutNetworkInput() = default;
+    OutNetworkInput(const OutNetworkInput &&_data) noexcept;
+    OutNetworkInput(const OutNetworkInput &_data);
+    OutNetworkInput(const ClientSocket &&_client, const fix::Message &&_msg) noexcept;
+    OutNetworkInput(const ClientSocket &_client, const fix::Message &_msg);
 
-        MarketToNet &operator=(MarketToNet &&_data) noexcept;
+    OutNetworkInput &operator=(OutNetworkInput &&_data) noexcept;
 
-        ClientSocket Client{};                      ///< Sender client information.
-        fix::Message Message{};                     ///< Final message send to the client.
-    };
-}
+    ClientSocket Client{};                      ///< Sender client information.
+    fix::Message Message{};                     ///< Final message send to the client.
+};
 
-/// @brief Output data type of the pip::InNetwork pipeline.
-using NetOut = data::NetToAction;
-/// @brief Input data type of the pip::Action pipeline.
-using ActionIn = NetOut;
+struct NotifNetworkInput
+{
+    std::string Symbol;
+    uint8_t SubType;
+    fix::Message Message;
+};
 
-/// @brief Output data type of the pip::Action pipeline.
-using ActionOut = data::ActionToMarket;
-/// @brief Input data type of the pip::Market pipeline.
-using MarketIn = ActionOut;
-
-/// @brief Output data type of the pip::Market pipeline.
-using MarketOut = data::MarketToNet;
-/// @brief Input data type of the pip::OutNetwork pipeline.
-using NetIn = MarketOut;
-
-/// @brief Input data type of the error to be send with pip::OutNetwork
-using ErrorMsg = NetIn;
+struct MarketDataInput
+{
+    std::string Symbol;
+    uint8_t SubType;
+};
 
 /// @brief Queue type use to transfer data from pip::InNetwork to pip::Action pipeline.
-using NetToAction = ts::Queue<NetOut>;
+using InAction = ts::Queue<ActionInput>;
 /// @brief Queue type use to transfer data from pip::Action to pip::Market pipeline.
-using ActionToMarket = ts::Queue<ActionOut>;
+using InMarket = ts::Queue<MarketInput>;
 /// @brief Queue type use to transfer data from pip::Market to pip::OutNetwork pipeline.
-using MarketToNet = ts::Queue<MarketOut>;
+using InOutNetwork = ts::Queue<OutNetworkInput>;
 /// @brief Queue type use to transfer direct message from any pipeline to the pip::OutNetwork pipeline.
-using RawOutput = ts::Queue<NetIn>;
-
+using InNotifNetwork = ts::Queue<NotifNetworkInput>;
+/// @brief Queue type use to transfer direct message from any pipeline to the pip::OutNetwork pipeline.
+using InMarketData = ts::Queue<MarketDataInput>;
 /// @brief Queue type use to transfer data to be formated and send by the pip::UDPOutNetwork pipeline.
-using UdpInput = ts::Queue<data::UDPPackage>;
+using InUDP = ts::Queue<data::UDPPackage>;
 
-/// @brief Map of market input ActionToMarket with as key the symbol of the market.
-using MarketEntry = std::unordered_map<std::string, ActionToMarket &>;
+class MarketContainerQueue
+{
+    public:
+        MarketContainerQueue(InMarket &_market, InMarketData &_data);
+        ~MarketContainerQueue() = default;
+
+        void pushToProcess(const MarketInput &&_data);
+        void pushToData(const MarketDataInput &&_data);
+
+    private:
+        InMarket &m_market;
+        InMarketData &m_data;
+};
+
+/// @brief Map of market input MarketInput with as key the symbol of the market.
+using MarketEntry = std::unordered_map<std::string, MarketContainerQueue>;

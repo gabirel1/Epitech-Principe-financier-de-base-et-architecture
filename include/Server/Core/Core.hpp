@@ -26,14 +26,18 @@ class Core
 
         std::vector<ClientSocket> m_clients;
 
-        UdpInput m_q_udp;
-        NetToAction m_q_action;
+        InUDP m_q_udp;
+        InAction m_q_action;
         MarketEntry m_q_markets;
-        MarketToNet m_q_tcp;
+        InOutNetwork m_q_tcp;
+        InNotifNetwork m_q_notif;
 
-        pip::InNetwork<net::tcp::Socket, &net::tcp::processor, ClientSocket> m_innet;
+        pip::InNetwork<net::tcp::Socket, net::tcp::in::Basic, ClientSocket> m_innet;
         pip::Action m_action;
         std::map<std::string, MarketContainer> m_markets;
-        pip::OutNetwork m_outnet;
+
+        pip::OutNetwork<net::tcp::Socket, net::tcp::out::Response, InOutNetwork, ClientSocket> m_outnet;
+        pip::OutNetwork<net::tcp::Socket, net::tcp::out::Notify, InNotifNetwork, ClientSocket> m_notify;
+
         pip::UDPOutNetwork m_udp;
 };

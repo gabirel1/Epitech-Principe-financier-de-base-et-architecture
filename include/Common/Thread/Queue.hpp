@@ -12,6 +12,8 @@ namespace ts
             Queue() = default;
             ~Queue() = default;
 
+            using type = T;
+
             /// @brief Check if the queue is empty.
             /// @return True if the queue is empty otherwise false.
             [[nodiscard]] bool empty() const;

@@ -8,7 +8,7 @@
 
 namespace pip
 {
-    Action::Action(NetToAction &_input, MarketEntry &_output, RawOutput &_raw)
+    Action::Action(InAction &_input, MarketEntry &_output, InOutNetwork &_raw)
         : m_input(_input), m_output(_output), m_raw(_raw)
     {
     }
@@ -30,7 +30,7 @@ namespace pip
     {
         Logger::SetThreadName(THIS_THREAD_ID, "Action convertion");
         std::pair<bool, fix::Reject> reject;
-        ActionIn input;
+        ActionInput input;
 
         while (m_running)
         {
@@ -60,6 +60,8 @@ namespace pip
                         break;
                     case fix::Logout::cMsgType: (void)treatLogout(input);
                         break;
+                    case fix::MarketDataRequest::cMsgType: (void) treatMarketDataRequest(input);
+                        break;
                     default: (void)treatUnknown(input);
                         break;
                 }
@@ -67,7 +69,7 @@ namespace pip
         }
     }
 
-    bool Action::treatLogon(ActionIn &_input)
+    bool Action::treatLogon(ActionInput &_input)
     {
         fix::Logon logon;
         std::pair<bool, fix::Reject> verif = fix::Logon::Verify(_input.Message);
@@ -89,7 +91,7 @@ namespace pip
         return true;
     }
 
-    bool Action::treatLogout(ActionIn &_input)
+    bool Action::treatLogout(ActionInput &_input)
     {
         fix::Logout logout;
         std::pair<bool, fix::Reject> reject = fix::Logout::Verify(_input.Message);
@@ -111,9 +113,9 @@ namespace pip
         return true;
     }
 
-    bool Action::treatNewOrderSingle(ActionIn &_input)
+    bool Action::treatNewOrderSingle(ActionInput &_input)
     {
-        ActionOut data(std::move(_input.Client));
+        MarketInput data(std::move(_input.Client));
         std::pair<bool, fix::Reject> reject = fix::NewOrderSingle::Verify(_input.Message);
         Logger::Log("[Action] (New Order Single) Treating message from: ", _input.Client.User);
 
@@ -130,13 +132,13 @@ namespace pip
         data.OrderData.order.orderId = utils::to<OrderId>(_input.Message.at(fix::Tag::ClOrdID));
         data.OrderData.order.quantity = utils::to<Quantity>(_input.Message.at(fix::Tag::OrderQty));
         Logger::Log("[Action] (New Order Single) Waiting for action from data: "); // todo log
-        m_output.at(_input.Message.at(fix::Tag::Symbol)).push(std::move(data));
+        m_output.at(_input.Message.at(fix::Tag::Symbol)).pushToProcess(std::move(data));
         return true;
     }
 
-    bool Action::treatOrderCancelRequest(ActionIn &_input)
+    bool Action::treatOrderCancelRequest(ActionInput &_input)
     {
-        ActionOut data(std::move(_input.Client));
+        MarketInput data(std::move(_input.Client));
         std::pair<bool, fix::Reject> reject = fix::OrderCancelRequest::Verify(_input.Message);
 
         if (reject.first) {
@@ -148,13 +150,13 @@ namespace pip
         data.OrderData.order.orderId = utils::to<OrderId>(_input.Message.at(fix::Tag::OrigClOrdID));
         data.OrderData.order.userId = _input.Client.User;
         data.OrderData.type = (_input.Message.at(fix::Tag::Side) == "3") ? OrderType::Bid : OrderType::Ask;
-        m_output.at(_input.Message.at(fix::Tag::Symbol)).push(std::move(data));
+        m_output.at(_input.Message.at(fix::Tag::Symbol)).pushToProcess(std::move(data));
         return true;
     }
 
-    bool Action::treatOrderCancelReplaceRequest(ActionIn &_input)
+    bool Action::treatOrderCancelReplaceRequest(ActionInput &_input)
     {
-        ActionOut data(std::move(_input.Client));
+        MarketInput data(std::move(_input.Client));
         std::pair<bool, fix::Reject> reject = fix::OrderCancelReplaceRequest::Verify(_input.Message);
         Logger::Log("[Action] (Order Cancel Replace) Treating message from: ", _input.Client.User);
 
@@ -172,11 +174,11 @@ namespace pip
         data.OrderData.price = utils::to<Price>(_input.Message.at(fix::Tag::Price));
         data.OrderData.type = (_input.Message.at(fix::Tag::Side) == "3") ? OrderType::Bid : OrderType::Ask;
         Logger::Log("[Action] (Order Cancel Replace) Waiting for action from data: "); // todo log
-        m_output.at(_input.Message.at(fix::Tag::Symbol)).push(std::move(data));
+        m_output.at(_input.Message.at(fix::Tag::Symbol)).pushToProcess(std::move(data));
         return true;
     }
 
-    bool Action::treatUnknown(ActionIn &_input)
+    bool Action::treatUnknown(ActionInput &_input)
     {
         fix::Reject reject;
 
@@ -189,7 +191,7 @@ namespace pip
         return true;
     }
 
-    bool Action::treatHeartbeat(ActionIn &_input)
+    bool Action::treatHeartbeat(ActionInput &_input)
     {
         fix::HeartBeat heartbeat;
         std::pair<bool, fix::Reject> reject = fix::HeartBeat::Verify(_input.Message);
@@ -206,4 +208,13 @@ namespace pip
         return true;
     }
 
+    bool Action::treatMarketDataRequest(ActionInput &_input)
+    {
+        std::vector<std::string> symbols = utils::split<','>(_input.Message.at(fix::Tag::Symbol));
+
+        for (const auto &_symbol : symbols) {
+            // m_output.at(_input.Message.at(fix::Tag::Symbol)).pushToData(std::move(data));
+        }
+        return true;
+    }
 }

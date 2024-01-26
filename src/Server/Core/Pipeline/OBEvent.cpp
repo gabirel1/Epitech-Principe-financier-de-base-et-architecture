@@ -4,7 +4,7 @@
 
 namespace pip
 {
-    OBEvent::OBEvent(const std::string &_name, OrderBook::EventQueue &_input, UdpInput &_udp, RawOutput &_tcp)
+    OBEvent::OBEvent(const std::string &_name, OrderBook::EventQueue &_input, InUDP &_udp, InOutNetwork &_tcp)
         : m_name(_name), m_input(_input), m_udp(_udp), m_tcp(_tcp)
     {
     }

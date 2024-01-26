@@ -1,6 +1,7 @@
 #include "Server/Core/MarketContainer.hpp"
+#include "Server/Core/Pipeline/Naming.hpp"
 
-MarketContainer::MarketContainer(const std::string &_name, UdpInput &_udp, RawOutput &_tcp)
+MarketContainer::MarketContainer(const std::string &_name, InUDP &_udp, InOutNetwork &_tcp)
     : m_name(_name), m_ob(m_name, m_q_event),
         m_market(m_name, m_ob, m_q_action, _tcp),
         m_obevent(m_name, m_q_event, _udp, _tcp)
@@ -38,7 +39,7 @@ const std::string &MarketContainer::getName() const
     return m_name;
 }
 
-ActionToMarket &MarketContainer::getInput()
+MarketContainerQueue MarketContainer::getInput()
 {
-    return m_q_action;
+    return MarketContainerQueue{ m_q_action, m_q_data };
 }

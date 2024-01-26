@@ -16,8 +16,8 @@ namespace pip
     /// @tparam T is the socket type managed.
     /// @tparam _T is function to process when an action is needed on a socket.
     /// @tparam __T is the format socket are stored in the vector referenced.
-    template<IsSocket T, auto _T, class __T = std::shared_ptr<T>>
-    requires SocketClient<__T, T>
+    template<IsSocket T, class _T, class __T = std::shared_ptr<T>>
+    requires SocketClient<__T, T> && IsProcessor<_T, ClientSocket &, InAction &, InOutNetwork &>
     class InNetwork : public Pipeline<InNetwork<T, _T, __T>>
     {
         public:
@@ -32,7 +32,7 @@ namespace pip
             /// @param _output Output data queue of the pipeline.
             /// @param _error Error output directly connected to pip::OutNetwork
             /// @param _port Port on which the network will listen to, for connection and receive message.
-            InNetwork(std::vector<__T> &_clients, NetToAction &_output, RawOutput &_error, uint32_t _port);
+            InNetwork(std::vector<__T> &_clients, InAction &_output, InOutNetwork &_error, uint32_t _port);
             /// @brief Disconnect from listening, stop the pipeline and the destroy it.
             ~InNetwork();
 
@@ -45,8 +45,8 @@ namespace pip
 
         private:
             std::vector<__T> &m_clients;            ///< Client list
-            NetToAction &m_output;                  ///< Ouput data queue
-            RawOutput &m_error;                     ///< Output message queue directly to the pip::OutNetwork
+            InAction &m_output;                     ///< Ouput data queue
+            InOutNetwork &m_error;                  ///< Output message queue directly to the pip::OutNetwork
 
             net::Acceptor<T> m_acceptor;            ///< Acceptor listening the the port passed as parameter.
             net::Selector<T> m_selector;            ///< Selector managing the client list action.

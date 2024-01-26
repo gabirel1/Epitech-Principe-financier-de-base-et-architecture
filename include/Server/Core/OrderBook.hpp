@@ -8,8 +8,8 @@
 #include "Server/Core/meta.hpp"
 #include "Common/Thread/Queue.hpp"
 
-using AskBook = std::map<Price, OrderList, std::greater<Price>>;
-using BidBook = std::map<Price, OrderList, std::less<Price>>;
+using AskBook = std::map<Price, OrderList, std::greater_equal<Price>>;
+using BidBook = std::map<Price, OrderList, std::less_equal<Price>>;
 
 class OrderBook
 {
