@@ -34,11 +34,14 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
             event.quantity = 0;
             event.orgQty = order.quantity;
             std::cout << "here" << std::endl;
+            std::cout << "\n\n\n[ORDERBOOK] (ADD) _order[" << _order.userId << "] Quantity: " << _order.quantity << ", price: " << _price << std::endl;
+            std::cout << "[ORDERBOOK] (ADD) order[" << _order.userId << "] Quantity: " << order.quantity << ", price: " << _price << "\n\n\n" << std::endl;
             if (order.quantity == _order.quantity) {
                 Logger::Log("[OrderBook] (", m_name, ") {Add} Filled the order: ", order, ", price: ", _key);
                 Logger::Log("[OrderBook] (", m_name, ") {Add-Incoming} Filled the order: ", _order);
                 _val.erase(_val.begin() + i);
                 _order.quantity = 0;
+                std::cout << "ORDERBOOK.inl, _order.quantity = " << _order.quantity << std::endl;
                 m_output.append(event);
                 return false;
             } else if (order.quantity < _order.quantity) {
@@ -51,6 +54,7 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
                 Logger::Log("[OrderBook] (", m_name, ") {Add} Partially sold the order: ", order, ", new quantity: ", order.quantity - _order.quantity, ", price: ", _key);
                 Logger::Log("[OrderBook] (", m_name, ") {Add-Incoming} Filled the order: ", _order);
                 order.quantity -= _order.quantity;
+                _order.quantity = 0;
                 event.quantity = order.quantity;
                 event.status = OrderStatus::PartiallyFilled;
                 m_output.append(event);
