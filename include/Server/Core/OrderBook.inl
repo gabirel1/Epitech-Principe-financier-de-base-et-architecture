@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <numeric>
 #include <vector>
 
 #include "Common/Core/Logger.hpp"
@@ -100,4 +101,43 @@ std::vector<Price> OrderBook::inter_getPrice(const T &_book)
     for (auto [_price, _order] : _book)
         price[i++] = _price;
     return price;
+}
+
+template<IsBook T>
+fix::MarketDataSnapshotFullRefresh OrderBook::refresh(T &_book, size_t _depth)
+{
+    std::lock_guard<std::mutex> guard(m_mutex);
+    size_t size = 0;
+    fix::MarketDataSnapshotFullRefresh result;
+
+    switch (_depth) {
+        case 0: size = _book.size();
+            break;
+        case 1: size = std::max((size_t)1, (_book.size() / 10) * 2);
+            break;
+        default: size = _depth;
+    }
+    size = std::min(size, _book.size());
+    std::string price{};
+    std::string quantity{};
+
+    for (const auto &[_price, _orders] : _book) {
+        if (size == 0)
+            break;
+
+        Quantity total_qty = std::accumulate(_orders.begin(), _orders.end(), 0,
+            [] (Quantity _sum, const Order& _order) {
+                return _sum + _order.quantity;
+            });
+        price += std::to_string(_price) + ",";
+        quantity += std::to_string(total_qty) + ",";
+        size--;
+    }
+    std::string ssize = std::to_string(size);
+    result.set55_symbol(m_name);
+    result.set110_minQty(quantity);
+    result.set267_noMDEntryTypes(ssize);
+    result.set269_mDEntryType(ssize);
+    result.set270_mDEntryPx(price);
+    return result;
 }

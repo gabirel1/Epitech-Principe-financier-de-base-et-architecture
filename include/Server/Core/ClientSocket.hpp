@@ -7,17 +7,12 @@
 
 #include "Common/Core/Order.hpp"
 #include "Common/Network/Socket.hpp"
+#include "Server/Core/OrderBook.hpp"
 
 class ClientSocket
 {
     public:
-        struct ClientSubscribe
-        {
-            uint8_t type = 2;
-            size_t Depth = 0;
-            std::string Id = "";
-        };
-
+        using Subs = std::vector<OrderBook::Subscription>;
 
         ClientSocket(std::shared_ptr<net::tcp::Socket> _socket = nullptr);
         ClientSocket(const ClientSocket &_client);
@@ -35,8 +30,8 @@ class ClientSocket
         [[nodiscard]] bool hasRequest(size_t _seqNumber) const;
         std::chrono::system_clock::time_point getRequest(size_t _seqNumber);
 
-
-        ClientSubscribe &subscribe(const std::string &_symbol);
+        [[nodiscard]] ClientSocket::Subs &subscribe(const std::string &_symbol);
+        void unsubscribe(const std::string &_symbol);
 
         ClientSocket &operator=(ClientSocket &&_client) noexcept;
 
@@ -44,7 +39,7 @@ class ClientSocket
         operator bool() const;
 
     protected:
-        using SubcribeMap = std::unordered_map<std::string, ClientSubscribe>;
+        using SubcribeMap = std::unordered_map<std::string, ClientSocket::Subs>;
 
         std::unordered_map<size_t, std::chrono::system_clock::time_point> m_request;
         std::shared_ptr<net::tcp::Socket> m_socket;

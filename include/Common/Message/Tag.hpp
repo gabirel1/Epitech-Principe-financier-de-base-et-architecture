@@ -39,6 +39,7 @@ namespace fix
         constexpr const char TransactTime[] = "60";             ///< Tag [60](https://www.onixs.biz/fix-dictionary/4.2/tagNum_60.html).
         constexpr const char EncryptMethod[] = "98";            ///< Tag [98](https://www.onixs.biz/fix-dictionary/4.2/tagNum_98.html).
         constexpr const char HearBtInt[] = "108";               ///< Tag [108](https://www.onixs.biz/fix-dictionary/4.2/tagNum_108.html).
+        constexpr const char MinQty[] = "110";                  ///< Tag [110](https://www.onixs.biz/fix-dictionary/4.2/tagNum_110.html).
         constexpr const char TestReqId[] = "112";               ///< Tag [112](https://www.onixs.biz/fix-dictionary/4.2/tagNum_112.html).
         constexpr const char NoRelatedSym[] = "146";            ///< Tag [146](https://www.onixs.biz/fix-dictionary/4.2/tagNum_146.html).
         constexpr const char ExecType[] = "150";                ///< Tag [150](https://www.onixs.biz/fix-dictionary/4.2/tagNum_150.html).
@@ -48,6 +49,7 @@ namespace fix
         constexpr const char MarketDepth[] = "264";             ///< Tag [264](https://www.onixs.biz/fix-dictionary/4.2/264.html).
         constexpr const char NoMDEntryTypes[] = "267";          ///< Tag [267](https://www.onixs.biz/fix-dictionary/4.2/267.html).
         constexpr const char MDEntryType[] = "269";             ///< Tag [269](https://www.onixs.biz/fix-dictionary/4.2/269.html).
+        constexpr const char MDEntryPx[] = "270";               ///< Tag [270](https://www.onixs.biz/fix-dictionary/4.2/270.html).
         constexpr const char RefTagId[] = "371";                ///< Tag [371](https://www.onixs.biz/fix-dictionary/4.2/tagNum_371.html).
         constexpr const char RefMsgType[] = "352";              ///< Tag [352](https://www.onixs.biz/fix-dictionary/4.2/tagNum_352.html).
         constexpr const char SessionRejectReason[] = "373";     ///< Tag [373](https://www.onixs.biz/fix-dictionary/4.2/tagNum_373.html).

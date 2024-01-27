@@ -45,9 +45,14 @@ std::chrono::system_clock::time_point ClientSocket::getRequest(size_t _seqNumber
     return ret;
 }
 
-ClientSocket::ClientSubscribe &ClientSocket::subscribe(const std::string &_symbol)
+ClientSocket::Subs &ClientSocket::subscribe(const std::string &_symbol)
 {
     return m_subscribe[_symbol];
+}
+
+void ClientSocket::unsubscribe(const std::string &_symbol)
+{
+    m_subscribe.erase(_symbol);
 }
 
 ClientSocket &ClientSocket::operator=(ClientSocket &&_client) noexcept

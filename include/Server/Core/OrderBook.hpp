@@ -7,6 +7,8 @@
 #include "Common/Core/Order.hpp"
 #include "Server/Core/meta.hpp"
 #include "Common/Thread/Queue.hpp"
+#include "Common/Message/MarketDataSnapshotFullRefresh.hpp"
+#include "Common/Message/MarketDataIncrementalRefresh.hpp"
 
 using AskBook = std::map<Price, OrderList, std::greater_equal<Price>>;
 using BidBook = std::map<Price, OrderList, std::less_equal<Price>>;
@@ -43,6 +45,14 @@ class OrderBook
             Order order;
         };
 
+        struct Subscription
+        {
+            uint8_t type = 2;
+            size_t depth = 0;
+            uint8_t entry = 0;
+            std::string Id = "";
+        };
+
         using EventQueue = ts::Queue<Event>;
 
         OrderBook(const std::string &_name, EventQueue &_output);
@@ -52,13 +62,17 @@ class OrderBook
         [[nodiscard]] bool modify(OrderType _type, Price _price, Order &_order);
         [[nodiscard]] bool cancel(OrderType _type, OrderId _orderId, bool _event = true);
 
+        [[nodiscard]] bool has(OrderType _type, OrderId _orderId) const;
+
+        fix::MarketDataSnapshotFullRefresh refresh(const OrderBook::Subscription &_sub);
+        fix::MarketDataIncrementalRefresh update(const OrderBook::Subscription &_sub);
+
         // front only
         [[nodiscard]] std::vector<Price> getPrice(OrderType _type);
         [[nodiscard]] bool contain(OrderType _type, Price _price);
         [[nodiscard]] const OrderList &getOrders(OrderType _type, Price _price);
         [[nodiscard]] Quantity sumQuantity(OrderType _type, Price _price);
 
-        [[nodiscard]] bool has(OrderType _type, OrderId _orderId) const;
 
     protected:
         template<IsBook T>
@@ -73,6 +87,9 @@ class OrderBook
 
         template<IsBook T>
         [[nodiscard]] std::vector<Price> inter_getPrice(const T &_book);
+
+        template<IsBook T>
+        fix::MarketDataSnapshotFullRefresh refresh(T &_book, size_t _depth);
 
     private:
         const std::string m_name;

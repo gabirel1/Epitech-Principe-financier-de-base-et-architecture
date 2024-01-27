@@ -39,6 +39,13 @@ bool OrderBook::has(OrderType _type, OrderId _orderId) const
     return m_bid_id.contains(_orderId);
 }
 
+fix::MarketDataSnapshotFullRefresh OrderBook::refresh(const OrderBook::Subscription &_sub)
+{
+    if (_sub.entry == 0)
+        return refresh<BidBook>(m_bid, _sub.depth);
+    return refresh<AskBook>(m_ask, _sub.depth);
+}
+
 std::vector<Price> OrderBook::getPrice(OrderType _type)
 {
     if (_type == OrderType::Ask)
