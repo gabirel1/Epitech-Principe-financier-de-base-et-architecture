@@ -17,6 +17,8 @@
 namespace data
 {
     /// @brief Data send to the UDP broadcast in pip::UDPOutNetwork pipeline.
+
+    #pragma pack (push, 1)
     struct UDPPackage
     {
         uint32_t time;
@@ -25,6 +27,7 @@ namespace data
         Quantity quantity;
         Price price;
     };
+    #pragma pack (pop)
 
     std::ostream &operator<<(std::ostream &_os, const UDPPackage &_package);
 }

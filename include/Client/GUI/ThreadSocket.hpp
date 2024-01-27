@@ -12,7 +12,7 @@ class ThreadSocket : public QThread {
     Q_OBJECT
 
     public:
-        ThreadSocket();
+        ThreadSocket(const net::Ip &_ip);
         ~ThreadSocket();
 
         void stop();
@@ -23,6 +23,7 @@ class ThreadSocket : public QThread {
     private:
         bool m_running = false;
         net::udp::Socket m_udp;
+        net::Ip m_ip;
 };
 
 #endif /* !THREADSOCKET_HPP_ */
