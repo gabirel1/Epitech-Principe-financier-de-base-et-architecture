@@ -7,6 +7,16 @@
 OrderBook::OrderBook(const std::string &_name, EventQueue &_output)
     : m_name(_name), m_output(_output)
 {
+    cache_on<AskBook, cache_AskBook>(m_ask, m_cache_ask, true);
+    cache_on<BidBook, cache_BidBook>(m_bid, m_cache_bid, true);
+    m_is_cached = true;
+    cache_on<AskBook, cache_AskBook>(m_ask, m_cache_ask_upd, false);
+    cache_on<BidBook, cache_BidBook>(m_bid, m_cache_bid_upd, false);
+    for (const auto &[_price, _qty] : m_cache_ask_upd)
+        m_cache_ask_upd.at(_price) = _qty - m_cache_ask[_price];
+    for (const auto &[_price, _qty] : m_cache_bid_upd)
+        m_cache_bid_upd.at(_price) = _qty - m_cache_bid[_price];
+    m_is_cached_udp = true;
 }
 
 bool OrderBook::add(OrderType _type, Price _price, Order& _order)
@@ -41,16 +51,41 @@ bool OrderBook::has(OrderType _type, OrderId _orderId) const
 
 fix::MarketDataSnapshotFullRefresh OrderBook::refresh(const OrderBook::Subscription &_sub)
 {
-    if (_sub.entry == 0)
-        return refresh<BidBook>(m_bid, _sub.depth);
-    return refresh<AskBook>(m_ask, _sub.depth);
+    if (m_is_cached) {
+        if (_sub.entry == 0)
+            return refresh<cache_BidBook>(m_cache_bid, _sub.depth);
+        return refresh<cache_AskBook>(m_cache_ask, _sub.depth);
+    }
+    cache_on<AskBook, cache_AskBook>(m_ask, m_cache_ask, true);
+    cache_on<BidBook, cache_BidBook>(m_bid, m_cache_bid, true);
+    m_is_cached = true;
+    return refresh(_sub);
 }
 
-std::vector<Price> OrderBook::getPrice(OrderType _type)
+fix::MarketDataIncrementalRefresh OrderBook::update(const OrderBook::Subscription &_sub)
 {
-    if (_type == OrderType::Ask)
-        return inter_getPrice<AskBook>(m_ask);
-    return inter_getPrice<BidBook>(m_bid);
+    if (m_is_cached && m_is_cached_udp) {
+        if (_sub.entry == 0)
+            return update<cache_BidBook>(m_cache_bid, m_cache_bid_upd, _sub.depth);
+        return update<cache_AskBook>(m_cache_ask, m_cache_ask_upd, _sub.depth);
+    }
+    cache_on<AskBook, cache_AskBook>(m_ask, m_cache_ask, true);
+    cache_on<BidBook, cache_BidBook>(m_bid, m_cache_bid, true);
+    m_is_cached = true;
+    cache_on<AskBook, cache_AskBook>(m_ask, m_cache_ask_upd, false);
+    cache_on<BidBook, cache_BidBook>(m_bid, m_cache_bid_upd, false);
+    for (const auto &[_price, _qty] : m_cache_ask_upd)
+        m_cache_ask_upd.at(_price) = _qty - m_cache_ask[_price];
+    for (const auto &[_price, _qty] : m_cache_bid_upd)
+        m_cache_bid_upd.at(_price) = _qty - m_cache_bid[_price];
+    m_is_cached_udp = true;
+    return update(_sub);
+}
+
+void OrderBook::cache_flush()
+{
+    m_is_cached = false;
+    m_is_cached_udp = false;
 }
 
 bool OrderBook::contain(OrderType _type, Price _price)
@@ -60,26 +95,6 @@ bool OrderBook::contain(OrderType _type, Price _price)
     if (_type == OrderType::Ask)
         return m_ask.contains(_price);
     return m_bid.contains(_price);
-}
-
-const OrderList& OrderBook::getOrders(OrderType _type, Price _price)
-{
-    std::lock_guard<std::mutex> guard(m_mutex);
-
-    if (_type == OrderType::Ask)
-        return m_ask.at(_price);
-    return m_bid.at(_price);
-}
-
-
-Quantity OrderBook::sumQuantity(OrderType _type, Price _price)
-{
-    const OrderList &ref = getOrders(_type, _price);
-    std::lock_guard<std::mutex> guard(m_mutex);
-
-    return std::accumulate(ref.begin(), ref.end(), 0ull, [] (Quantity _total, const Order& _order) {
-        return std::move(_total) + _order.quantity;
-    });
 }
 
 void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _status)

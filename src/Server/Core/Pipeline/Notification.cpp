@@ -34,7 +34,6 @@ namespace pip
             auto update_diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - update);
 
             if (refresh_diff.count() >= NOTIF_REFRESH_TO) {
-
                 for (auto &_client : m_clients) {
                     const ClientSocket::Subs &subs = _client.subscribe(m_name);
 
@@ -49,6 +48,7 @@ namespace pip
                         }
                     }
                 }
+                m_ob.cache_flush();
             }
             if (update_diff.count() >= NOTIF_UPDATE_TO) {
                 for (auto &_client : m_clients) {
@@ -56,15 +56,16 @@ namespace pip
 
                     for (const auto &_sub : subs) {
                         if (_sub.type == 1) {
-                            // fix::MarketDataIncrementalRefresh notif = m_ob.update(_sub);
+                            fix::MarketDataIncrementalRefresh notif = m_ob.update(_sub);
 
-                            // notif.header.set34_msgSeqNum(std::to_string((_client.SeqNumber)++));
-                            // notif.header.set49_SenderCompId(PROVIDER_NAME);
-                            // notif.header.set56_TargetCompId(_client.User);
-                            // _client.getSocket()->send(notif.to_string());
+                            notif.header.set34_msgSeqNum(std::to_string((_client.SeqNumber)++));
+                            notif.header.set49_SenderCompId(PROVIDER_NAME);
+                            notif.header.set56_TargetCompId(_client.User);
+                            _client.getSocket()->send(notif.to_string());
                         }
                     }
                 }
+                m_ob.cache_flush();
             }
         }
     }

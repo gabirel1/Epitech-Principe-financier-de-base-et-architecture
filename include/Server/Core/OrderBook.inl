@@ -91,53 +91,124 @@ bool OrderBook::cancel(OrderIdMap<T> &_mapId, OrderId _orderId, bool _event)
     return false;
 }
 
-template<IsBook T>
-std::vector<Price> OrderBook::inter_getPrice(const T &_book)
-{
-    std::vector<Price> price(_book.size());
-    size_t i = 0;
-    std::lock_guard<std::mutex> guard(m_mutex);
-
-    for (auto [_price, _order] : _book)
-        price[i++] = _price;
-    return price;
-}
-
-template<IsBook T>
-fix::MarketDataSnapshotFullRefresh OrderBook::refresh(T &_book, size_t _depth)
+template<IsBookCache T>
+fix::MarketDataSnapshotFullRefresh OrderBook::refresh(T &_cache, size_t _depth)
 {
     std::lock_guard<std::mutex> guard(m_mutex);
     size_t size = 0;
     fix::MarketDataSnapshotFullRefresh result;
+    const std::string type = (std::is_same_v<T, cache_BidBook>) ? "0" : "1";
 
     switch (_depth) {
-        case 0: size = _book.size();
+        case 0: size = _cache.size();
             break;
-        case 1: size = std::max((size_t)1, (_book.size() / 10) * 2);
+        case 1: size = std::max((size_t)1, (_cache.size() / 10) * 2);
             break;
         default: size = _depth;
     }
-    size = std::min(size, _book.size());
+    size = std::min(size, _cache.size());
+    std::string ssize = std::to_string(size);
     std::string price{};
     std::string quantity{};
+    std::string types{};
 
-    for (const auto &[_price, _orders] : _book) {
+    for (const auto &[_price, _qty] : _cache) {
         if (size == 0)
             break;
 
-        Quantity total_qty = std::accumulate(_orders.begin(), _orders.end(), 0,
-            [] (Quantity _sum, const Order& _order) {
-                return _sum + _order.quantity;
-            });
         price += std::to_string(_price) + ",";
-        quantity += std::to_string(total_qty) + ",";
+        types += type + ",";
+        quantity += std::to_string(_qty) + ",";
         size--;
     }
-    std::string ssize = std::to_string(size);
+    if (!price.empty())
+        price.erase(price.end());
+    if (!types.empty())
+        types.erase(types.end());
+    if (!quantity.empty())
+        quantity.erase(quantity.end());
+
     result.set55_symbol(m_name);
     result.set110_minQty(quantity);
     result.set267_noMDEntryTypes(ssize);
-    result.set269_mDEntryType(ssize);
+    result.set269_mDEntryType(types);
     result.set270_mDEntryPx(price);
     return result;
+}
+
+template<IsBookCache T>
+fix::MarketDataIncrementalRefresh OrderBook::update(T &_cache_orig, T &_cache, size_t _depth)
+{
+    std::lock_guard<std::mutex> guard(m_mutex);
+    size_t size = 0;
+    fix::MarketDataIncrementalRefresh result;
+    const std::string type = (std::is_same_v<T, cache_BidBook>) ? "0" : "1";
+
+    switch (_depth) {
+        case 0: size = _cache.size();
+            break;
+        case 1: size = std::max((size_t)1, (_cache.size() / 10) * 2);
+            break;
+        default: size = _depth;
+    }
+    size = std::min(size, _cache.size());
+    std::string ssize = std::to_string(size);
+    std::string prices{};
+    std::string quantity{};
+    std::string types{};
+    std::string actions{};
+    std::string symbols{};
+
+    // need delete support
+    for (const auto &[_price, _qty] : _cache) {
+        if (size == 0)
+            break;
+
+        if (_cache_orig.contains(_price)) {
+            if (_cache_orig.at(_price) == _qty)
+                continue;
+            actions += "1,";
+            quantity += std::to_string(_cache_orig.at(_price) - _qty) + ",";
+        } else {
+            actions += "0,";
+            quantity += std::to_string(_qty) + ",";
+        }
+        symbols += m_name + ",";
+        prices += std::to_string(_price) + ",";
+        types += type + ",";
+        size--;
+    }
+    if (!types.empty())
+        types.erase(types.end());
+    if (!prices.empty())
+        prices.erase(prices.end());
+    if (!actions.empty())
+        actions.erase(actions.end());
+    if (!quantity.empty())
+        quantity.erase(quantity.end());
+    if (!symbols.empty())
+        symbols.erase(symbols.end());
+
+    result.set55_symbol(symbols);
+    result.set110_minQty(quantity);
+    result.set267_noMDEntryTypes(ssize);
+    result.set269_mDEntryType(types);
+    result.set270_mDEntryPx(prices);
+    result.set279_mDUpdateAction(actions);
+    return result;
+}
+
+template<IsBook T, IsBookCache _T>
+void OrderBook::cache_on(T &_book, _T &_cache, bool _ref)
+{
+    if (_ref) {
+        _cache.clear();
+        for (const auto &[_price, _orders] : _book) {
+            Quantity total_qty = std::accumulate(_orders.begin(), _orders.end(), 0,
+                [] (Quantity _sum, const Order& _order) {
+                    return _sum + _order.quantity;
+                });
+            _cache.emplace(_price, total_qty);
+        }
+    }
 }

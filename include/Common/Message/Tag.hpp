@@ -50,6 +50,7 @@ namespace fix
         constexpr const char NoMDEntryTypes[] = "267";          ///< Tag [267](https://www.onixs.biz/fix-dictionary/4.2/267.html).
         constexpr const char MDEntryType[] = "269";             ///< Tag [269](https://www.onixs.biz/fix-dictionary/4.2/269.html).
         constexpr const char MDEntryPx[] = "270";               ///< Tag [270](https://www.onixs.biz/fix-dictionary/4.2/270.html).
+        constexpr const char MDUpdateAction[] = "279";          ///< Tag [279](https://www.onixs.biz/fix-dictionary/4.2/279.html).
         constexpr const char RefTagId[] = "371";                ///< Tag [371](https://www.onixs.biz/fix-dictionary/4.2/tagNum_371.html).
         constexpr const char RefMsgType[] = "352";              ///< Tag [352](https://www.onixs.biz/fix-dictionary/4.2/tagNum_352.html).
         constexpr const char SessionRejectReason[] = "373";     ///< Tag [373](https://www.onixs.biz/fix-dictionary/4.2/tagNum_373.html).
