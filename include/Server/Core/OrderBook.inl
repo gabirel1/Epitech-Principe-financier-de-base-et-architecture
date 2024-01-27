@@ -13,9 +13,9 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
     Event event;
 
     if constexpr (std::is_same_v<T, BidBook>)
-        event.side = OrderType::Ask;
-    else
         event.side = OrderType::Bid;
+    else
+        event.side = OrderType::Ask;
     event.sold = true;
     for (auto &[_key, _val] : _book) {
         if (cmp(_key, _price))
@@ -38,6 +38,7 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
                 Logger::Log("[OrderBook] (", m_name, ") {Add-Incoming} Filled the order: ", _order);
                 _order.quantity = 0;
                 _val.erase(_val.begin() + i);
+                _order.quantity = 0;
                 m_output.append(event);
                 return false;
             } else if (order.quantity < _order.quantity) {
@@ -50,6 +51,7 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
                 Logger::Log("[OrderBook] (", m_name, ") {Add} Partially sold the order: ", order, ", new quantity: ", order.quantity - _order.quantity, ", price: ", _key);
                 Logger::Log("[OrderBook] (", m_name, ") {Add-Incoming} Filled the order: ", _order);
                 order.quantity -= _order.quantity;
+                _order.quantity = 0;
                 event.quantity = order.quantity;
                 event.status = OrderStatus::PartiallyFilled;
                 m_output.append(event);

@@ -108,7 +108,7 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
     event.side = _type;
     event.sold = false;
     if (_type == OrderType::Bid) {
-        if (add<AskBook, std::less_equal<Price>>(m_ask, _price, _order)) {
+        if (add<AskBook, std::greater_equal<Price>>(m_ask, _price, _order)) {
             std::lock_guard<std::mutex> guard(m_mutex);
 
             Logger::Log("[OrderBook] (", m_name, ") {Add} New order in BID: ", _order, " at price: ", _price);
@@ -118,7 +118,7 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
         }
     }
     else {
-        if (add<BidBook, std::greater_equal<Price>>(m_bid, _price, _order)) {
+        if (add<BidBook, std::less_equal<Price>>(m_bid, _price, _order)) {
             std::lock_guard<std::mutex> guard(m_mutex);
 
             Logger::Log("[OrderBook] (", m_name, ") {Add} New order in ASK: ", _order, " at price: ", _price);

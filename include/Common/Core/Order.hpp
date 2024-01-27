@@ -33,6 +33,6 @@ enum OrderStatus {
 
 enum class OrderType
 {
-    Bid,
-    Ask
+    Ask,
+    Bid
 };

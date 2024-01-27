@@ -81,7 +81,7 @@ namespace pip
             report.set39_ordStatus("8");
             report.set40_ordType("2");
             report.set44_price(std::to_string(_data.OrderData.price));
-            report.set54_side((_data.OrderData.type == OrderType::Ask) ? "3" : "4");
+            report.set54_side((_data.OrderData.type == OrderType::Ask) ? "4" : "3");
             report.set58_text("Order Id already used");
             report.set151_leavesQty("0");
             m_output.append(std::move(_data.Client), std::move(report));
