@@ -33,6 +33,9 @@ namespace net
 
             operator bool();
 
+            // override operator "=="
+            bool operator==(const Socket &_socket) const; 
+
         protected:
             Socket(int _type);
 

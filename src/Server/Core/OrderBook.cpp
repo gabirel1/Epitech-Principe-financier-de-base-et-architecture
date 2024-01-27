@@ -99,6 +99,7 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
         }
     }
     else {
+        std::cout << "ADD ASK: Price = " << _price << ", quantity = " << _order.quantity << std::endl;
         if (add<BidBook, std::less_equal<Price>>(m_bid, _price, _order)) {
             std::lock_guard<std::mutex> guard(m_mutex);
 
@@ -107,6 +108,7 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
             m_ask_id.emplace(_order.orderId, std::make_pair(m_ask.find(_price), m_ask.at(_price).end() - 1));
         }
     }
+    std::cout << "[ORDERBOOK::ADD] event.quantity = " << event.quantity << ", _order.quantity = " << _order.quantity << std::endl;
     event.quantity = _order.quantity;
     if (event.quantity == event.orgQty)
         event.status = _status;

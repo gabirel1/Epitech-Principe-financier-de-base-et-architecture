@@ -31,8 +31,10 @@ class ClientSocket
 
         bool operator==(const ClientSocket &_client) const;
         operator bool() const;
+        // std::ostream &operator<<(std::ostream &_os) const;
+        friend std::ostream &operator<<(std::ostream &_os, const ClientSocket &_client);
 
     protected:
-        std::unordered_map<size_t, std::chrono::system_clock::time_point> m_request;
-        std::shared_ptr<net::tcp::Socket> m_socket;
+        std::shared_ptr<net::tcp::Socket> m_socket = nullptr;
+        std::unordered_map<size_t, std::chrono::system_clock::time_point> m_request{};
 };

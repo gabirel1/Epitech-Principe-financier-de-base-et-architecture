@@ -58,6 +58,12 @@ namespace net
         return is_open();
     }
 
+    bool Socket::operator==(const Socket &_socket) const
+    {
+        // return this == &_socket;
+        return raw() == _socket.raw();
+    }
+
     Socket::Socket(int _type)
         : c::Socket(AF_INET, _type, 0)
     {

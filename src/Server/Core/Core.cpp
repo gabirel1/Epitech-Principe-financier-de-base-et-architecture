@@ -26,12 +26,18 @@ bool Core::start()
     while (m_running)
     {
         try {
+            std::cout << "m_udp.status();\n";
             m_udp.status();
+            std::cout << "m_innet.status();\n";
             m_innet.status();
+            std::cout << "for m_market;\n";
             for (auto &[_, _pip] : m_markets)
                 _pip.status();
+            std::cout << "m_action.status();\n";
             m_action.status();
+            std::cout << "m_outnet.status();\n";
             m_outnet.status();
+            std::cout << "end of line\n";
         } catch (std::future_error &_e) {
             Logger::Log("[Core] Pipeline have crash: ", _e.what(), "\n\t> with the code: ", _e.code());
             stop();

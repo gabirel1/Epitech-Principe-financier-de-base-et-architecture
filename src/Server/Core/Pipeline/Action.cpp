@@ -36,7 +36,9 @@ namespace pip
         {
             if (!m_input.empty())
             {
+                std::cout << "entered !m_input.empty()" << std::endl;
                 input = m_input.pop_front();
+                std::cout << "input_popfront" << std::endl;
                 reject = fix::Header::Verify(input.Message, input.Client.User, PROVIDER_NAME, input.Client.ClientSeqNumber - 1);
                 if (reject.first) {
                     Logger::Log("[Action] Incorrect header received from client: ", input.Client.User);
@@ -63,6 +65,7 @@ namespace pip
                     default: (void)treatUnknown(input);
                         break;
                 }
+                std::cout << "after switch" << std::endl;
             }
         }
     }
@@ -105,7 +108,7 @@ namespace pip
         _input.Client.Logged = false;
         _input.Client.Disconnect = true;
         logout.header.set56_TargetCompId(_input.Client.User);
-        _input.Client.User = "";
+        // _input.Client.User = "";
         Logger::Log("[Action] (Logout) Request from: ", _input.Client.User, ", sucessfuly handle");
         m_raw.append(std::move(_input.Client), std::move(logout));
         return true;

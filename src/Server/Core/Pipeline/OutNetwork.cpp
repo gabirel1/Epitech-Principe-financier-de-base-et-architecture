@@ -48,9 +48,11 @@ namespace pip
                                 Logger::Log("[OutNetwork] Data send successfuly: ", data);
                             else
                                 Logger::Log("[OutNetwork] Error occured when sending data");
+                            std::cout << "[OUTNETWORK]: CLIENT BEFORE: " << *client << std::endl;
                             client->Logged = _input.Client.Logged;
                             client->User = userId;
                             client->Disconnect = _input.Client.Disconnect;
+                            std::cout << "[OUTNETWORK]: CLIENT AFTER: " << *client << std::endl;
                             logTiming(client);
                             Logger::Log("[OutNetwork] Updated client status: "); // todo log
                             if (_input.Client.Disconnect) {

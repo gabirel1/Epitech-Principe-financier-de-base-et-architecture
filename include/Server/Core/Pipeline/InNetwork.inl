@@ -44,6 +44,7 @@ namespace pip
         std::vector<Client> clients;
 
         while (this->m_running) {
+            // std::cout << "[TKT](1): m_clients.size(): " << m_clients.size() << ", m_selector.size(): " << m_selector.size() << std::endl;
             accept = m_acceptor.accept();
             if (accept) {
                 m_clients.emplace_back(accept);
@@ -51,6 +52,8 @@ namespace pip
                 Logger::Log("[InNetwork] Accepted new client: "); // todo log
             }
             clients = m_selector.pull();
+            // std::cout << "[TKT](2.0): clients.size(): " << clients.size() << std::endl;
+            // std::cout << "[TKT](2.1): m_clients.size(): " << m_clients.size() << ", m_selector.size(): " << m_selector.size() << std::endl;
             if (clients.size())
                 Logger::Log("[InNetwork] Received event from: ", clients.size(), " clients");
             for (Client &_client : clients) {
@@ -67,10 +70,13 @@ namespace pip
                     continue;
                 } else if (_T(*client, m_output, m_error)) {
                     Logger::Log("[InNetwork] Disconnecting client: "); // todo log
-                    m_clients.erase(client);
                     m_selector.erase(client->getSocket());
+                    // std::cout << "BETWEEN" << std::endl;
+                    m_clients.erase(client);
                 }
+                // std::cout << "[TKT](2): m_clients.size(): " << m_clients.size() << ", m_selector.size(): " << m_selector.size() << std::endl;
             }
+            // std::cout << "[TKT](3): m_clients.size(): " << m_clients.size() << ", m_selector.size(): " << m_selector.size() << std::endl;
         }
     }
 }
