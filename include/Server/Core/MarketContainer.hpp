@@ -18,17 +18,20 @@ class MarketContainer
 
         [[nodiscard]] ThreadStatus stop();
 
+        [[nodiscard]] fix::MarketDataSnapshotFullRefresh refresh(const OrderBook::Subscription &_sub);
+        [[nodiscard]] fix::MarketDataIncrementalRefresh update(const OrderBook::Subscription &_sub);
+        void cache_flush();
+
         bool status(float _to = 1.f);
 
         [[nodiscard]] const std::string &getName() const;
-        [[nodiscard]] MarketContainerQueue getInput();
+        [[nodiscard]] InMarket &getInput();
 
     private:
         const std::string m_name;
 
         OrderBook::EventQueue m_q_event;
         InMarket m_q_action;
-        InMarketData m_q_data;
 
         OrderBook m_ob;
 

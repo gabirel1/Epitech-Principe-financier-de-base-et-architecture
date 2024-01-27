@@ -27,21 +27,20 @@ namespace net::tcp
             ClientInfo getClientInfo(OutNetworkInput &_input, std::vector<ClientSocket> &_clients);
             ClientInfo getClientInfo(const std::string &_userId, std::vector<ClientSocket> &_clients);
             ClientInfo getClientInfo(std::shared_ptr<net::tcp::Socket> _socket, std::vector<ClientSocket> &_clients);
+
+            void LogTiming(std::vector<ClientSocket>::iterator _it);
         }
 
         class Response
         {
             public:
                 static bool run(OutNetworkInput &_input, std::vector<ClientSocket> &_clients);
-
-            private:
-                static void LogTiming(std::vector<ClientSocket>::iterator _it);
         };
 
-        class Notify
+        class SubResponse
         {
             public:
-                static bool run(NotifNetworkInput &_input, std::vector<ClientSocket> &_clients);
+                static bool run(OutNetworkInput &_input, std::vector<ClientSocket> &_clients);
         };
     }
 }

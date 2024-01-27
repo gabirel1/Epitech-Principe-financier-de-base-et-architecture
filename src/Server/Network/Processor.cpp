@@ -80,6 +80,16 @@ namespace net::tcp
                 Logger::Log("[OutNetwork] (Reply) Comming from an Action pipeline");
                 return ClientInfo(it, userId);
             }
+
+            void LogTiming(std::vector<ClientSocket>::iterator _it)
+            {
+                if (!_it->hasRequest(_it->SeqNumber - 1))
+                    return;
+                auto start = _it->getRequest(_it->SeqNumber - 1);
+                auto end = std::chrono::system_clock::now();
+                auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+                Logger::Log("[Responce] Send respond after: ", diff.count(), " ms");
+            }
         }
 
         bool Response::run(OutNetworkInput &_data, std::vector<ClientSocket> &_clients)
@@ -101,7 +111,7 @@ namespace net::tcp
                     client->Logged = _data.Client.Logged;
                     client->User = userId;
                     client->Disconnect = _data.Client.Disconnect;
-                    LogTiming(client);
+                    priv::LogTiming(client);
                     Logger::Log("[Responce] Updated client status: "); // todo log
                     if (_data.Client.Disconnect) {
                         client->getSocket()->close();
@@ -119,40 +129,22 @@ namespace net::tcp
             return false;
         }
 
-        void Response::LogTiming(std::vector<ClientSocket>::iterator _it)
+        bool SubResponse::run(OutNetworkInput &_data, std::vector<ClientSocket> &_clients)
         {
-            if (!_it->hasRequest(_it->SeqNumber - 1))
-                return;
-            auto start = _it->getRequest(_it->SeqNumber - 1);
-            auto end = std::chrono::system_clock::now();
-            auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-            Logger::Log("[Responce] Send respond after: ", diff.count(), " ms");
-        }
+            auto [client, userId] = priv::getClientInfo(_data.Client.getSocket(), _clients);
+            std::string data{};
 
-        bool Notify::run(NotifNetworkInput &_data, std::vector<ClientSocket> &_clients)
-        {
-            auto [client, userId] = priv::getClientInfo(_data.User, _clients);
-
-            if (client == _clients.end()) {
-                _data.Message.header.set34_msgSeqNum(std::to_string((client->SeqNumber)++));
-                _data.Message.header.set49_SenderCompId(PROVIDER_NAME);
-                if (client->getSocket()) {
-                    std::string data = _data.Message.to_string();
-
-                    if (client->getSocket()->send(reinterpret_cast<const uint8_t *>(data.c_str()), data.size()) == data.size())
-                        Logger::Log("[Notify] Data send successfuly: ", data);
-                    else
-                        Logger::Log("[Notify] Error occured when sending data");
-                } else {
-                    Logger::Log("[Notify] Client not connected: ", userId);
-                    _clients.erase(client);
-                    return true;
-                }
-            } else {
-                Logger::Log("[Responce] Client not found: ", userId);
-                return false;
-            }
-            return true;
+            _data.Message.header.set49_SenderCompId(PROVIDER_NAME);
+            _data.Message.header.set34_msgSeqNum(std::to_string((client->SeqNumber)++));
+            _data.Message.header.set56_TargetCompId(client->User);
+            data = _data.Message.to_string();
+            if (client->getSocket()->send(reinterpret_cast<const uint8_t *>(data.c_str()), data.size()) == data.size())
+                Logger::Log("[Responce] Data send successfuly: ", data);
+            else
+                Logger::Log("[Responce] Error occured when sending data");
+            client->refreshSubscribe(std::move(_data.Client));
+            priv::LogTiming(client);
+            return false;
         }
     }
 }

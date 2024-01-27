@@ -47,9 +47,8 @@ class OrderBook
 
         struct Subscription
         {
-            uint8_t type = 2;
             size_t depth = 0;
-            uint8_t entry = 0;
+            OrderType type;
             std::string Id = "";
         };
 
@@ -64,8 +63,8 @@ class OrderBook
 
         [[nodiscard]] bool has(OrderType _type, OrderId _orderId) const;
 
-        fix::MarketDataSnapshotFullRefresh refresh(const OrderBook::Subscription &_sub);
-        fix::MarketDataIncrementalRefresh update(const OrderBook::Subscription &_sub);
+        [[nodiscard]] fix::MarketDataSnapshotFullRefresh refresh(const OrderBook::Subscription &_sub);
+        [[nodiscard]] fix::MarketDataIncrementalRefresh update(const OrderBook::Subscription &_sub);
 
         void cache_flush();
 

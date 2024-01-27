@@ -27,6 +27,6 @@ namespace fix
 
     void HeartBeat::set112_testReqID(const std::string &_val)
     {
-        m_params.emplace({ Tag::TestReqId, _val });
+        m_params.append({ Tag::TestReqId, _val });
     }
 }

@@ -30,6 +30,7 @@ class ClientSocket
         [[nodiscard]] bool hasRequest(size_t _seqNumber) const;
         std::chrono::system_clock::time_point getRequest(size_t _seqNumber);
 
+        bool refreshSubscribe(const ClientSocket &&_client);
         [[nodiscard]] ClientSocket::Subs &subscribe(const std::string &_symbol);
         void unsubscribe(const std::string &_symbol);
 

@@ -5,7 +5,7 @@ ActionInput::ActionInput(const ActionInput &&_data) noexcept
 {
 }
 
-ActionInput::ActionInput(const ClientSocket &_client, const fix::Serializer::AnonMessage &&_msg) noexcept
+ActionInput::ActionInput(const ClientSocket &_client, const fix::Serializer::AnonMessage &&_msg)
     : Client(_client), Message(std::move(_msg))
 {
 }
@@ -72,17 +72,21 @@ OutNetworkInput &OutNetworkInput::operator=(OutNetworkInput &&_data) noexcept
     return *this;
 }
 
-MarketContainerQueue::MarketContainerQueue(InMarket &_market, InMarketData &_data)
-    : m_market(_market), m_data(_data)
+MarketDataInput::MarketDataInput(const MarketDataInput &&_data) noexcept
+    : MarketDataInputData(std::move(_data)), Client(std::move(_data.Client))
 {
 }
 
-void MarketContainerQueue::pushToProcess(const MarketInput &&_data)
+MarketDataInput::MarketDataInput(const MarketDataInputData &&_data, const ClientSocket &&_client) noexcept
+    : MarketDataInputData(std::move(_data)), Client(std::move(_client))
 {
-    m_market.push(std::move(_data));
 }
 
-void MarketContainerQueue::pushToData(const MarketDataInput &&_data)
+MarketDataInput &MarketDataInput::operator=(MarketDataInput &&_data) noexcept
 {
-    m_data.push(std::move(_data));
+    if (this != &_data) {
+        MarketDataInputData::operator=(std::move(_data));
+        Client = std::move(_data.Client);
+    }
+    return *this;
 }

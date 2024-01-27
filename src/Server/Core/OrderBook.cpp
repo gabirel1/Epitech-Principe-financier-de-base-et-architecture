@@ -52,7 +52,7 @@ bool OrderBook::has(OrderType _type, OrderId _orderId) const
 fix::MarketDataSnapshotFullRefresh OrderBook::refresh(const OrderBook::Subscription &_sub)
 {
     if (m_is_cached) {
-        if (_sub.entry == 0)
+        if (_sub.type == OrderType::Bid)
             return refresh<cache_BidBook>(m_cache_bid, _sub.depth);
         return refresh<cache_AskBook>(m_cache_ask, _sub.depth);
     }
@@ -65,7 +65,7 @@ fix::MarketDataSnapshotFullRefresh OrderBook::refresh(const OrderBook::Subscript
 fix::MarketDataIncrementalRefresh OrderBook::update(const OrderBook::Subscription &_sub)
 {
     if (m_is_cached && m_is_cached_udp) {
-        if (_sub.entry == 0)
+        if (_sub.type == OrderType::Bid)
             return update<cache_BidBook>(m_cache_bid, m_cache_bid_upd, _sub.depth);
         return update<cache_AskBook>(m_cache_ask, m_cache_ask_upd, _sub.depth);
     }

@@ -36,6 +36,7 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
             if (order.quantity == _order.quantity) {
                 Logger::Log("[OrderBook] (", m_name, ") {Add} Filled the order: ", order, ", price: ", _key);
                 Logger::Log("[OrderBook] (", m_name, ") {Add-Incoming} Filled the order: ", _order);
+                _order.quantity = 0;
                 _val.erase(_val.begin() + i);
                 m_output.append(event);
                 return false;
@@ -128,7 +129,6 @@ fix::MarketDataSnapshotFullRefresh OrderBook::refresh(T &_cache, size_t _depth)
     if (!quantity.empty())
         quantity.erase(quantity.end());
 
-    result.set55_symbol(m_name);
     result.set110_minQty(quantity);
     result.set267_noMDEntryTypes(ssize);
     result.set269_mDEntryType(types);

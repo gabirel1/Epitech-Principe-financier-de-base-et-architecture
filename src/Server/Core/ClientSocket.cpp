@@ -15,7 +15,7 @@ ClientSocket::ClientSocket(const ClientSocket &_client)
 ClientSocket::ClientSocket(const ClientSocket &&_client) noexcept
     : Logged(std::move(_client.Logged)), Disconnect(std::move(_client.Disconnect)),
         User(std::move(_client.User)), SeqNumber(std::move(_client.SeqNumber)),
-        m_socket(std::move(_client.m_socket))
+        m_socket(std::move(_client.m_socket)), m_subscribe(std::move(_client.m_subscribe))
 {
 }
 
@@ -43,6 +43,15 @@ std::chrono::system_clock::time_point ClientSocket::getRequest(size_t _seqNumber
     auto ret = it->second;
     m_request.erase(it);
     return ret;
+}
+
+bool ClientSocket::refreshSubscribe(const ClientSocket &&_client)
+{
+    if (this != &_client) {
+        m_subscribe = std::move(_client.m_subscribe);
+        return true;
+    }
+    return false;
 }
 
 ClientSocket::Subs &ClientSocket::subscribe(const std::string &_symbol)

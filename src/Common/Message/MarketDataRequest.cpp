@@ -28,36 +28,36 @@ namespace fix
 
     void MarketDataRequest::set55_symbol(const std::string &_val)
     {
-        m_params.emplace({ Tag::Symbol, _val });
+        m_params.append({ Tag::Symbol, _val });
     }
 
     void MarketDataRequest::set146_noRelatedSym(const std::string &_val)
     {
-        m_params.emplace({ Tag::NoRelatedSym, _val });
+        m_params.append({ Tag::NoRelatedSym, _val });
     }
 
     void MarketDataRequest::set262_mDReqID(const std::string &_val)
     {
-        m_params.emplace({ Tag::MDReqID, _val });
+        m_params.append({ Tag::MDReqID, _val });
     }
 
     void MarketDataRequest::set263_subscriptionRequestType(const std::string &_val)
     {
-        m_params.emplace({ Tag::SubscriptionRequestType, _val });
+        m_params.append({ Tag::SubscriptionRequestType, _val });
     }
 
     void MarketDataRequest::set264_marketDepth(const std::string &_val)
     {
-        m_params.emplace({ Tag::MarketDepth, _val });
+        m_params.append({ Tag::MarketDepth, _val });
     }
 
     void MarketDataRequest::set267_noMDEntryTypes(const std::string &_val)
     {
-        m_params.emplace({ Tag::NoMDEntryTypes, _val });
+        m_params.append({ Tag::NoMDEntryTypes, _val });
     }
 
     void MarketDataRequest::set269_mDEntryType(const std::string &_val)
     {
-        m_params.emplace({ Tag::MDEntryType, _val });
+        m_params.append({ Tag::MDEntryType, _val });
     }
 }

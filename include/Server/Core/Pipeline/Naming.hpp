@@ -12,7 +12,7 @@ struct ActionInput
 {
     ActionInput() = default;
     ActionInput(const ActionInput &&_data) noexcept;
-    ActionInput(const ClientSocket &_client, const fix::Serializer::AnonMessage &&_message) noexcept;
+    ActionInput(const ClientSocket &_client, const fix::Serializer::AnonMessage &&_message);
 
     ActionInput &operator=(ActionInput &&_data) noexcept;
 
@@ -45,21 +45,29 @@ struct OutNetworkInput
 
     OutNetworkInput &operator=(OutNetworkInput &&_data) noexcept;
 
-    ClientSocket Client{};                      ///< Sender client information.
+    ClientSocket Client{};                              ///< Sender client information.
     fix::Message Message{};                     ///< Final message send to the client.
 };
 
-struct NotifNetworkInput
+struct MarketDataInputData
 {
-    fix::Message Message;
-    std::shared_ptr<net::tcp::Socket> Socket;
-    UserId User;
+    std::string Id;
+    uint8_t SubType;
+    uint8_t Depth;
+    uint8_t UpdateType;
+    std::vector<OrderType> Types;
+    std::vector<std::string> Symbols;
 };
 
-struct MarketDataInput
+struct MarketDataInput : public MarketDataInputData
 {
-    std::string Symbol;
-    uint8_t SubType;
+    MarketDataInput() = default;
+    MarketDataInput(const MarketDataInput &&_data) noexcept;
+    MarketDataInput(const MarketDataInputData &&_data, const ClientSocket &&_client) noexcept;
+
+    MarketDataInput &operator=(MarketDataInput &&_data) noexcept;
+
+    ClientSocket Client{};
 };
 
 /// @brief Queue type use to transfer data from pip::InNetwork to pip::Action pipeline.
@@ -69,25 +77,9 @@ using InMarket = ts::Queue<MarketInput>;
 /// @brief Queue type use to transfer data from pip::Market to pip::OutNetwork pipeline.
 using InOutNetwork = ts::Queue<OutNetworkInput>;
 /// @brief Queue type use to transfer direct message from any pipeline to the pip::OutNetwork pipeline.
-using InNotifNetwork = ts::Queue<NotifNetworkInput>;
-/// @brief Queue type use to transfer direct message from any pipeline to the pip::OutNetwork pipeline.
 using InMarketData = ts::Queue<MarketDataInput>;
 /// @brief Queue type use to transfer data to be formated and send by the pip::UDPOutNetwork pipeline.
 using InUDP = ts::Queue<data::UDPPackage>;
 
-class MarketContainerQueue
-{
-    public:
-        MarketContainerQueue(InMarket &_market, InMarketData &_data);
-        ~MarketContainerQueue() = default;
-
-        void pushToProcess(const MarketInput &&_data);
-        void pushToData(const MarketDataInput &&_data);
-
-    private:
-        InMarket &m_market;
-        InMarketData &m_data;
-};
-
 /// @brief Map of market input MarketInput with as key the symbol of the market.
-using MarketEntry = std::unordered_map<std::string, MarketContainerQueue>;
+using MarketEntry = std::unordered_map<std::string, InMarket &>;
