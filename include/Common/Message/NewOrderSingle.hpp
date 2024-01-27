@@ -37,7 +37,7 @@ namespace fix
             void set44_price(const std::string &_val);
 
             /// @brief Set the strategy of buying/selling [54](https://www.onixs.biz/fix-dictionary/4.2/tagNum_54.html).
-            /// @param _val Value assigned ot it: (3 or 4).
+            /// @param _val Value assigned ot it: (3 or 4). (3 = Buy, 4 = Sell)
             void set54_side(const std::string &_val);
 
             /// @brief Set the symbol of the target market to trad on [55](https://www.onixs.biz/fix-dictionary/4.2/tagNum_21.html).
