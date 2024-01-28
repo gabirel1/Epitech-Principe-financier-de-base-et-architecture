@@ -101,6 +101,7 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
 {
     Event event;
 
+    event.quantity = 0;
     event.orderId = _order.orderId;
     event.orgQty = _order.quantity;
     event.userId = _order.userId;

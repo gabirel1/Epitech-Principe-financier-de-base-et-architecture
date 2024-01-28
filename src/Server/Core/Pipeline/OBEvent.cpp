@@ -71,9 +71,13 @@ namespace pip
 
         if (_input.status == OrderStatus::Pending || _input.quantity == 0)
             return false;
+
         package.time = 0;   // todo
-        package.id = m_id++;
+        package.id = 0;
         package.flag = 0;
+        package.quantity = 0;
+        package.price = 0;
+        package.id = m_id++;
         UDP_FLAG_SET_SOLD(package.flag, _input.sold);
         UDP_FLAG_SET_STATUS(package.flag, _input.status);
         (_input.side == OrderType::Ask) ? UDP_FLAG_SET_ASK(package.flag) : UDP_FLAG_SET_BID(package.flag);

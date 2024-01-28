@@ -77,6 +77,7 @@ bool OrderBook::cancel(OrderIdMap<T> &_mapId, OrderId _orderId, bool _event)
                 event.side = OrderType::Bid;
             else
                 event.side = OrderType::Ask;
+            event.price = 0;
             event.orderId = _orderId;
             event.status = OrderStatus::Canceld;
             event.userId = it->second.second->userId;

@@ -1,17 +1,17 @@
 #include "Client/Data/UDPHandler.hpp"
 
-UDPHandler::UDPHandler(uint32_t _port, const Ip &_ip, UDPInput &_input, UDPOutput &_output)
+UDPHandler::UDPHandler(uint32_t _port, const net::Ip &_ip, UDPInput &_input, UDPOutput &_output)
     : m_ip(_ip), m_input(_input), m_output(_output)
 {
     m_socket = std::make_shared<net::udp::Socket>();
     m_socket->connect(_ip, _port);
     m_socket->blocking(false);
-    m_selector->blockgin(false);
+    m_selector.timeout(100);
 }
 
 UDPHandler::~UDPHandler()
 {
-    stop();
+    (void)stop();
 }
 
 bool UDPHandler::start()
@@ -35,6 +35,16 @@ bool UDPHandler::stop()
     return false;
 }
 
+uint32_t UDPHandler::port() const
+{
+    return m_socket->getPort();
+}
+
+net::Ip UDPHandler::ip() const
+{
+    return m_ip;
+}
+
 void UDPHandler::loop()
 {
     m_selector.client(m_socket);
@@ -44,13 +54,13 @@ void UDPHandler::loop()
     while (m_running) {
         clients = m_selector.pull();
         if (!clients.empty()) {
-            const data::UDPPackage *package = reinterpret_cast<const data::UDPPackage *>(m_socket->receiveUDP(sizeof(data::UDPPackage), error));
+            const data::UDPPackage *package = reinterpret_cast<const data::UDPPackage *>(m_socket->receiveUDP(sizeof(data::UDPPackage), error).c_str());
 
             m_output.push(std::move(*package));
         }
         if (!m_input.empty()) {
-            data::UDPPackage package = m_input.front();
-            m_socket->send(reinterpret_cast<const uint8_t *>(&pacakge), sizeof(data::UDPPackage));
+            data::UDPPackage package = m_input.pop_front();
+            m_socket->send(reinterpret_cast<const uint8_t *>(&package), sizeof(data::UDPPackage));
         }
     }
 }
