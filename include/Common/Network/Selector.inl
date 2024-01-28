@@ -29,10 +29,9 @@ namespace net
     template<IsSocket T>
     void Selector<T>::erase(Client _client)
     {
-        size_t res = std::erase_if(m_clients, [_client] (const std::pair<int, Client> &_lclient) {
-            return (*_client) == (*(_lclient.second));
+        std::erase_if(m_clients, [_client] (const std::pair<int, Client> &_lclient) {
+            return _client->raw() == _lclient.second->raw();
         });
-        std::cout << "ERASE_IF SIZE_T RES: " << res << std::endl;
     }
 
     template<IsSocket T>
@@ -51,21 +50,17 @@ namespace net
     std::vector<typename Selector<T>::Client> Selector<T>::pull()
     {
         Event events[MAX_EVENT_EPOLL];
-        // std::cout << "[ZEBI]: before wait" << std::endl;
         int set = wait(events, m_to);
-        // std::cout << "[ZEBI]: after wait, set = " << set << std::endl;
         std::vector<Client> clients;
 
         if (set == -1) {
             Logger::Log("[Selector] Error when waiting event from epoll: ", strerror(errno));
             return clients;
         }
-        // std::cout << "[ZEBI]: for loop: set = " << std::to_string(set) << ", MAX_SOCKET = " << MAX_SOCKET << ", std::min(set, MAX_SOCKET) = " << std::min(set, MAX_SOCKET) << ", m_clients.size(): " << m_clients.size() << std::endl;
         for (int it = 0; it < std::min(set, MAX_SOCKET); it++) {
             clients.emplace_back(m_clients.at(events[it].data.fd));
             std::cout << "add" << std::endl;
         }
-        // std::cout << "[ZEBI]: End of function, returning clients" << std::endl;
         return clients;
     }
 

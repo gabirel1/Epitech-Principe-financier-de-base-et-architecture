@@ -16,7 +16,8 @@ ClientSocket::ClientSocket(const ClientSocket &_client)
 ClientSocket::ClientSocket(const ClientSocket &&_client) noexcept
     : Logged(std::move(_client.Logged)), Disconnect(std::move(_client.Disconnect)),
         User(std::move(_client.User)), SeqNumber(std::move(_client.SeqNumber)),
-        ClientSeqNumber(std::move(_client.ClientSeqNumber)), m_socket(std::move(_client.m_socket))
+        ClientSeqNumber(std::move(_client.ClientSeqNumber)),
+        m_socket(std::move(_client.m_socket)), m_subscribe(std::move(_client.m_subscribe))
 {
 }
 
@@ -28,6 +29,7 @@ std::shared_ptr<net::tcp::Socket> ClientSocket::getSocket() const
 void ClientSocket::newRequest()
 {
     m_request.emplace(SeqNumber, std::chrono::system_clock::now());
+    ClientSeqNumber++;
 }
 
 bool ClientSocket::hasRequest(size_t _seqNumber) const
@@ -44,6 +46,25 @@ std::chrono::system_clock::time_point ClientSocket::getRequest(size_t _seqNumber
     auto ret = it->second;
     m_request.erase(it);
     return ret;
+}
+
+bool ClientSocket::refreshSubscribe(const ClientSocket &&_client)
+{
+    if (this != &_client) {
+        m_subscribe = std::move(_client.m_subscribe);
+        return true;
+    }
+    return false;
+}
+
+ClientSocket::Subs &ClientSocket::subscribe(const std::string &_symbol)
+{
+    return m_subscribe[_symbol];
+}
+
+void ClientSocket::unsubscribe(const std::string &_symbol)
+{
+    m_subscribe.erase(_symbol);
 }
 
 ClientSocket &ClientSocket::operator=(ClientSocket &&_client) noexcept
@@ -69,14 +90,9 @@ ClientSocket::operator bool() const
     return m_socket->is_open();
 }
 
-// std::ostream &ClientSocket::operator<<(std::ostream &_os) const
-// {
-//     _os << "ClientSocket: [User: " << User << "], [Logged: " << (Logged ? "true" : "false") << "], [Disconnect: " << (Disconnect ? "true" : "false") << "], [SeqNumber: " << SeqNumber << "], [ClientSeqNumber: " << ClientSeqNumber << "]";
-//     return _os;
-// }
-
 std::ostream &operator<<(std::ostream &_os, const ClientSocket &_client)
 {
-    _os << "ClientSocket: [User: " << _client.User << "], [Logged: " << (_client.Logged ? "true" : "false") << "], [Disconnect: " << (_client.Disconnect ? "true" : "false") << "], [SeqNumber: " << _client.SeqNumber << "], [ClientSeqNumber: " << _client.ClientSeqNumber << "]";
+    _os << "ClientSocket: { User: " << _client.User << ", Logged: " << _client.Logged << ", Disconnect: " << _client.Disconnect;
+    _os << ", SeqNumber: " << _client.SeqNumber << ", ClientSeqNumber: " << _client.ClientSeqNumber << " }";
     return _os;
 }

@@ -5,7 +5,7 @@
 
 namespace pip
 {
-    UDPOutNetwork::UDPOutNetwork(UdpInput &_input, uint32_t _port)
+    UDPOutNetwork::UDPOutNetwork(InUDP &_input, uint32_t _port)
         : m_input(_input)
     {
         std::cout << "[UDPOutNetwork] Port => " << _port << std::endl;

@@ -27,7 +27,7 @@ namespace pip
 
             /// @brief Construct the pipeline.
             /// @param _input Input data queue.
-            UDPOutNetwork(UdpInput &_input, uint32_t _port);
+            UDPOutNetwork(InUDP &_input, uint32_t _port);
             ~UDPOutNetwork();
 
             /// @brief Run the pipeline
@@ -46,6 +46,6 @@ namespace pip
 
             net::udp::Socket m_socket;
 
-            UdpInput &m_input;
+            InUDP &m_input;
     };
 }

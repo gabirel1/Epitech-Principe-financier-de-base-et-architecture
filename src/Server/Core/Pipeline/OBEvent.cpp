@@ -4,7 +4,7 @@
 
 namespace pip
 {
-    OBEvent::OBEvent(const std::string &_name, OrderBook::EventQueue &_input, UdpInput &_udp, RawOutput &_tcp)
+    OBEvent::OBEvent(const std::string &_name, OrderBook::EventQueue &_input, InUDP &_udp, InOutNetwork &_tcp)
         : m_name(_name), m_input(_input), m_udp(_udp), m_tcp(_tcp)
     {
     }
@@ -48,7 +48,6 @@ namespace pip
         client.User = _input.userId;
         client.Logged = true;
         client.Disconnect = false;
-        // report.set14_cumQty(std::to_string(_input.quantity));
         report.set14_cumQty(std::to_string(_input.orgQty - _input.quantity));
         report.set17_execID();
         report.set20_execTransType("0");
@@ -56,13 +55,9 @@ namespace pip
         report.set37_orderID(_input.orderId);
         report.set39_ordStatus(std::to_string(static_cast<uint8_t>(_input.status)));
         report.set40_ordType("2");
-        // if (_input.status == OrderStatus::Replaced
-        //     || _input.status == OrderStatus::Canceld)
-        //     report.set41_origClOrdID(_input.orderId);
         report.set44_price(std::to_string(_input.price));
         report.set54_side((_input.side == OrderType::Ask) ? "4" : "3");
         report.set55_symbol(m_name);
-        // report.set151_leavesQty(std::to_string(_input.orgQty - _input.quantity));
         report.set151_leavesQty(std::to_string(_input.quantity));
         report.set150_execType(std::to_string(static_cast<uint8_t>(_input.status)));
         m_tcp.append(std::move(client), std::move(report));

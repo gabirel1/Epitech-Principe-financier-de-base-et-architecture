@@ -7,6 +7,16 @@
 OrderBook::OrderBook(const std::string &_name, EventQueue &_output)
     : m_name(_name), m_output(_output)
 {
+    cache_on<AskBook, cache_AskBook>(m_ask, m_cache_ask, true);
+    cache_on<BidBook, cache_BidBook>(m_bid, m_cache_bid, true);
+    m_is_cached = true;
+    cache_on<AskBook, cache_AskBook>(m_ask, m_cache_ask_upd, false);
+    cache_on<BidBook, cache_BidBook>(m_bid, m_cache_bid_upd, false);
+    for (const auto &[_price, _qty] : m_cache_ask_upd)
+        m_cache_ask_upd.at(_price) = _qty - m_cache_ask[_price];
+    for (const auto &[_price, _qty] : m_cache_bid_upd)
+        m_cache_bid_upd.at(_price) = _qty - m_cache_bid[_price];
+    m_is_cached_udp = true;
 }
 
 bool OrderBook::add(OrderType _type, Price _price, Order& _order)
@@ -39,11 +49,43 @@ bool OrderBook::has(OrderType _type, OrderId _orderId) const
     return m_bid_id.contains(_orderId);
 }
 
-std::vector<Price> OrderBook::getPrice(OrderType _type)
+fix::MarketDataSnapshotFullRefresh OrderBook::refresh(const OrderBook::Subscription &_sub)
 {
-    if (_type == OrderType::Ask)
-        return inter_getPrice<AskBook>(m_ask);
-    return inter_getPrice<BidBook>(m_bid);
+    if (m_is_cached) {
+        if (_sub.type == OrderType::Bid)
+            return refresh<cache_BidBook>(m_cache_bid, _sub.depth);
+        return refresh<cache_AskBook>(m_cache_ask, _sub.depth);
+    }
+    cache_on<AskBook, cache_AskBook>(m_ask, m_cache_ask, true);
+    cache_on<BidBook, cache_BidBook>(m_bid, m_cache_bid, true);
+    m_is_cached = true;
+    return refresh(_sub);
+}
+
+fix::MarketDataIncrementalRefresh OrderBook::update(const OrderBook::Subscription &_sub)
+{
+    if (m_is_cached && m_is_cached_udp) {
+        if (_sub.type == OrderType::Bid)
+            return update<cache_BidBook>(m_cache_bid, m_cache_bid_upd, _sub.depth);
+        return update<cache_AskBook>(m_cache_ask, m_cache_ask_upd, _sub.depth);
+    }
+    cache_on<AskBook, cache_AskBook>(m_ask, m_cache_ask, true);
+    cache_on<BidBook, cache_BidBook>(m_bid, m_cache_bid, true);
+    m_is_cached = true;
+    cache_on<AskBook, cache_AskBook>(m_ask, m_cache_ask_upd, false);
+    cache_on<BidBook, cache_BidBook>(m_bid, m_cache_bid_upd, false);
+    for (const auto &[_price, _qty] : m_cache_ask_upd)
+        m_cache_ask_upd.at(_price) = _qty - m_cache_ask[_price];
+    for (const auto &[_price, _qty] : m_cache_bid_upd)
+        m_cache_bid_upd.at(_price) = _qty - m_cache_bid[_price];
+    m_is_cached_udp = true;
+    return update(_sub);
+}
+
+void OrderBook::cache_flush()
+{
+    m_is_cached = false;
+    m_is_cached_udp = false;
 }
 
 bool OrderBook::contain(OrderType _type, Price _price)
@@ -55,26 +97,6 @@ bool OrderBook::contain(OrderType _type, Price _price)
     return m_bid.contains(_price);
 }
 
-const OrderList& OrderBook::getOrders(OrderType _type, Price _price)
-{
-    std::lock_guard<std::mutex> guard(m_mutex);
-
-    if (_type == OrderType::Ask)
-        return m_ask.at(_price);
-    return m_bid.at(_price);
-}
-
-
-Quantity OrderBook::sumQuantity(OrderType _type, Price _price)
-{
-    const OrderList &ref = getOrders(_type, _price);
-    std::lock_guard<std::mutex> guard(m_mutex);
-
-    return std::accumulate(ref.begin(), ref.end(), 0ull, [] (Quantity _total, const Order& _order) {
-        return std::move(_total) + _order.quantity;
-    });
-}
-
 void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _status)
 {
     Event event;
@@ -84,9 +106,6 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
     event.userId = _order.userId;
     event.price = _price;
     event.side = _type;
-    std::cout << "\n\n\n\n\nEVENT.SIDE == " << ((event.side == OrderType::Ask) ? "ASK (4)" : "BID (3)") << "\n"; 
-    std::cout << "_TYPE == " << ((_type == OrderType::Ask) ? "ASK (4)" : "BID (3)") << "\n";
-    std::cout << "_price == " << _price << "\n\n\n\n\n";
     event.sold = false;
     if (_type == OrderType::Bid) {
         if (add<AskBook, std::greater_equal<Price>>(m_ask, _price, _order)) {
@@ -99,7 +118,6 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
         }
     }
     else {
-        std::cout << "ADD ASK: Price = " << _price << ", quantity = " << _order.quantity << std::endl;
         if (add<BidBook, std::less_equal<Price>>(m_bid, _price, _order)) {
             std::lock_guard<std::mutex> guard(m_mutex);
 
@@ -108,7 +126,6 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
             m_ask_id.emplace(_order.orderId, std::make_pair(m_ask.find(_price), m_ask.at(_price).end() - 1));
         }
     }
-    std::cout << "[ORDERBOOK::ADD] event.quantity = " << event.quantity << ", _order.quantity = " << _order.quantity << std::endl;
     event.quantity = _order.quantity;
     if (event.quantity == event.orgQty)
         event.status = _status;
