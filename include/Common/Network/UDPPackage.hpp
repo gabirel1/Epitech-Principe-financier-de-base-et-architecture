@@ -26,6 +26,7 @@ namespace data
         uint8_t flag;
         Quantity quantity;
         Price price;
+        char symbol[5];
     };
     #pragma pack (pop)
 

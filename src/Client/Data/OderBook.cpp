@@ -56,8 +56,12 @@ void OrderBook::loop()
     while (m_running) {
         if (!m_udp.empty()) {
             const data::UDPPackage package = m_udp.front();
-            // calculate udp application on m_bid/m_ask
-            // need symbol
+
+            if (UDP_FLAG_GET_BOOK(package.flag) == OrderType::Bid)
+                functional_sync(m_bid, package.symbol, package.price, package.quantity, OrderBook::QtySync);
+            else
+                functional_sync(m_ask, package.symbol, package.price, package.quantity, OrderBook::QtySync);
+            m_tcp.pop();
         }
         if (!m_tcp.empty()) {
             fix::Serializer::AnonMessage &msg = m_tcp.front();
@@ -81,9 +85,9 @@ void OrderBook::treatFullRefresh(fix::Serializer::AnonMessage &_msg)
 
     for (size_t it = 0; it < refresh.size; it++) {
         if (refresh.types[it] == OrderType::Bid)
-            copy_quantity(bid, refresh.symbol, refresh.prices[it], refresh.quantitys[it]);
+            functional_sync(bid, refresh.symbol, refresh.prices[it], refresh.quantitys[it], OrderBook::CopySync);
         else
-            copy_quantity(ask, refresh.symbol, refresh.prices[it], refresh.quantitys[it]);
+            functional_sync(ask, refresh.symbol, refresh.prices[it], refresh.quantitys[it], OrderBook::CopySync);
     }
 
     sync_book(bid, m_bid_last, OrderBook::CopySync);
@@ -101,9 +105,9 @@ void OrderBook::treatIncrRefresh(fix::Serializer::AnonMessage &_msg)
 
         for (size_t it = 0; it < refresh.size; it++) {
             if (refresh.types[it] == OrderType::Bid)
-                copy_quantity(bid, refresh.symbols[it], refresh.prices[it], refresh.quantitys[it]);
+                functional_sync(bid, refresh.symbols[it], refresh.prices[it], refresh.quantitys[it], OrderBook::QtySync);
             else
-                copy_quantity(ask, refresh.symbols[it], refresh.prices[it], refresh.quantitys[it]);
+                functional_sync(ask, refresh.symbols[it], refresh.prices[it], refresh.quantitys[it], OrderBook::QtySync);
         }
 
         sync_book(bid, m_bid_last, OrderBook::QtySync);

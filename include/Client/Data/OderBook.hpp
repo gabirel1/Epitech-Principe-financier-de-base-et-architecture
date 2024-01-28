@@ -92,12 +92,6 @@ class OrderBook
                     functional_sync<T>(_target, _sym, _price, _qty, _sync);
         }
 
-        template<class T>
-        static bool copy_quantity(T &_map, const std::string &_sym, Price _price, Quantity _qty)
-        {
-            return functional_sync<T>(_map, _sym, _price, _qty, OrderBook::CopySync);
-        }
-
         // turn this function into class later
         template<class T>
         static bool functional_sync(T &_map, const std::string &_sym, Price _price, Quantity _qty, SyncFn _sync)
