@@ -36,3 +36,5 @@ enum class OrderType
     Ask,
     Bid
 };
+
+std::istream &operator>>(std::istream &_is, OrderType &_type);

@@ -7,12 +7,12 @@
 namespace data
 {
     IncrRefresh::IncrRefresh(size_t _size)
-        : m_size(_size), prices(m_size), types(m_size), quantitys(m_size), symbols(m_size)
+        : size(_size), prices(size), types(size), quantitys(size), symbols(size)
     {
     }
 }
 
-OrderBook::OrderBook(const std::string &_name, UDPInput &_udp, TCPInput &_tcp, TCPInput &_output)
+OrderBook::OrderBook(const std::string &_name, UDPOutput &_udp, TCPOutput &_tcp, TCPInput &_output)
     : m_name(_name), m_udp(_udp), m_tcp(_tcp), m_output(_output)
 {
 }
@@ -20,7 +20,9 @@ OrderBook::OrderBook(const std::string &_name, UDPInput &_udp, TCPInput &_tcp, T
 bool OrderBook::start()
 {
     if (!m_running) {
-        m_thread = std::thread(&loop, this);
+        m_thread = std::thread([this] () {
+            loop();
+        });
         m_running = true;
     }
     return m_running;
@@ -29,17 +31,19 @@ bool OrderBook::start()
 bool OrderBook::stop()
 {
     m_running = false;
-    if (m_thread.is_joinable())
-        return m_thread.join();
+    if (m_thread.joinable()) {
+        m_thread.join();
+        return true;
+    }
     return false;
 }
 
-std::shared_ptr<BidBook> &OrderBook::getBid(const std::string &_sym)
+std::shared_ptr<OrderBook::BidBook> OrderBook::getBid(const std::string &_sym)
 {
     return m_bid[_sym];
 }
 
-std::shared_ptr<AskBook> &OrderBook::getAsk(const std::string &_sym)
+std::shared_ptr<OrderBook::AskBook> OrderBook::getAsk(const std::string &_sym)
 {
     return m_ask[_sym];
 }
@@ -61,11 +65,10 @@ void OrderBook::loop()
             if (msg.at(fix::Tag::MsgType) != "" && msg.at(fix::Tag::MsgType) != "")
                 continue;
             if (msg.at(fix::Tag::MsgType) == "")
-                treatFullRefresh(msg)
+                treatFullRefresh(msg);
             else if (msg.at(fix::Tag::MsgType) == "")
-                treatIncrRefresh(msg)
-            if (m_tcp.front() == msg)
-                m_tcp.pop();
+                treatIncrRefresh(msg);
+            m_tcp.pop();
         }
     }
 }
@@ -77,16 +80,16 @@ void OrderBook::treatFullRefresh(fix::Serializer::AnonMessage &_msg)
     AskMap ask;
 
     for (size_t it = 0; it < refresh.size; it++) {
-        if (refresh.types.at(it) == OrderType::Bid)
-            bid[refresh.symbol][refresg.prices] = refresh.quantitys[it];
-        if (refresh.types.at(it) == OrderType::Bid)
-            ask[refresh.symbol][refresg.prices] = refresh.quantitys[it];
+        if (refresh.types[it] == OrderType::Bid)
+            copy_quantity(bid, refresh.symbol, refresh.prices[it], refresh.quantitys[it]);
+        else
+            copy_quantity(ask, refresh.symbol, refresh.prices[it], refresh.quantitys[it]);
     }
 
-    sync_book(bid, m_bid_last, OrderBook::QtyOverwrite);
-    sync_book(ask, m_ask_last, OrderBook::QtyOverwrite);
-    sync_book(bid, m_bid, OrderBook::QtyOverwrite);
-    sync_book(ask, m_ask, OrderBook::QtyOverwrite);
+    sync_book(bid, m_bid_last, OrderBook::CopySync);
+    sync_book(ask, m_ask_last, OrderBook::CopySync);
+    sync_book(bid, m_bid, OrderBook::CopySync);
+    sync_book(ask, m_ask, OrderBook::CopySync);
 }
 
 void OrderBook::treatIncrRefresh(fix::Serializer::AnonMessage &_msg)
@@ -97,10 +100,10 @@ void OrderBook::treatIncrRefresh(fix::Serializer::AnonMessage &_msg)
         AskMap ask;
 
         for (size_t it = 0; it < refresh.size; it++) {
-            if (refresh.types.at(it) == OrderType::Bid)
-                bid[refresh.symbols[it]][refresh.prices[it]] = refresh.quantitys[it];
+            if (refresh.types[it] == OrderType::Bid)
+                copy_quantity(bid, refresh.symbols[it], refresh.prices[it], refresh.quantitys[it]);
             else
-                ask[refresh.symbols[it]][refresh.prices[it]] = refresh.quantitys[it];
+                copy_quantity(ask, refresh.symbols[it], refresh.prices[it], refresh.quantitys[it]);
         }
 
         sync_book(bid, m_bid_last, OrderBook::QtySync);
@@ -118,15 +121,15 @@ data::IncrRefresh OrderBook::loadIncrRefresh(fix::Serializer::AnonMessage &_msg)
     size_t size = utils::to<size_t>(_msg.at(fix::Tag::NoMDEntries));
     data::IncrRefresh refresh{size};
 
-    std::vector<Quantity> quantitys = extract<Quantity>(_msg, fix::Tag::MinQty);
-    std::vector<Price> prices = extract<Price>(_msg, fix::Tag::MDEntryPx);
-    std::vector<Price> types = extract<Price>(_msg, fix::Tag::MDEntryType);
-    std::vector<Price> symbols = extract<Price>(_msg, fix::Tag::Symbol);
+    std::vector<Quantity> quantitys = data::extract<Quantity>(_msg, fix::Tag::MinQty);
+    std::vector<Price> prices = data::extract<Price>(_msg, fix::Tag::MDEntryPx);
+    std::vector<OrderType> types = data::extract<OrderType>(_msg, fix::Tag::MDEntryType);
+    std::vector<std::string> symbols = data::extract<std::string>(_msg, fix::Tag::Symbol);
     for (size_t it = 0; it < size; it++) {
         refresh.quantitys.push_back(quantitys[it]);
         refresh.prices.push_back(prices[it]);
         refresh.types.push_back(types[it]);
-        refresh.symbols.push_back(symbol[it]);
+        refresh.symbols.push_back(symbols[it]);
     }
     return refresh;
 }
@@ -136,9 +139,9 @@ data::FullRefresh OrderBook::loadFullRefresh(fix::Serializer::AnonMessage &_msg)
     size_t size = utils::to<size_t>(_msg.at(fix::Tag::NoMDEntries));
     data::FullRefresh refresh{size};
 
-    std::vector<Quantity> quantitys = extract<Quantity>(_msg, fix::Tag::MinQty);
-    std::vector<Price> prices = extract<Price>(_msg, fix::Tag::MDEntryPx);
-    std::vector<Price> types = extract<Price>(_msg, fix::Tag::MDEntryType);
+    std::vector<Quantity> quantitys = data::extract<Quantity>(_msg, fix::Tag::MinQty);
+    std::vector<Price> prices = data::extract<Price>(_msg, fix::Tag::MDEntryPx);
+    std::vector<OrderType> types = data::extract<OrderType>(_msg, fix::Tag::MDEntryType);
     for (size_t it = 0; it < size; it++) {
         refresh.quantitys.push_back(quantitys[it]);
         refresh.prices.push_back(prices[it]);
@@ -150,41 +153,41 @@ data::FullRefresh OrderBook::loadFullRefresh(fix::Serializer::AnonMessage &_msg)
 void OrderBook::sendFullRefresh()
 {
     fix::MarketDataRequest request;
-    const std::vector<std::string> symbols = { MARKET_DATA_SYM }
+    const std::vector<std::string> symbols{ MARKET_NAME };
     std::string lsymbols;
 
     request.set146_noRelatedSym(std::to_string(symbols.size()));
     for (const auto &_sym : symbols)
-        lsymbols += _sym ",";
+        lsymbols += _sym + ",";
     if (!symbols.empty())
         lsymbols.erase(lsymbols.end());
-    request.set55_symbol(lsymbol);
-    request.set262_mDReqID(); // generate randome id
+    request.set55_symbol(lsymbols);
+    request.set262_mDReqID(utils::id());
     request.set263_subscriptionRequestType("0");
     request.set264_marketDepth("0");
     request.set267_noMDEntryTypes("2");
     request.set269_mDEntryType("0,1");
-    // send over TCP
+    m_output.push(std::move(request));
 }
 
-void OderBook::sendSubscribe()
+void OrderBook::sendSubscribe()
 {
     fix::MarketDataRequest request;
-    const std::vector<std::string> symbols = { MARKET_DATA_SYM }
+    const std::vector<std::string> symbols{ MARKET_NAME };
     std::string lsymbols;
 
     request.set146_noRelatedSym(std::to_string(symbols.size()));
     for (const auto &_sym : symbols)
-        lsymbols += _sym ",";
+        lsymbols += _sym + ",";
     if (!symbols.empty())
         lsymbols.erase(lsymbols.end());
-    request.set55_symbol(lsymbol);
-    request.set262_mDReqID(); // generate randome id
-    request.set263_subscriptionRequestType("2");
+    request.set55_symbol(lsymbols);
+    request.set262_mDReqID(utils::id());
+    request.set263_subscriptionRequestType("1");
     request.set264_marketDepth("0");
     request.set267_noMDEntryTypes("2");
     request.set269_mDEntryType("0,1");
-    // send over TCP
+    m_output.push(std::move(request));
 }
 
 Quantity OrderBook::QtySync(Quantity _left, Quantity _right)
@@ -194,17 +197,7 @@ Quantity OrderBook::QtySync(Quantity _left, Quantity _right)
 
 Quantity OrderBook::CopySync(Quantity _left, Quantity _right)
 {
-    return _left;
-}
+    std::ignore = _right;
 
-template<class T, class T>
-void OrderBook::sync_book(T &_origine, _T &_target, SyncFn _sync)
-{
-    for (auto [_sym, _book] : _origine) {
-        for (auto [_price, _qty] : _book) {
-            _target[_symbol][_price] = _sync(_target[_symbol][_price], _qty);
-            if (_target[_symbol][_price] <= 0)
-                _target[_symbol].erase(_price);
-        }
-    }
+    return _left;
 }

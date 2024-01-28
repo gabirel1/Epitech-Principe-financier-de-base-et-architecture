@@ -49,6 +49,7 @@ namespace fix
         constexpr const char MarketDepth[] = "264";             ///< Tag [264](https://www.onixs.biz/fix-dictionary/4.2/tagNum_264.html).
         constexpr const char MDUpdateType[] = "265";            ///< Tag [265](https://www.onixs.biz/fix-dictionary/4.2/tagNum_265.html).
         constexpr const char NoMDEntryTypes[] = "267";          ///< Tag [267](https://www.onixs.biz/fix-dictionary/4.2/tagNum_267.html).
+        constexpr const char NoMDEntries[] = "268";             ///< Tag [268](https://www.onixs.biz/fix-dictionary/4.2/tagNum_268.html).
         constexpr const char MDEntryType[] = "269";             ///< Tag [269](https://www.onixs.biz/fix-dictionary/4.2/tagNum_269.html).
         constexpr const char MDEntryPx[] = "270";               ///< Tag [270](https://www.onixs.biz/fix-dictionary/4.2/tagNum_270.html).
         constexpr const char MDUpdateAction[] = "279";          ///< Tag [279](https://www.onixs.biz/fix-dictionary/4.2/tagNum_279.html).

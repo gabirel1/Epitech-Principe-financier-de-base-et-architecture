@@ -16,6 +16,9 @@ namespace utils
     std::pair<bool, fix::Reject> Has(fix::Serializer::AnonMessage &_msg);
     template<char C>
     std::vector<std::string> split(const std::string &_str);
+
+    std::string id();
+
 }
 
 #include "Common/Core/Utils.inl"
