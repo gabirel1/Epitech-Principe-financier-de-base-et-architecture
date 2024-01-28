@@ -9,7 +9,7 @@ std::ostream &operator<<(std::ostream &_os, const Order &_order)
 std::istream &operator>>(std::istream &_is, OrderType &_type)
 {
     // warning maybe uint8_t is wrong type
-    uint8_t type;
+    uint8_t type = 0;
 
     _is >> _type;
     _type = static_cast<OrderType>(type);

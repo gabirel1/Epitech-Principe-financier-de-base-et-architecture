@@ -5,7 +5,9 @@
 
 #include <QMainWindow>
 #include <QStandardItemModel>
+#include <QThread>
 
+#include "ThreadHeartBeat.hpp"
 #include "Client/Data/OderBook.hpp"
 #include "Client/Data/UDPHandler.hpp"
 #include "Client/GUI/GestionnaireSocket.hpp"
@@ -25,6 +27,7 @@ public:
 
 private:
     NetIO m_netio;
+    std::string m_userID;
 
     GestionnaireSocket m_gsocket;
     Ui::MainWindow *m_ui;
@@ -45,9 +48,11 @@ private:
 private slots:
     void slot_log();
     void slot_send();
+    void slot_heartBeat();
     void slot_cancelOrder();
     void slot_modifyOrder();
     void slot_sendNewOrderSingle();
+    void slot_marketTypeLayout(int pindex);
     void slot_messageTypeLayout(int p_index);
 };
 

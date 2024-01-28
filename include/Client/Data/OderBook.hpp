@@ -8,9 +8,7 @@
 #include "Common/Network/UDPPackage.hpp"
 #include "Common/Thread/Queue.hpp"
 #include "Client/Data/UDPHandler.hpp"
-
-using TCPOutput = ts::Queue<fix::Serializer::AnonMessage>;
-using TCPInput = ts::Queue<fix::Message>;
+#include "Client/GUI/ThreadSocketTCP.hpp"
 
 namespace data
 {
