@@ -21,7 +21,7 @@ void ThreadSocket::run()
     while (m_running) {
 
 
-        std::cout << m_udp.receiveUDP(sizeof(udp::UDPPackage), error) <<std::endl;
+        std::cout << m_udp.receiveUDP(sizeof(data::UDPPackage), error) <<std::endl;
         // UDPPackage* udp = const_cast<UDPPackage*>(reinterpret_cast<const UDPPackage*>(&pack));
         // std::cout << udp->id << " || "<< udp->price << " || "<< udp->quantity << " || "<< udp->time << std::endl;
     }
