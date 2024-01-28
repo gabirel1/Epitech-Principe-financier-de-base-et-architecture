@@ -79,6 +79,7 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
 {
     Event event;
 
+    event.quantity = 0;
     event.orderId = _order.orderId;
     event.orgQty = _order.quantity;
     event.userId = _order.userId;
@@ -108,7 +109,8 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
             m_ask_id.emplace(_order.orderId, std::make_pair(m_ask.find(_price), m_ask.at(_price).end() - 1));
         }
     }
-    std::cout << "[ORDERBOOK::ADD] event.quantity = " << event.quantity << ", _order.quantity = " << _order.quantity << std::endl;
+    std::cout << "[ORDERBOOK::ADD] event.quantity = " << event.quantity << std::endl;
+    std::cout << "[ORDERBOOK::ADD] _order.quantity = " << _order.quantity << std::endl;
     event.quantity = _order.quantity;
     if (event.quantity == event.orgQty)
         event.status = _status;
