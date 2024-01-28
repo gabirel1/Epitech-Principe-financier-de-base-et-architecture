@@ -50,7 +50,10 @@ namespace net::c
 
     const uint8_t *Socket::receive(int _fd, size_t _size, int &_error)
     {
-        std::unique_ptr<uint8_t []> data(new uint8_t[_size]);
+        std::unique_ptr<uint8_t []> data(new uint8_t[_size]{});
+
+        std::cout << "data => " << data << std::endl;
+        std::cout << "data.get() => " << data.get() << std::endl;
 
         std::cout << "before recv" <<std::endl;
         _error = ::recv(_fd, data.get(), _size, 0);
@@ -200,6 +203,9 @@ namespace net::c
 
     const uint8_t *Socket::c_receive(size_t _size, int &_error)
     {
+        std::cout << "c_receive: _size" << _size << std::endl;
+        std::cout << "c_receive: _error: " << _error << std::endl;
+        std::cout << "c_receive: m_fd: " << m_fd << std::endl;
         return receive(m_fd, _size, _error);
     }
 

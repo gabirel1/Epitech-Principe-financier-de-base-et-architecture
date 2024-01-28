@@ -48,16 +48,21 @@ namespace pip
                                 Logger::Log("[OutNetwork] Data send successfuly: ", data);
                             else
                                 Logger::Log("[OutNetwork] Error occured when sending data");
-                            std::cout << "[OUTNETWORK]: CLIENT BEFORE: " << *client << std::endl;
+                            // std::cout << "[OUTNETWORK]: CLIENT BEFORE: " << *client << std::endl;
                             client->Logged = _input.Client.Logged;
+                            std::cout << "[OUTNETWORK]: userId: '" << userId << "'" << std::endl;
+                            std::cout << "[OUTNETWORK]: client->User: '" << client->User << "'" << std::endl;
                             client->User = userId;
                             client->Disconnect = _input.Client.Disconnect;
-                            std::cout << "[OUTNETWORK]: CLIENT AFTER: " << *client << std::endl;
+                            // std::cout << "[OUTNETWORK]: CLIENT AFTER: " << *client << std::endl;
                             logTiming(client);
                             Logger::Log("[OutNetwork] Updated client status: "); // todo log
                             if (_input.Client.Disconnect) {
-                                client->getSocket()->close();
-                                Logger::Log("[OutNetwork] Client has been disconnected: ", userId);
+                                std::cout << "CHECK IF CLIENT SOCKET EXISTS: " << client->getSocket() << std::endl;
+                                if (client->getSocket()) {
+                                    client->getSocket()->close();
+                                    Logger::Log("[OutNetwork] Client has been disconnected: ", userId);
+                                }
                             }
                         } else {
                             Logger::Log("[OutNetwork] Client not connected: ", userId);
@@ -65,6 +70,12 @@ namespace pip
                         }
                     } else {
                         Logger::Log("[OutNetwork] Client not found: ", userId);
+                        // std::cout << "[ELSE OUT] m_clients.size(): " << m_clients.size() << std::endl;
+                        // std::cout << "[ELSE OUT] client: " << (*client) << std::endl;
+                        // std::cout << "[ELSE OUT] m_clients.end(): " << *m_clients.end() << std::endl;
+                        // std::cout << "[ELSE OUT] client != m_clients.end(): " << (((client != m_clients.end()) == true) ? "True" : "False") << std::endl;
+                        // for (auto &it : m_clients)
+                        //     std::cout << "[ELSE OUT] Client: " << it << std::endl;
                     }
                 });
             }
@@ -96,6 +107,8 @@ namespace pip
 
     void OutNetwork::logTiming(std::vector<ClientSocket>::iterator _it)
     {
+        std::cout << "it: " << *_it << std::endl;
+        std::cout << "SeqNumber: " << _it->SeqNumber << std::endl;
         if (!_it->hasRequest(_it->SeqNumber - 1))
             return;
         auto start = _it->getRequest(_it->SeqNumber - 1);

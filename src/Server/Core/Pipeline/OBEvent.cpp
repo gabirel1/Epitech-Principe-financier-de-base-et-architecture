@@ -77,8 +77,20 @@ namespace pip
         if (_input.status == OrderStatus::Pending || _input.quantity == 0)
             return false;
         package.time = 0;   // todo
-        package.id = m_id++;
+        package.id = 0;
         package.flag = 0;
+        package.quantity = 0;
+        package.price = 0;
+
+        std::cout << "OBEvent::createUdp, package: " << package << std::endl;
+        std::cout << "OBEvent::createUdp, m_id: " << m_id << std::endl;
+        std::cout << "OBEvent::createUdp, _input.sold: " << _input.sold << std::endl;
+        std::cout << "OBEvent::createUdp, _input.status: " << _input.status << std::endl;
+        std::cout << "OBEvent::createUdp, _input.side: " << ((_input.side == OrderType::Ask) ? "ASK" : "BID") << std::endl;
+        std::cout << "OBEvent::createUdp, _input.quantity: " << _input.quantity << std::endl;
+        std::cout << "OBEvent::createUdp, _input.price: " << _input.price << std::endl;
+
+        package.id = m_id++;
         UDP_FLAG_SET_SOLD(package.flag, _input.sold);
         UDP_FLAG_SET_STATUS(package.flag, _input.status);
         (_input.side == OrderType::Ask) ? UDP_FLAG_SET_ASK(package.flag) : UDP_FLAG_SET_BID(package.flag);
