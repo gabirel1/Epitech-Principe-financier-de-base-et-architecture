@@ -13,9 +13,14 @@ namespace data
     }
 }
 
-OrderBook::OrderBook(const std::string &_name, UDPOutput &_udp, TCPOutput &_tcp, TCPInput &_output)
-    : m_name(_name), m_udp(_udp), m_tcp(_tcp), m_output(_output)
+OrderBook::OrderBook(UDPOutput &_udp, TCPOutput &_tcp, TCPInput &_output)
+    : m_udp(_udp), m_tcp(_tcp), m_output(_output)
 {
+}
+
+OrderBook::~OrderBook()
+{
+    (void)stop();
 }
 
 bool OrderBook::start()

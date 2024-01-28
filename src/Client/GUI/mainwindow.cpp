@@ -8,20 +8,15 @@
 #include "Common/Message/Message.hpp"
 
 MainWindow::MainWindow(QWidget *parent)
-    : m_gestionnaireSocket(nullptr)
-    , QMainWindow(parent)
-    , m_ui(new Ui::MainWindow)
+    : QMainWindow(parent), m_gsocket("127.0.0.1", 8080, 8081, m_netio),
+        m_ui(new Ui::MainWindow), m_ob(m_netio.udp_out, m_netio.tcp_out, m_netio.tcp_in)
 {
     m_ui->setupUi(this);
 
-    messageID = 1;
-    orderID = 0;
+    m_msgId = 1;
 
     setupValidator();
     m_ui->messageTypeWidgetList->setEnabled(false);
-
-    m_gestionnaireSocket = new GestionnaireSocket("127.0.0.1", 8080, 8081);
-    // m_gestionnaireSocket.startThread();
 
     connect(m_ui->messageType, SIGNAL(currentIndexChanged(int)), this, SLOT(slot_messageTypeLayout(int)));
     connect(m_ui->btn_log, SIGNAL(pressed()), this, SLOT(slot_log()));
@@ -52,13 +47,13 @@ void MainWindow::slot_log()
     if (m_ui->btn_log->text() == "Log On") {
         fix::Logon logon;
 
-        logon.header.set34_msgSeqNum(std::to_string(messageID));
+        logon.header.set34_msgSeqNum(std::to_string(m_msgId));
         logon.header.set49_SenderCompId("Lorenzo");
         logon.header.set56_TargetCompId("MyMarket");
         logon.set98_EncryptMethod("0");
         logon.set108_HeartBtInt("30");
 
-        m_gestionnaireSocket->sendTcpSocket(logon.to_string());
+        m_netio.tcp_in.push(std::move(logon));
 
         m_ui->messageTypeWidgetList->setEnabled(true);
         m_ui->btn_log->setText("Log Out");
@@ -66,17 +61,17 @@ void MainWindow::slot_log()
     } else {
         fix::Logout logout;
 
-        logout.header.set34_msgSeqNum(std::to_string(messageID));
+        logout.header.set34_msgSeqNum(std::to_string(m_msgId));
         logout.header.set49_SenderCompId("Lorenzo");
         logout.header.set56_TargetCompId("MyMarket");
 
-        m_gestionnaireSocket->sendTcpSocket(logout.to_string());
+        m_netio.tcp_in.push(std::move(logout));
 
         m_ui->messageTypeWidgetList->setEnabled(false);
         m_ui->btn_log->setText("Log On");
 
     }
-    messageID ++;
+    m_msgId++;
 }
 
 void MainWindow::slot_send()
@@ -113,12 +108,12 @@ void MainWindow::slot_sendNewOrderSingle()
 {
     fix::NewOrderSingle newOrderSingle;
 
-    std::cout << messageID <<std::endl;
+    std::cout << m_msgId <<std::endl;
 
-    newOrderSingle.header.set34_msgSeqNum(std::to_string(messageID));
+    newOrderSingle.header.set34_msgSeqNum(std::to_string(m_msgId));
     newOrderSingle.header.set49_SenderCompId("Lorenzo");
     newOrderSingle.header.set56_TargetCompId("MyMarket");
-    newOrderSingle.set11_clOrdID(std::to_string(orderID));
+    newOrderSingle.set11_clOrdID(utils::id());
     newOrderSingle.set21_handlInst("3");
     newOrderSingle.set38_orderQty(m_ui->quantityValue_NewOrderSingle->text().toStdString());
     newOrderSingle.set40_ordType("2");
@@ -127,10 +122,10 @@ void MainWindow::slot_sendNewOrderSingle()
     newOrderSingle.set55_symbol(m_ui->symbolType_NewOrderSingle->currentText().toStdString());
     newOrderSingle.set60_transactTime(getDate());
 
-    m_gestionnaireSocket->sendTcpSocket(newOrderSingle.to_string());
+    m_netio.tcp_in.push(std::move(newOrderSingle));
 
     Order orderTemp;
-    orderTemp.orderId = orderID;
+    orderTemp.orderId = utils::id();
     orderTemp.quantity = m_ui->quantityValue_NewOrderSingle->text().toULongLong();
     orderTemp.userId = m_ui->userIdValue->text().toULongLong();
 
@@ -138,12 +133,12 @@ void MainWindow::slot_sendNewOrderSingle()
     priceTemp = m_ui->priceValue_NewOrderSingle->text().toLongLong();
 
     std::pair<Order, Price> pair = std::make_pair(orderTemp, priceTemp);
-    m_orderList.emplace(orderID, pair);
+    m_orderList.emplace(orderTemp.orderId, pair);
 
     int rowNbr = m_ui->orderHistory->rowCount();
     m_ui->orderHistory->insertRow(rowNbr);
 
-    QTableWidgetItem *item_orderID = new QTableWidgetItem(std::to_string(orderID).c_str());
+    QTableWidgetItem *item_orderID = new QTableWidgetItem(orderTemp.orderId.c_str());
     item_orderID->setFlags(item_orderID->flags() & ~Qt::ItemIsEditable);
     QTableWidgetItem *item_orderType = new QTableWidgetItem(m_ui->orderType_NewOrderSingle->currentText());
     item_orderType->setFlags(item_orderType->flags() & ~Qt::ItemIsEditable);
@@ -157,8 +152,7 @@ void MainWindow::slot_sendNewOrderSingle()
     m_ui->orderHistory->setItem(rowNbr, 2, item_orderPrice);
     m_ui->orderHistory->setItem(rowNbr, 3, item_orderQuantity);
 
-    messageID ++;
-    orderID ++;
+    m_msgId++;
 }
 
 void MainWindow::slot_cancelOrder()
@@ -172,20 +166,18 @@ void MainWindow::slot_cancelOrder()
 
         std::string side = (item->text() == "Bid") ? "3" : "4";
 
-        orderCancel.header.set34_msgSeqNum(std::to_string(messageID));
+        orderCancel.header.set34_msgSeqNum(std::to_string(m_msgId));
         orderCancel.header.set49_SenderCompId("Lorenzo");
         orderCancel.header.set56_TargetCompId("MyMarket");
-        orderCancel.set11_clOrdID(std::to_string(orderID));
+        orderCancel.set11_clOrdID(utils::id());
         orderCancel.set41_origClOrdID(m_ui->orderIDValue_OrderCancel->text().toStdString());
         orderCancel.set54_side(side);
         orderCancel.set55_symbol("3");
         orderCancel.set60_transactTime(getDate());
 
-        m_gestionnaireSocket->sendTcpSocket(orderCancel.to_string());
+        m_netio.tcp_in.push(std::move(orderCancel));
 
         m_ui->orderHistory->removeRow(list.at(0)->row());
-
-        orderID ++;
     }
 }
 
@@ -200,7 +192,7 @@ void MainWindow::slot_modifyOrder()
 
         fix::OrderCancelReplaceRequest orderCancelReplace;
 
-        orderCancelReplace.header.set34_msgSeqNum(std::to_string(messageID));
+        orderCancelReplace.header.set34_msgSeqNum(std::to_string(m_msgId));
         orderCancelReplace.header.set49_SenderCompId("Lorenzo");
         orderCancelReplace.header.set56_TargetCompId("MyMarket");
         orderCancelReplace.set11_clOrdID(m_ui->orderIDValue_OrderCancelReplace->text().toStdString());
@@ -213,7 +205,7 @@ void MainWindow::slot_modifyOrder()
         orderCancelReplace.set55_symbol("3");
         orderCancelReplace.set60_transactTime(getDate());
 
-        m_gestionnaireSocket->sendTcpSocket(orderCancelReplace.to_string());
+        m_netio.tcp_in.push(std::move(orderCancelReplace));
 
         m_ui->orderHistory->item(list.at(0)->row(), 1)->setText(m_ui->orderType_OrderCancelReplace->currentText());
         if (m_ui->priceValue_OrderCancelReplace->text() != "")
@@ -222,8 +214,6 @@ void MainWindow::slot_modifyOrder()
             m_ui->orderHistory->item(list.at(0)->row(), 3)->setText(m_ui->quantityValue_OrderCancelReplace->text());
 
         m_ui->orderHistory->editItem(item);
-
-        orderID ++;
     }
 }
 

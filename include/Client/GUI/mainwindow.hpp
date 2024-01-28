@@ -6,13 +6,11 @@
 #include <QMainWindow>
 #include <QStandardItemModel>
 
+#include "Client/Data/OderBook.hpp"
+#include "Client/Data/UDPHandler.hpp"
 #include "Client/GUI/GestionnaireSocket.hpp"
 #include "Common/Core/Order.hpp"
 #include "Common/Network/Socket.hpp"
-
-
-static int orderID;
-static int messageID;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {class MainWindow;}
@@ -26,11 +24,12 @@ public:
     ~MainWindow();
 
 private:
+    NetIO m_netio;
 
-    GestionnaireSocket *m_gestionnaireSocket;
+    GestionnaireSocket m_gsocket;
     Ui::MainWindow *m_ui;
 
-    std::unordered_map<int, std::pair<Order, Price>> m_orderList; // Real Need with the orderHistory ? 
+    std::unordered_map<std::string, std::pair<Order, Price>> m_orderList; // Real Need with the orderHistory ? 
 
     std::string getDate();
     void setupValidator();
@@ -38,6 +37,10 @@ private:
     void buildNewOrderSingleWidget();
     void buildOrderCancelRequestWidget();
     void buildOrderCancelReplaceRequestWidget();
+
+    size_t m_msgId = 1;
+
+    OrderBook m_ob;
 
 private slots:
     void slot_log();

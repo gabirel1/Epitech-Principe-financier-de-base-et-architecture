@@ -7,8 +7,8 @@
 #include "Common/Message/Fix.hpp"
 #include "Common/Network/UDPPackage.hpp"
 #include "Common/Thread/Queue.hpp"
+#include "Client/Data/UDPHandler.hpp"
 
-using UDPOutput = ts::Queue<data::UDPPackage>;
 using TCPOutput = ts::Queue<fix::Serializer::AnonMessage>;
 using TCPInput = ts::Queue<fix::Message>;
 
@@ -55,7 +55,7 @@ class OrderBook
         using BidBook = std::map<Price, Quantity, std::less_equal<Price>>;
         using AskBook = std::map<Price, Quantity, std::greater_equal<Price>>;
 
-        OrderBook(const std::string &_name, UDPOutput &_udp, TCPOutput &_tcp, TCPInput &_output);
+        OrderBook(UDPOutput &_udp, TCPOutput &_tcp, TCPInput &_output);
         ~OrderBook();
 
         bool start();
@@ -104,8 +104,6 @@ class OrderBook
                 _map[_sym]->erase(_price);
             return true;
         }
-
-        const std::string m_name;
 
         bool m_running = false;
 

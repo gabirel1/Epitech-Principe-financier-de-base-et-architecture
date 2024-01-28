@@ -98,6 +98,7 @@ namespace fix
             NewOrderSingle::cMsgType,
             OrderCancelRequest::cMsgType,
             OrderCancelReplaceRequest::cMsgType,
+            MarketDataRequest::cMsgType,
             Logout::cMsgType
         };
         constexpr const size_t size_type = 6;
