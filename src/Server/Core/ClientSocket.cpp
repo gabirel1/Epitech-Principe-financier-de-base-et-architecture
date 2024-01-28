@@ -9,7 +9,8 @@ ClientSocket::ClientSocket(const ClientSocket &_client)
     : Logged(_client.Logged), Disconnect(_client.Disconnect),
         User(_client.User), SeqNumber(_client.SeqNumber),
         ClientSeqNumber(_client.ClientSeqNumber),
-        m_socket(_client.m_socket), m_request(_client.m_request)
+        m_socket(_client.m_socket), m_request(_client.m_request),
+        m_subscribe(_client.m_subscribe)
 {
 }
 
@@ -17,7 +18,8 @@ ClientSocket::ClientSocket(const ClientSocket &&_client) noexcept
     : Logged(std::move(_client.Logged)), Disconnect(std::move(_client.Disconnect)),
         User(std::move(_client.User)), SeqNumber(std::move(_client.SeqNumber)),
         ClientSeqNumber(std::move(_client.ClientSeqNumber)),
-        m_socket(std::move(_client.m_socket)), m_subscribe(std::move(_client.m_subscribe))
+        m_socket(std::move(_client.m_socket)), m_request(std::move(_client.m_request)),
+        m_subscribe(std::move(_client.m_subscribe))
 {
 }
 

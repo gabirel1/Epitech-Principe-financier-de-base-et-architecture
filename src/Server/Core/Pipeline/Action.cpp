@@ -104,6 +104,7 @@ namespace pip
             return false;
         }
         _input.Client.Logged = false;
+        _input.Client.User = _input.Message.at(fix::Tag::SenderCompId);
         _input.Client.Disconnect = true;
         logout.header.set56_TargetCompId(_input.Client.User);
         Logger::Log("[Action] (Logout) Request from: ", _input.Client.User, ", sucessfuly handle");
@@ -129,7 +130,7 @@ namespace pip
         data.OrderData.order.userId = _input.Client.User;
         data.OrderData.order.orderId = utils::to<OrderId>(_input.Message.at(fix::Tag::ClOrdID));
         data.OrderData.order.quantity = utils::to<Quantity>(_input.Message.at(fix::Tag::OrderQty));
-        Logger::Log("[Action] (New Order Single) Waiting for action from data: "); // todo log
+        Logger::Log("[Action] (New Order Single) Waiting for action from data: ", data.OrderData.order.userId); // todo log
         m_markets.at(_input.Message.at(fix::Tag::Symbol)).push(std::move(data));
         return true;
     }

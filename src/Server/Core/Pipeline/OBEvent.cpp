@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include "Server/Core/Pipeline/OBEvent.hpp"
 #include "Common/Message/ExecutionReport.hpp"
 #include "Server/Core/Pipeline/Naming.hpp"
@@ -31,7 +33,7 @@ namespace pip
         while (m_running) {
             if (!m_input.empty()) {
                 input = m_input.pop_front();
-                Logger::Log("[OBEvent] New event from the OderBook: "); // todo log
+                Logger::Log("[OBEvent] New event from the OderBook");
                 m_tp.enqueue([this, _data = std::move(input)] () {
                     createUdp(_data);
                     createTcp(_data);
@@ -45,6 +47,7 @@ namespace pip
         fix::ExecutionReport report;
         ClientSocket client{};
 
+        std::cout << "User id: " << _input.userId << std::endl;
         client.User = _input.userId;
         client.Logged = true;
         client.Disconnect = false;
@@ -71,8 +74,7 @@ namespace pip
 
         if (_input.status == OrderStatus::Pending || _input.quantity == 0)
             return false;
-
-        package.time = 0;   // todo
+        package.time = 0; // todo
         package.id = 0;
         package.flag = 0;
         package.quantity = 0;
@@ -83,8 +85,11 @@ namespace pip
         (_input.side == OrderType::Ask) ? UDP_FLAG_SET_ASK(package.flag) : UDP_FLAG_SET_BID(package.flag);
         package.quantity = _input.quantity;
         package.price = _input.price;
-        m_udp.append(package);
-        Logger::Log("[OBEvent] (UDP) Report created: "); // todo log
+        Logger::Log("[OBEvent] (UDP) Setting Symbol");
+        std::memset(package.symbol, '0', std::min(m_name.size(), (size_t)MARKET_NAME_MAX_SIZE));
+        std::memcpy(package.symbol, m_name.c_str(), std::min(m_name.size(), (size_t)MARKET_NAME_MAX_SIZE));
+        Logger::Log("[OBEvent] (UDP) Report created: ", package);
+        m_udp.append(std::move(package));
         return true;
     }
 }

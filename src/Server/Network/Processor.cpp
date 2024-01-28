@@ -61,8 +61,11 @@ namespace net::tcp
                 it = std::find_if(_clients.begin(), _clients.end(), [_userId = _userId] (const ClientSocket &_client) {
                     return _client.User == _userId;
                 });
-                if (it != _clients.end())
+                if (it != _clients.end()) {
+                    Logger::Log("[OutNetwork] (Reply) Found client: ", _userId);
                     userId = _userId;
+                    Logger::Log("[OutNetwork] (Reply) Found client: ", userId);
+                }
                 Logger::Log("[OutNetwork] (ClientInfo) Comming from an anonymous pipeline");
                 return ClientInfo(it, userId);
             }
@@ -72,11 +75,13 @@ namespace net::tcp
                 std::vector<ClientSocket>::iterator it;
                 UserId userId = "";
 
-                it = std::find_if(_clients.begin(), _clients.end(), [_socket = _socket] (const ClientSocket &_client) {
+                it = std::find_if(_clients.begin(), _clients.end(), [_socket] (const ClientSocket &_client) {
                     return _client.getSocket() == _socket;
                 });
-                if (it != _clients.end())
+                if (it != _clients.end()) {
                     userId = it->User;
+                    Logger::Log("[OutNetwork] (Reply) Found client: ", userId);
+                }
                 Logger::Log("[OutNetwork] (Reply) Comming from an Action pipeline");
                 return ClientInfo(it, userId);
             }
@@ -98,9 +103,15 @@ namespace net::tcp
 
             _data.Message.header.set49_SenderCompId(PROVIDER_NAME);
             if (client != _clients.end()) {
+                std::cout << "target user id: " << userId << " " << _data.Client.User << std::endl;
                 _data.Message.header.set34_msgSeqNum(std::to_string((client->SeqNumber)++));
-                if (userId != "")
-                    _data.Message.header.set56_TargetCompId(userId);
+                if (client->Logged) {
+                    _data.Message.header.set56_TargetCompId(client->User);
+                    userId = client->User;
+                } else {
+                    _data.Message.header.set56_TargetCompId(_data.Client.User);
+                    userId = _data.Client.User;
+                }
                 std::string data = _data.Message.to_string();
 
                 if (client->getSocket()) {
@@ -108,11 +119,12 @@ namespace net::tcp
                         Logger::Log("[Responce] Data send successfuly: ", data);
                     else
                         Logger::Log("[Responce] Error occured when sending data");
+                    if (!client->Logged)
+                        client->User = _data.Client.User;
                     client->Logged = _data.Client.Logged;
-                    client->User = userId;
                     client->Disconnect = _data.Client.Disconnect;
                     priv::LogTiming(client);
-                    Logger::Log("[Responce] Updated client status: "); // todo log
+                    Logger::Log("[Responce] Updated client status: { UserId: ", userId, " }"); // todo log
                     if (_data.Client.Disconnect) {
                         client->getSocket()->close();
                         Logger::Log("[Responce] Client has been disconnected: ", userId);

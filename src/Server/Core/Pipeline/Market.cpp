@@ -41,7 +41,7 @@ namespace pip
 
     void Market::process(MarketInput &_data)
     {
-        Logger::Log("[Market] Processing new action: "); // todo log
+        Logger::Log("[Market] Processing new action: ", _data.Client.User); // todo log
 
         switch (_data.OrderData.action) {
             case OrderBook::Data::Action::Add:
@@ -70,7 +70,7 @@ namespace pip
         fix::ExecutionReport report;
         Order order = _data.OrderData.order;
 
-        Logger::Log("[Market] (New) request: "); // todo log
+        Logger::Log("[Market] (New) request: ", _data.OrderData.order); // todo log
         if (!m_ob.add(_data.OrderData.type, _data.OrderData.price, order)) {
             Logger::Log("[Market] (New) Reject: Order ID already used: ", _data.OrderData.order.orderId);
             report.set14_cumQty("0");

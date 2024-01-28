@@ -29,12 +29,14 @@ namespace pip
 
         while (m_running) {
             auto now = std::chrono::system_clock::now();
-            auto update_diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - update);
+            auto update_diff = std::chrono::duration_cast<std::chrono::seconds>(now - update);
 
             if (update_diff.count() >= NOTIF_UPDATE_TO) {
+                Logger::Log("[Refresh] incremenetal - start");
                 for (auto &_client : m_clients) {
                     const ClientSocket::Subs &subs = _client.subscribe(m_name);
                     fix::MarketDataIncrementalRefresh notif;
+                    Logger::Log("[Refresh] Incremental For client: ", _client.User);
 
                     for (const auto &_sub : subs)
                         notif += m_ob.update(_sub);
@@ -44,6 +46,8 @@ namespace pip
                     _client.getSocket()->send(notif.to_string());
                 }
                 m_ob.cache_flush();
+                Logger::Log("[Refresh] Incremenetal - done");
+                update = now;
             }
         }
     }
