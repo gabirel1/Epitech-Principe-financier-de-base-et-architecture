@@ -121,7 +121,6 @@ class OrderBook
         BidMap m_bid_last;
         AskMap m_ask_last;
 
-
         std::thread m_thread;
 };
 
