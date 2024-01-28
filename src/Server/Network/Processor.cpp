@@ -5,11 +5,11 @@
 #include "Common/Message/Reject.hpp"
 #include "Server/Core/Pipeline/Naming.hpp"
 
-namespace net
+namespace net::tcp
 {
-    namespace tcp
+    namespace in
     {
-        bool processor(ClientSocket &_client, NetToAction &_serial, RawOutput &_error)
+        bool Basic::run(ClientSocket &_client, InAction &_serial, InOutNetwork &_error)
         {
             int error = 0;
             fix::Serializer::AnonMessage msg;
@@ -34,19 +34,117 @@ namespace net
             }
             Logger::Log("[Processor] Porcessing request from the client: "); // todo log
             _client.newRequest();
-            _client.ClientSeqNumber += 1;
             _serial.append(_client, std::move(msg));
             return false;
         }
     }
 
-    namespace udp
+    namespace out
     {
-        bool processor(std::shared_ptr<net::udp::Socket> _socket)
+        namespace priv
         {
-            std::ignore = _socket;
+            ClientInfo getClientInfo(OutNetworkInput &_input, std::vector<ClientSocket> &_clients)
+            {
+                std::vector<ClientSocket>::iterator it;
+                UserId userId = "";
 
-            return true;
+                if (_input.Client.getSocket())
+                    return getClientInfo(_input.Client.getSocket(), _clients);
+                return getClientInfo(_input.Client.User, _clients);
+            }
+
+            ClientInfo getClientInfo(const std::string &_userId, std::vector<ClientSocket> &_clients)
+            {
+                std::vector<ClientSocket>::iterator it;
+                UserId userId = "";
+
+                it = std::find_if(_clients.begin(), _clients.end(), [_userId = _userId] (const ClientSocket &_client) {
+                    return _client.User == _userId;
+                });
+                if (it != _clients.end())
+                    userId = _userId;
+                Logger::Log("[OutNetwork] (ClientInfo) Comming from an anonymous pipeline");
+                return ClientInfo(it, userId);
+            }
+
+            ClientInfo getClientInfo(std::shared_ptr<net::tcp::Socket> _socket, std::vector<ClientSocket> &_clients)
+            {
+                std::vector<ClientSocket>::iterator it;
+                UserId userId = "";
+
+                it = std::find_if(_clients.begin(), _clients.end(), [_socket = _socket] (const ClientSocket &_client) {
+                    return _client.getSocket() == _socket;
+                });
+                if (it != _clients.end())
+                    userId = it->User;
+                Logger::Log("[OutNetwork] (Reply) Comming from an Action pipeline");
+                return ClientInfo(it, userId);
+            }
+
+            void LogTiming(std::vector<ClientSocket>::iterator _it)
+            {
+                if (!_it->hasRequest(_it->SeqNumber - 1))
+                    return;
+                auto start = _it->getRequest(_it->SeqNumber - 1);
+                auto end = std::chrono::system_clock::now();
+                auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+                Logger::Log("[Responce] Send respond after: ", diff.count(), " ms");
+            }
+        }
+
+        bool Response::run(OutNetworkInput &_data, std::vector<ClientSocket> &_clients)
+        {
+            auto [client, userId] = priv::getClientInfo(_data, _clients);
+
+            _data.Message.header.set49_SenderCompId(PROVIDER_NAME);
+            if (client != _clients.end()) {
+                _data.Message.header.set34_msgSeqNum(std::to_string((client->SeqNumber)++));
+                if (userId != "")
+                    _data.Message.header.set56_TargetCompId(userId);
+                std::string data = _data.Message.to_string();
+
+                if (client->getSocket()) {
+                    if (client->getSocket()->send(reinterpret_cast<const uint8_t *>(data.c_str()), data.size()) == data.size())
+                        Logger::Log("[Responce] Data send successfuly: ", data);
+                    else
+                        Logger::Log("[Responce] Error occured when sending data");
+                    client->Logged = _data.Client.Logged;
+                    client->User = userId;
+                    client->Disconnect = _data.Client.Disconnect;
+                    priv::LogTiming(client);
+                    Logger::Log("[Responce] Updated client status: "); // todo log
+                    if (_data.Client.Disconnect) {
+                        client->getSocket()->close();
+                        Logger::Log("[Responce] Client has been disconnected: ", userId);
+                    }
+                } else {
+                    Logger::Log("[Responce] Client not connected: ", userId);
+                    _clients.erase(client);
+                    return true;
+                }
+            } else {
+                Logger::Log("[Responce] Client not found: ", userId);
+                return false;
+            }
+            return false;
+        }
+
+        bool SubResponse::run(OutNetworkInput &_data, std::vector<ClientSocket> &_clients)
+        {
+            auto [client, userId] = priv::getClientInfo(_data.Client.getSocket(), _clients);
+            std::string data{};
+
+            _data.Message.header.set49_SenderCompId(PROVIDER_NAME);
+            _data.Message.header.set34_msgSeqNum(std::to_string((client->SeqNumber)++));
+            _data.Message.header.set56_TargetCompId(client->User);
+            data = _data.Message.to_string();
+            if (client->getSocket()->send(reinterpret_cast<const uint8_t *>(data.c_str()), data.size()) == data.size())
+                Logger::Log("[Responce] Data send successfuly: ", data);
+            else
+                Logger::Log("[Responce] Error occured when sending data");
+            client->refreshSubscribe(std::move(_data.Client));
+            priv::LogTiming(client);
+            return false;
         }
     }
 }

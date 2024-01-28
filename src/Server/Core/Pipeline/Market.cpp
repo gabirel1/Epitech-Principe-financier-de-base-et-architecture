@@ -8,7 +8,7 @@
 
 namespace pip
 {
-    Market::Market(const std::string &_name, OrderBook &_ob, ActionToMarket &_input, MarketToNet &_output)
+    Market::Market(const std::string &_name, OrderBook &_ob, InMarket &_input, InOutNetwork &_output)
         : m_name(_name), m_input(_input), m_output(_output), m_ob(_ob)
     {
     }
@@ -29,7 +29,7 @@ namespace pip
     void Market::loop()
     {
         Logger::SetThreadName(THIS_THREAD_ID, "Market - " + m_name);
-        MarketIn input;
+        MarketInput input;
 
         while (m_running) {
             if (!m_input.empty()) {
@@ -39,7 +39,7 @@ namespace pip
         }
     }
 
-    void Market::process(MarketIn &_data)
+    void Market::process(MarketInput &_data)
     {
         Logger::Log("[Market] Processing new action: "); // todo log
 
@@ -65,7 +65,7 @@ namespace pip
         }
     }
 
-    bool Market::runAdd(const MarketIn &_data)
+    bool Market::runAdd(const MarketInput &_data)
     {
         fix::ExecutionReport report;
         Order order = _data.OrderData.order;
@@ -91,7 +91,7 @@ namespace pip
         return true;
     }
 
-    bool Market::runModify(const MarketIn &_data)
+    bool Market::runModify(const MarketInput &_data)
     {
         fix::OrderCancelReject report;
         Order order = _data.OrderData.order;
@@ -117,7 +117,7 @@ namespace pip
         return true;
     }
 
-    bool Market::runCancel(const MarketIn &_data)
+    bool Market::runCancel(const MarketInput &_data)
     {
         fix::OrderCancelReject report;
 

@@ -4,12 +4,9 @@
 #include <mutex>
 #include <vector>
 
-template<class T>
-concept IsKey = requires (T _val) {
-    _val == _val;
-};
+#include "Common/Core/meta.hpp"
 
-template<IsKey T, class _T>
+template<IsKey T, IsEmptyCtor _T>
 class InsertMap
 {
     public:
@@ -25,10 +22,14 @@ class InsertMap
 
         [[nodiscard]] bool contains(const T &_key);
         [[nodiscard]] Iterator find(const T &_key);
-        void emplace(const Pair &&_pair);
+        void append(const Pair &&_pair);
+        template<class ...Ts>
+        void emplace(const Ts &&..._data);
 
         [[nodiscard]] _T &at(const T &_key);
         [[nodiscard]] const _T &at(const T &_key) const;
+
+        [[nodiscard]] _T &operator[](const T &_key);
 
         [[nodiscard]] constexpr size_t size() const;
         void clear();

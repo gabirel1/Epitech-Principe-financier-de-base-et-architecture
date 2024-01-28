@@ -16,7 +16,7 @@ namespace pip
             /// @param _input Input data queue of the pipeline.
             /// @param _output Output data queue of the pipeline.
             /// @param _raw Raw message queue send to the pip::OutNetwork pipeline.
-            Action(NetToAction &_input, MarketEntry &_output, RawOutput &_raw);
+            Action(MarketEntry &_markets, InAction &_input, InMarketData &_data, InOutNetwork &_raw);
             /// @brief Stop and then destroy the pipeline.
             ~Action();
 
@@ -28,17 +28,20 @@ namespace pip
             void loop();
 
         protected:
-            bool treatLogon(ActionIn &_input);
-            bool treatLogout(ActionIn &_input);
-            bool treatNewOrderSingle(ActionIn &_input);
-            bool treatOrderCancelRequest(ActionIn &_input);
-            bool treatOrderCancelReplaceRequest(ActionIn &_input);
-            bool treatUnknown(ActionIn &_input);
-            bool treatHeartbeat(ActionIn &_input);
+            bool treatLogon(ActionInput &_input);
+            bool treatLogout(ActionInput &_input);
+            bool treatNewOrderSingle(ActionInput &_input);
+            bool treatOrderCancelRequest(ActionInput &_input);
+            bool treatOrderCancelReplaceRequest(ActionInput &_input);
+            bool treatUnknown(ActionInput &_input);
+            bool treatHeartbeat(ActionInput &_input);
+            bool treatMarketDataRequest(ActionInput &_input);
 
         private:
-            NetToAction &m_input;       ///< Intput data queue.
-            MarketEntry &m_output;      ///< Map of every market ouput data queue.
-            RawOutput &m_raw;           ///< Raw message queue.
+            MarketEntry &m_markets;      ///< Map of every market ouput data queue.
+
+            InAction &m_input;       ///< Intput data queue.
+            InMarketData &m_q_data;      ///< Map of every market ouput data queue.
+            InOutNetwork &m_q_raw;           ///< Raw message queue.
     };
 }

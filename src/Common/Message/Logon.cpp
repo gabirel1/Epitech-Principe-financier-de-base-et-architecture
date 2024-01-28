@@ -21,11 +21,11 @@ namespace fix
 
     void Logon::set98_EncryptMethod(const std::string &_val)
     {
-        m_params.emplace({ Tag::EncryptMethod, _val });
+        m_params.append({ Tag::EncryptMethod, _val });
     }
 
     void Logon::set108_HeartBtInt(const std::string &_val)
     {
-        m_params.emplace({ Tag::HearBtInt, _val });
+        m_params.append({ Tag::HearBtInt, _val });
     }
 }
