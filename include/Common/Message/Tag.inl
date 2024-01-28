@@ -101,7 +101,7 @@ namespace fix
             MarketDataRequest::cMsgType,
             Logout::cMsgType
         };
-        constexpr const size_t size_type = 6;
+        constexpr const size_t size_type = 7;
         std::pair<bool, fix::Reject> reject = { false, {} };
 
         for (size_t i = 0; i < size_type; i++)
