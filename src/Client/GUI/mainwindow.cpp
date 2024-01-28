@@ -6,19 +6,20 @@
 #include "Common/Message/NewOrderSingle.hpp"
 #include "Common/Message/OrderCancelRequest.hpp"
 #include "Common/Message/OrderCancelReplaceRequest.hpp"
-#include "Common/Message/OrderStatusRequest.hpp"
 #include "Common/Message/MarketDataRequest.hpp"
 #include "Common/Message/HeartBeat.hpp"
 
 #include <iostream>
 
 #include <QDateTime>
+#include <QThread>
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
     : m_gestionnaireSocket(nullptr)
     , QMainWindow(parent)
     , m_ui(new Ui::MainWindow)
+    , m_threadHeartBeat(nullptr)
 {
     m_ui->setupUi(this);
 
@@ -29,24 +30,32 @@ MainWindow::MainWindow(QWidget *parent)
     m_ui->messageTypeWidgetList->setEnabled(false);
 
     m_gestionnaireSocket = new GestionnaireSocket("127.0.0.1", 8080, 8081);
-    // m_gestionnaireSocket.startThread();
+    m_threadHeartBeat = new ThreadHeartBeat();
 
     connect(m_ui->messageType, SIGNAL(currentIndexChanged(int)), this, SLOT(slot_messageTypeLayout(int)));
+    connect(m_ui->marketSymbol, SIGNAL(currentIndexChanged(int)), this, SLOT(slot_marketTypeLayout(int)));
     connect(m_ui->btn_log, SIGNAL(pressed()), this, SLOT(slot_log()));
     connect(m_ui->btn_send, SIGNAL(pressed()), this, SLOT(slot_send()));
+    connect(m_threadHeartBeat, SIGNAL(callHeartBeat()), this, SLOT(slot_heartBeat()));
+ 
+    m_threadHeartBeat->start();
 }
 
 MainWindow::~MainWindow()
 {
+    fix::Logout logout;
+
+    logout.header.set34_msgSeqNum(std::to_string(messageID));
+    logout.header.set49_SenderCompId(m_userID);
+    logout.header.set56_TargetCompId("MyMarket");
+
+    m_gestionnaireSocket->sendTcpSocket(logout.to_string());
 }
 
 void MainWindow::setupValidator()
 {
     m_ui->priceValue_NewOrderSingle->setValidator(new QDoubleValidator);
     m_ui->quantityValue_NewOrderSingle->setValidator(new QDoubleValidator);
-    
-    m_ui->priceValue_NewOrderList->setValidator(new QDoubleValidator);
-    m_ui->quantityValue_NewOrderList->setValidator(new QDoubleValidator);
     
     m_ui->orderIDValue_OrderCancel->setValidator(new QIntValidator);
 
@@ -60,8 +69,11 @@ void MainWindow::slot_log()
     if (m_ui->btn_log->text() == "Log On") {
         fix::Logon logon;
 
+        m_userID = m_ui->userIdValue->text().toStdString();
+        std::cout << m_userID <<std::endl;
+
         logon.header.set34_msgSeqNum(std::to_string(messageID));
-        logon.header.set49_SenderCompId("Lorenzo");
+        logon.header.set49_SenderCompId(m_userID);
         logon.header.set56_TargetCompId("MyMarket");
         logon.set98_EncryptMethod("0");
         logon.set108_HeartBtInt("30");
@@ -75,7 +87,7 @@ void MainWindow::slot_log()
         fix::Logout logout;
 
         logout.header.set34_msgSeqNum(std::to_string(messageID));
-        logout.header.set49_SenderCompId("Lorenzo");
+        logout.header.set49_SenderCompId(m_userID);
         logout.header.set56_TargetCompId("MyMarket");
 
         m_gestionnaireSocket->sendTcpSocket(logout.to_string());
@@ -95,22 +107,13 @@ void MainWindow::slot_send()
             slot_sendNewOrderSingle();
             break;
         case 1:
-            // slot_sendNewOrderList();
-            break;
-        case 2:
             slot_cancelOrder();
             break;
-        case 3:
+        case 2:
             slot_modifyOrder();
             break;
-        case 4:
-            // slot_statusOrder();
-            break;
-        case 5:
-            // slot_marketData();
-            break;
-        case 6:
-            // slor_heartBeat();
+        case 3:
+            slot_marketData();
             break;
         default:
             break;
@@ -124,7 +127,7 @@ void MainWindow::slot_sendNewOrderSingle()
     std::cout << messageID <<std::endl;
 
     newOrderSingle.header.set34_msgSeqNum(std::to_string(messageID));
-    newOrderSingle.header.set49_SenderCompId("Lorenzo");
+    newOrderSingle.header.set49_SenderCompId(m_userID);
     newOrderSingle.header.set56_TargetCompId("MyMarket");
     newOrderSingle.set11_clOrdID(std::to_string(orderID));
     newOrderSingle.set21_handlInst("3");
@@ -132,7 +135,7 @@ void MainWindow::slot_sendNewOrderSingle()
     newOrderSingle.set40_ordType("2");
     newOrderSingle.set44_price(m_ui->priceValue_NewOrderSingle->text().toStdString());
     newOrderSingle.set54_side(std::to_string(m_ui->orderType_NewOrderSingle->currentIndex() + 3));
-    newOrderSingle.set55_symbol(m_ui->symbolType_NewOrderSingle->currentText().toStdString());
+    newOrderSingle.set55_symbol(m_ui->marketSymbol->currentText().toStdString());
     newOrderSingle.set60_transactTime(getDate());
 
     m_gestionnaireSocket->sendTcpSocket(newOrderSingle.to_string());
@@ -181,7 +184,7 @@ void MainWindow::slot_cancelOrder()
         std::string side = (item->text() == "Bid") ? "3" : "4";
 
         orderCancel.header.set34_msgSeqNum(std::to_string(messageID));
-        orderCancel.header.set49_SenderCompId("Lorenzo");
+        orderCancel.header.set49_SenderCompId(m_userID);
         orderCancel.header.set56_TargetCompId("MyMarket");
         orderCancel.set11_clOrdID(std::to_string(orderID));
         orderCancel.set41_origClOrdID(m_ui->orderIDValue_OrderCancel->text().toStdString());
@@ -209,7 +212,7 @@ void MainWindow::slot_modifyOrder()
         fix::OrderCancelReplaceRequest orderCancelReplace;
 
         orderCancelReplace.header.set34_msgSeqNum(std::to_string(messageID));
-        orderCancelReplace.header.set49_SenderCompId("Lorenzo");
+        orderCancelReplace.header.set49_SenderCompId(m_userID);
         orderCancelReplace.header.set56_TargetCompId("MyMarket");
         orderCancelReplace.set11_clOrdID(m_ui->orderIDValue_OrderCancelReplace->text().toStdString());
         orderCancelReplace.set21_handlInst("3");
@@ -217,8 +220,8 @@ void MainWindow::slot_modifyOrder()
         orderCancelReplace.set40_ordType("2");
         orderCancelReplace.set41_origClOrdID(m_ui->orderIDValue_OrderCancelReplace->text().toStdString());
         orderCancelReplace.set44_price(m_ui->priceValue_OrderCancelReplace->text().toStdString());
-        orderCancelReplace.set54_side(std::to_string(m_ui->orderType_NewOrderSingle->currentIndex() + 3));
-        orderCancelReplace.set55_symbol("3");
+        orderCancelReplace.set54_side(std::to_string(m_ui->orderType_OrderCancelReplace->currentIndex() + 3));
+        orderCancelReplace.set55_symbol(m_ui->marketSymbol->currentText().toStdString());
         orderCancelReplace.set60_transactTime(getDate());
 
         m_gestionnaireSocket->sendTcpSocket(orderCancelReplace.to_string());
@@ -235,10 +238,43 @@ void MainWindow::slot_modifyOrder()
     }
 }
 
+// void MainWindow::slot_marketData()
+// {
+//     fix::MarketDataRequest marketData;
+
+//     marketData.header.set34_msgSeqNum(std::to_string(messageID));
+//     marketData.header.set49_SenderCompId(m_userID);
+//     marketData.header.set56_TargetCompId("MyMarket");
+//     marketData.set262_MDReqID();
+//     marketData.set263_SubscriptionRequestType("1");
+//     marketData.set264_MarketDepth("0");
+//     marketData.set267_NoMDEntryTypes();
+//     marketData.set269_MDEntryType();
+//     marketData.set146_NoRealatedSym();
+//     marketData.set55_Symbol();
+// }
+
+void MainWindow::slot_heartBeat()
+{
+    fix::HeartBeat heartBeat;
+
+    std::cout << "HeartBeat slot" <<std::endl;
+
+    heartBeat.header.set34_msgSeqNum(std::to_string(messageID));
+    heartBeat.header.set49_SenderCompId(m_userID);
+    heartBeat.header.set56_TargetCompId("MyMarket");
+    heartBeat.set112_testReqID("1");
+}
+
 void MainWindow::slot_messageTypeLayout(int p_index)
 {
     m_ui->messageTypeWidgetList->setCurrentIndex(p_index);
     m_ui->lab_messageType->setText("MessageType : " + m_ui->messageType->currentText());
+}
+
+void MainWindow::slot_marketTypeLayout(int p_index)
+{
+    m_ui->marketWidgetList->setCurrentIndex(p_index);
 }
 
 std::string MainWindow::getDate()

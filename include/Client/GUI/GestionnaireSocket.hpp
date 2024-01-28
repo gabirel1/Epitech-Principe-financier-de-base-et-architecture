@@ -2,7 +2,8 @@
 #define GESTIONNAIRESOCKET_HPP_
 
 #include "../../Common/Network/Socket.hpp"
-#include "ThreadSocket.hpp"
+#include "ThreadSocketUDP.hpp"
+#include "ThreadSocketTCP.hpp"
 
 class GestionnaireSocket
 {
@@ -18,10 +19,9 @@ class GestionnaireSocket
     private:
 
         net::tcp::Socket m_tcp;
-        net::udp::Socket m_udp;
 
-        // ThreadSocket *m_thread_tcp;
-        ThreadSocket *m_thread_udp;
+        ThreadSocketTCP *m_thread_tcp;
+        ThreadSocketUDP *m_thread_udp;
 };
 
 #endif /* !GESTIONNAIRESOCKET_HPP_ */
