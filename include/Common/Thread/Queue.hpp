@@ -12,6 +12,8 @@ namespace ts
             Queue() = default;
             ~Queue() = default;
 
+            using type = T;
+
             /// @brief Check if the queue is empty.
             /// @return True if the queue is empty otherwise false.
             [[nodiscard]] bool empty() const;
@@ -35,6 +37,9 @@ namespace ts
             /// @brief Get the element in front of the queue.
             /// @return The front element.
             [[nodiscard]] const T &front() const;
+            /// @brief Get the element in front of the queue.
+            /// @return The front element.
+            [[nodiscard]] T &front();
 
             /// @brief Delete the element in front of the queue.
             void pop();

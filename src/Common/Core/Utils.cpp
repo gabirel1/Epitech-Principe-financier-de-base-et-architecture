@@ -21,4 +21,14 @@ namespace utils
         stream >> std::noskipws >> f;
         return stream.eof() && !stream.fail();
     }
+
+    std::string id()
+    {
+        std::srand(static_cast<unsigned>(std::time(nullptr)));
+        int randomNum = std::rand();
+        std::stringstream ss;
+
+        ss << std::hex << randomNum;
+        return ss.str().substr(0, 7);
+    }
 }

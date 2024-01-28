@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
+#include <arpa/inet.h> 
 
 #include "Common/Core/Logger.hpp"
 #include "Common/Network/Socket.hpp"
@@ -48,6 +49,22 @@ namespace net
         return str;
     }
 
+    std::string Socket::receiveUDP(size_t _size, int &_error)
+    {
+        const uint8_t *data = c_receiveUDP(_size, _error);
+        std::string str = "";
+
+        if (_error == -1) {
+            Logger::Log("[Socket] Error will trying to receive data: ", strerror(errno));
+            if (data != nullptr)
+                delete[] data;
+            return str;
+        }
+        str.assign(data, data + _error);
+        delete[] data;
+        return str;
+    }
+
     bool Socket::close()
     {
         return c_close();
@@ -57,6 +74,12 @@ namespace net
     {
         return is_open();
     }
+
+    bool Socket::operator==(const Socket &_socket)
+    {
+        return raw() == _socket.raw();
+    }
+
 
     Socket::Socket(int _type)
         : c::Socket(AF_INET, _type, 0)
@@ -90,8 +113,9 @@ namespace net
         {
             int enable = 1;
 
-            if (is_open())
+            if (is_open()) {
                 close();
+            }
             if (!c_create())
                 return false;
             if (setsockopt(raw(), SOL_SOCKET, SO_BROADCAST, &enable, sizeof(enable)) == -1) {
@@ -103,22 +127,31 @@ namespace net
             std::cout << "PORT BROADCAST => "<< _port << std::endl;
             std::memset(&m_broad_addr, 0, sizeof(m_broad_addr));
             m_broad_addr.sin_family = AF_INET;
-            m_broad_addr.sin_port = _port;
+            m_broad_addr.sin_port = htons(8081);
             std::cout << "PORT BROADCAST => "<< m_broad_addr.sin_port << std::endl;
-            m_broad_addr.sin_addr.s_addr = INADDR_LOOPBACK;
+            m_broad_addr.sin_addr.s_addr =  htonl(INADDR_LOOPBACK);
             m_broadcast = true;
+
+            std::cout << "Address: " << inet_ntoa(m_broad_addr.sin_addr) << std::endl;
+            std::cout << "Port: " << ntohs(m_broad_addr.sin_port) << std::endl;
 
             return true;
         }
 
         bool Socket::broadcast(const uint8_t *_data, size_t _size)
         {
-            std::cout << "fd => " << raw() << " || data => " << _data << " || size => " << _size << " || m_broad_addr => " << m_broad_addr.sin_addr.s_addr << ":" << m_broad_addr.sin_port << std::endl; 
-            if (sendto(raw(), _data, _size, 0, (struct sockaddr*)&m_broad_addr, sizeof(m_broad_addr)) == -1) {
+            if (sendto(raw(), _data, _size, 0, (struct sockaddr*)&m_broad_addr, sizeof(sockaddr_in)) == -1) {
                 Logger::Log("[udp::Socket] Failed to send the data on the broadcast: ", strerror(errno));
                 return false;
             }
             return true;
+        }
+
+        bool Socket::bind() {
+
+            // struct sockaddr_in addr_client = getAddr();
+
+            return c_bind((struct sockaddr *)&m_broad_addr);
         }
     }
 }

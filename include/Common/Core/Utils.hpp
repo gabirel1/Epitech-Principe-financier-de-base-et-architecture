@@ -14,6 +14,11 @@ namespace utils
     T to(const std::string &_str);
     template<const char *T, const char *...Ts>
     std::pair<bool, fix::Reject> Has(fix::Serializer::AnonMessage &_msg);
+    template<char C>
+    std::vector<std::string> split(const std::string &_str);
+
+    std::string id();
+
 }
 
 #include "Common/Core/Utils.inl"

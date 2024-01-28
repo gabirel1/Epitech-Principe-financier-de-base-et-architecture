@@ -29,9 +29,13 @@ namespace net
 
             [[nodiscard]] std::string receive(size_t _size, int &_error);
 
+            [[nodiscard]] std::string receiveUDP(size_t _size, int &_error);
+
             bool close();
 
             operator bool();
+
+            bool operator==(const Socket &_socket);
 
         protected:
             Socket(int _type);
@@ -70,6 +74,8 @@ namespace net
                 /// @param _size Size of the data to send.
                 /// @return False if the broadcast failed, otherwise true.
                 [[nodiscard]] bool broadcast(const uint8_t *_data, size_t _size);
+                
+                [[nodiscard]] bool bind();
 
             private:
                 bool m_broadcast = false;               ///< Broadcast mode.

@@ -22,26 +22,26 @@ namespace fix
 
     void OrderCancelRequest::set11_clOrdID(const std::string &_val)
     {
-        m_params.emplace({ Tag::ClOrdID, _val });
+        m_params.append({ Tag::ClOrdID, _val });
     }
 
     void OrderCancelRequest::set41_origClOrdID(const std::string &_val)
     {
-        m_params.emplace({ Tag::OrigClOrdID, _val });
+        m_params.append({ Tag::OrigClOrdID, _val });
     }
 
     void OrderCancelRequest::set54_side(const std::string &_val)
     {
-        m_params.emplace({ Tag::Side, _val });
+        m_params.append({ Tag::Side, _val });
     }
 
     void OrderCancelRequest::set55_symbol(const std::string &_val)
     {
-        m_params.emplace({ Tag::Symbol, _val });
+        m_params.append({ Tag::Symbol, _val });
     }
 
     void OrderCancelRequest::set60_transactTime(const std::string &_val)
     {
-        m_params.emplace({ Tag::TransactTime, _val });
+        m_params.append({ Tag::TransactTime, _val });
     }
 }

@@ -30,7 +30,7 @@ namespace net
     void Selector<T>::erase(Client _client)
     {
         std::erase_if(m_clients, [_client] (const std::pair<int, Client> &_lclient) {
-            return _client == _lclient.second;
+            return _client->raw() == _lclient.second->raw();
         });
     }
 

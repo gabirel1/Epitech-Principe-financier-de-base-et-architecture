@@ -12,9 +12,6 @@ namespace net::c
     Socket::Socket(int _dom, int _type, int _proto)
         : m_dom(_dom), m_type(_type), m_proto(_proto)
     {
-
-        std::cout << "CONSTRUCTEUR SOCKET " << "dom => " <<_dom<<" || type => " <<_type<<" || _proto => "<<_proto<<std::endl;
-
         (void)c_create();
     }
 
@@ -25,8 +22,6 @@ namespace net::c
 
     int Socket::create(int _dom, int _type, int _proto)
     {
-        std::cout << "CREATION SOCKET " << "dom => " <<_dom<<" || type => " <<_type<<" || _proto => "<<_proto<<std::endl;
-
         return socket(_dom, _type, _proto);
     }
 
@@ -37,15 +32,27 @@ namespace net::c
 
     size_t Socket::send(int _fd, const uint8_t *_data, size_t _size)
     {
+
         return ::send(_fd, _data, _size, 0);
+    }
+
+    const uint8_t *Socket::receiveUDP(int _fd, size_t _size, int &_error)
+    {
+        std::unique_ptr<uint8_t []> data(new uint8_t[_size]);
+        struct sockaddr_in addr;
+        socklen_t addr_len = sizeof(addr);
+
+        std::cout << "before recv" <<std::endl;
+        _error = ::recvfrom(_fd, data.get(), _size, 0, (struct sockaddr*)&addr, &addr_len);
+        std::cout << "error => " << _error <<std::endl;
+        return data.release();
     }
 
     const uint8_t *Socket::receive(int _fd, size_t _size, int &_error)
     {
-        std::unique_ptr<uint8_t []> data(new uint8_t[_size]);
+        std::unique_ptr<uint8_t []> data(new uint8_t[_size]{});
 
-        std::cout << "fd => " << _fd << " || data => " << data.get() << " || size => " << _size << std::endl;
-
+        std::cout << "before recv" <<std::endl;
         _error = ::recv(_fd, data.get(), _size, 0);
         std::cout << "error => " << _error <<std::endl;
         return data.release();
@@ -159,7 +166,9 @@ namespace net::c
         struct sockaddr_in addr;
 
         addr.sin_family = m_dom;
+        std::cout <<"DOM => " << m_dom << std::endl;
         addr.sin_port = htons(_port);
+        std::cout <<"PORT => " << addr.sin_port << std::endl;
         if (inet_pton(m_dom, _ip, &addr.sin_addr) <= 0) {
             Logger::Log("[c::Socket] Connection failed: ", strerror(errno), ", when converting Ip");
             return false;
@@ -168,6 +177,9 @@ namespace net::c
             Logger::Log("[c::Socket] Connection failed: ", strerror(errno));
             return false;
         }
+        std::cout << addr.sin_addr.s_addr <<std::endl;
+        std::cout << "Address: " << inet_ntoa(addr.sin_addr) << std::endl;
+        std::cout << "Port: " << ntohs(addr.sin_port) << std::endl;
         return true;
     }
 
@@ -188,7 +200,15 @@ namespace net::c
 
     const uint8_t *Socket::c_receive(size_t _size, int &_error)
     {
+        std::cout << "c_receive: _size" << _size << std::endl;
+        std::cout << "c_receive: _error: " << _error << std::endl;
+        std::cout << "c_receive: m_fd: " << m_fd << std::endl;
         return receive(m_fd, _size, _error);
+    }
+
+    const uint8_t *Socket::c_receiveUDP(size_t _size, int &_error)
+    {
+        return receiveUDP(m_fd, _size, _error);
     }
 
     bool Socket::c_blocking(bool _block)

@@ -38,4 +38,17 @@ namespace utils
         }
         return reject;
     }
+
+    template<char C>
+    std::vector<std::string> split(const std::string &_str)
+    {
+        std::vector<std::string> result;
+        size_t old = 0;
+
+        for (size_t pos = _str.find(C); pos != std::string::npos; pos = _str.find(C)) {
+            result.emplace_back(std::move(_str.substr(old, pos)));
+            old = pos;
+        }
+        return result;
+    }
 }

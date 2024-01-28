@@ -23,7 +23,7 @@ namespace fix
     std::pair<bool, Reject> verify(const std::string &_value)
     {
         // the definition of the specialization are made after the static_assert(false), so it need to be calculated to have the instance of the specialization
-        static_assert(std::is_same_v<bool, float>, "No specialization for the verification of this tag");
+        static_assert(!std::is_same_v<T, T>, "No specialization for the verification of this tag");
         return { true,  {} };
     }
 
@@ -31,7 +31,7 @@ namespace fix
     std::pair<bool, Reject> verify(const std::string &, const std::string &)
     {
         // the definition of the specialization are made after the static_assert(false), so it need to be calculated to have the instance of the specialization
-        static_assert(std::is_same_v<bool, float>, "No specialization for the verification of this tag");
+        static_assert(!std::is_same_v<T, T>, "No specialization for the verification of this tag");
         return { true,  {} };
     }
 
@@ -39,7 +39,7 @@ namespace fix
     std::pair<bool, Reject> verify(const std::string &, size_t)
     {
         // the definition of the specialization are made after the static_assert(false), so it need to be calculated to have the instance of the specialization
-        static_assert(std::is_same_v<bool, float>, "No specialization for the verification of this tag");
+        static_assert(!std::is_same_v<T, T>, "No specialization for the verification of this tag");
         return { true,  {} };
     }
 
@@ -98,9 +98,10 @@ namespace fix
             NewOrderSingle::cMsgType,
             OrderCancelRequest::cMsgType,
             OrderCancelReplaceRequest::cMsgType,
+            MarketDataRequest::cMsgType,
             Logout::cMsgType
         };
-        constexpr const size_t size_type = 6;
+        constexpr const size_t size_type = 7;
         std::pair<bool, fix::Reject> reject = { false, {} };
 
         for (size_t i = 0; i < size_type; i++)
@@ -155,6 +156,7 @@ namespace fix
             reject.first = true;
             reject.second.set373_sessionRejectReason(Reject::ValueOORange);
             reject.second.set58_text("Sequence number is not correct");
+            std::cout << "seqnum: '" << _seqnum << "' != '" << _value << "'" << std::endl;
         }
         return reject;
     }
@@ -273,7 +275,37 @@ namespace fix
             reject.first = true;
             reject.second.set371_refTagId(Tag::Symbol);
             reject.second.set373_sessionRejectReason(Reject::ValueOORange);
-            reject.second.set58_text("Not supported symbol");
+            reject.second.set58_text("Not supported symbol in the group");
+        }
+        return reject;
+    }
+
+    template<>
+    std::pair<bool, Reject> verify<Tag::Symbol>(const std::string &_value, size_t _n)
+    {
+        const std::vector<std::string> sym{ MARKET_NAME };
+        std::pair<bool, fix::Reject> reject = { false, {} };
+        std::vector<std::string> symbols = utils::split<','>(_value);
+
+        if (symbols.size() != _n) {
+            reject.first = true;
+            reject.second.set371_refTagId(Tag::Symbol);
+            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
+            reject.second.set58_text("The number of symbole doesn't match the number of group");
+        } else {
+            for (const auto &_symbol : symbols) {
+                auto it = std::find_if(sym.begin(), sym.end(), [_symbol] (const std::string &_sym) {
+                    return _symbol == _sym;
+                });
+
+                if (it == sym.end()) {
+                    reject.first = true;
+                    reject.second.set371_refTagId(Tag::Symbol);
+                    reject.second.set373_sessionRejectReason(Reject::ValueOORange);
+                    reject.second.set58_text("Not supported symbol");
+                    return reject;
+                }
+            }
         }
         return reject;
     }
@@ -316,6 +348,91 @@ namespace fix
             reject.second.set371_refTagId(Tag::HearBtInt);
             reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
             reject.second.set58_text("Heart beat should be a numerical value");
+        }
+        return reject;
+    }
+
+    template<>
+    std::pair<bool, Reject> verify<Tag::NoRelatedSym>(const std::string &_value)
+    {
+        std::pair<bool, fix::Reject> reject = { false, {} };
+
+        if (!utils::is_numeric(_value)) {
+            reject.first = true;
+            reject.second.set371_refTagId(Tag::NoRelatedSym);
+            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
+            reject.second.set58_text("Number of related symbol should be a numerical value");
+        }
+        return reject;
+    }
+
+    template<>
+    std::pair<bool, Reject> verify<Tag::SubscriptionRequestType>(const std::string &_value)
+    {
+        std::pair<bool, fix::Reject> reject = { false, {} };
+
+        reject.second.set371_refTagId(Tag::SubscriptionRequestType);
+        if (!utils::is_numeric(_value)) {
+            reject.first = true;
+            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
+            reject.second.set58_text("Subscription type should be a numerical value");
+        } else if (_value != "0" && _value != "1" && _value != "3") {
+            reject.first = true;
+            reject.second.set373_sessionRejectReason(Reject::ValueOORange);
+            reject.second.set58_text("Not supported subscrition type");
+        }
+        return reject;
+    }
+
+    template<>
+    std::pair<bool, Reject> verify<Tag::MarketDepth>(const std::string &_value)
+    {
+        std::pair<bool, fix::Reject> reject = { false, {} };
+
+        reject.second.set371_refTagId(Tag::MarketDepth);
+        if (!utils::is_numeric(_value)) {
+            reject.first = true;
+            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
+            reject.second.set58_text("Market depth shoudl be a numeric value");
+        }
+        return reject;
+    }
+
+    template<>
+    std::pair<bool, Reject> verify<Tag::NoMDEntryTypes>(const std::string &_value)
+    {
+        std::pair<bool, fix::Reject> reject = { false, {} };
+
+        reject.second.set371_refTagId(Tag::NoMDEntryTypes);
+        if (!utils::is_numeric(_value)) {
+            reject.first = true;
+            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
+            reject.second.set58_text("Market depth shoudl be a numeric value");
+        }
+        return reject;
+    }
+
+    template<>
+    std::pair<bool, Reject> verify<Tag::MDEntryType>(const std::string &_value, size_t _n)
+    {
+        std::pair<bool, fix::Reject> reject = { false, {} };
+        std::vector<std::string> entrys = utils::split<','>(_value);
+
+        if (entrys.size() != _n) {
+            reject.first = true;
+            reject.second.set371_refTagId(Tag::MDEntryType);
+            reject.second.set373_sessionRejectReason(Reject::IncorrectFormat);
+            reject.second.set58_text("The number of symbole doesn't match the number of group");
+        } else {
+            for (const auto &_sym : entrys) {
+                if (_sym != "0" && _sym != "1") {
+                    reject.first = true;
+                    reject.second.set371_refTagId(Tag::MDEntryType);
+                    reject.second.set373_sessionRejectReason(Reject::ValueOORange);
+                    reject.second.set58_text("Not entry type in the group");
+                    return reject;
+                }
+            }
         }
         return reject;
     }

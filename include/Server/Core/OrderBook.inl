@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <numeric>
 #include <vector>
 
 #include "Common/Core/Logger.hpp"
@@ -12,9 +13,9 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
     Event event;
 
     if constexpr (std::is_same_v<T, BidBook>)
-        event.side = OrderType::Ask;
-    else
         event.side = OrderType::Bid;
+    else
+        event.side = OrderType::Ask;
     event.sold = true;
     for (auto &[_key, _val] : _book) {
         if (cmp(_key, _price))
@@ -35,7 +36,9 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
             if (order.quantity == _order.quantity) {
                 Logger::Log("[OrderBook] (", m_name, ") {Add} Filled the order: ", order, ", price: ", _key);
                 Logger::Log("[OrderBook] (", m_name, ") {Add-Incoming} Filled the order: ", _order);
+                _order.quantity = 0;
                 _val.erase(_val.begin() + i);
+                _order.quantity = 0;
                 m_output.append(event);
                 return false;
             } else if (order.quantity < _order.quantity) {
@@ -48,6 +51,7 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
                 Logger::Log("[OrderBook] (", m_name, ") {Add} Partially sold the order: ", order, ", new quantity: ", order.quantity - _order.quantity, ", price: ", _key);
                 Logger::Log("[OrderBook] (", m_name, ") {Add-Incoming} Filled the order: ", _order);
                 order.quantity -= _order.quantity;
+                _order.quantity = 0;
                 event.quantity = order.quantity;
                 event.status = OrderStatus::PartiallyFilled;
                 m_output.append(event);
@@ -73,6 +77,7 @@ bool OrderBook::cancel(OrderIdMap<T> &_mapId, OrderId _orderId, bool _event)
                 event.side = OrderType::Bid;
             else
                 event.side = OrderType::Ask;
+            event.price = 0;
             event.orderId = _orderId;
             event.status = OrderStatus::Canceld;
             event.userId = it->second.second->userId;
@@ -90,14 +95,123 @@ bool OrderBook::cancel(OrderIdMap<T> &_mapId, OrderId _orderId, bool _event)
     return false;
 }
 
-template<IsBook T>
-std::vector<Price> OrderBook::inter_getPrice(const T &_book)
+template<IsBookCache T>
+fix::MarketDataSnapshotFullRefresh OrderBook::refresh(T &_cache, size_t _depth)
 {
-    std::vector<Price> price(_book.size());
-    size_t i = 0;
     std::lock_guard<std::mutex> guard(m_mutex);
+    size_t size = 0;
+    fix::MarketDataSnapshotFullRefresh result;
+    const std::string type = (std::is_same_v<T, cache_BidBook>) ? "0" : "1";
 
-    for (auto [_price, _order] : _book)
-        price[i++] = _price;
-    return price;
+    switch (_depth) {
+        case 0: size = _cache.size();
+            break;
+        case 1: size = std::max((size_t)1, (_cache.size() / 10) * 2);
+            break;
+        default: size = _depth;
+    }
+    size = std::min(size, _cache.size());
+    std::string ssize = std::to_string(size);
+    std::string price{};
+    std::string quantity{};
+    std::string types{};
+
+    for (const auto &[_price, _qty] : _cache) {
+        if (size == 0)
+            break;
+
+        price += std::to_string(_price) + ",";
+        types += type + ",";
+        quantity += std::to_string(_qty) + ",";
+        size--;
+    }
+    if (!price.empty())
+        price.erase(price.end());
+    if (!types.empty())
+        types.erase(types.end());
+    if (!quantity.empty())
+        quantity.erase(quantity.end());
+
+    result.set110_minQty(quantity);
+    result.set267_noMDEntryTypes(ssize);
+    result.set269_mDEntryType(types);
+    result.set270_mDEntryPx(price);
+    return result;
+}
+
+template<IsBookCache T>
+fix::MarketDataIncrementalRefresh OrderBook::update(T &_cache_orig, T &_cache, size_t _depth)
+{
+    std::lock_guard<std::mutex> guard(m_mutex);
+    size_t size = 0;
+    fix::MarketDataIncrementalRefresh result;
+    const std::string type = (std::is_same_v<T, cache_BidBook>) ? "0" : "1";
+
+    switch (_depth) {
+        case 0: size = _cache.size();
+            break;
+        case 1: size = std::max((size_t)1, (_cache.size() / 10) * 2);
+            break;
+        default: size = _depth;
+    }
+    size = std::min(size, _cache.size());
+    std::string ssize = std::to_string(size);
+    std::string prices{};
+    std::string quantity{};
+    std::string types{};
+    std::string actions{};
+    std::string symbols{};
+
+    // need delete support
+    for (const auto &[_price, _qty] : _cache) {
+        if (size == 0)
+            break;
+
+        if (_cache_orig.contains(_price)) {
+            if (_cache_orig.at(_price) == _qty)
+                continue;
+            actions += "1,";
+            quantity += std::to_string(_cache_orig.at(_price) - _qty) + ",";
+        } else {
+            actions += "0,";
+            quantity += std::to_string(_qty) + ",";
+        }
+        symbols += m_name + ",";
+        prices += std::to_string(_price) + ",";
+        types += type + ",";
+        size--;
+    }
+    if (!types.empty())
+        types.erase(types.end());
+    if (!prices.empty())
+        prices.erase(prices.end());
+    if (!actions.empty())
+        actions.erase(actions.end());
+    if (!quantity.empty())
+        quantity.erase(quantity.end());
+    if (!symbols.empty())
+        symbols.erase(symbols.end());
+
+    result.set55_symbol(symbols);
+    result.set110_minQty(quantity);
+    result.set267_noMDEntryTypes(ssize);
+    result.set269_mDEntryType(types);
+    result.set270_mDEntryPx(prices);
+    result.set279_mDUpdateAction(actions);
+    return result;
+}
+
+template<IsBook T, IsBookCache _T>
+void OrderBook::cache_on(T &_book, _T &_cache, bool _ref)
+{
+    if (_ref) {
+        _cache.clear();
+        for (const auto &[_price, _orders] : _book) {
+            Quantity total_qty = std::accumulate(_orders.begin(), _orders.end(), 0,
+                [] (Quantity _sum, const Order& _order) {
+                    return _sum + _order.quantity;
+                });
+            _cache.emplace(_price, total_qty);
+        }
+    }
 }

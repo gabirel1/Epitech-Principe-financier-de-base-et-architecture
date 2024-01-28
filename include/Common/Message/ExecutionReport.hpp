@@ -45,6 +45,10 @@ namespace fix
             /// @param _val Value assigned to it: (2).
             void set40_ordType(const std::string &_val);
 
+            /// @brief Set the Original order id [41](https://www.onixs.biz/fix-dictionary/4.2/tagNum_41.html).
+            /// @param _val Value assigned to it: string.
+            void set41_origClOrdID(const std::string &_val);
+
             /// @brief Set the price of the order [44](https://www.onixs.biz/fix-dictionary/4.2/tagNum_44.html).
             /// @param _val Value assigned to it: double.
             void set44_price(const std::string &_val);

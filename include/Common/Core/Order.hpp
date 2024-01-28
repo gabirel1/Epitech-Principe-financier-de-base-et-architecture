@@ -33,6 +33,8 @@ enum OrderStatus {
 
 enum class OrderType
 {
-    Bid,
-    Ask
+    Ask,
+    Bid
 };
+
+std::istream &operator>>(std::istream &_is, OrderType &_type);

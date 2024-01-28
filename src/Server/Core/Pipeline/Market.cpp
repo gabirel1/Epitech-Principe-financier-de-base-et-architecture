@@ -8,7 +8,7 @@
 
 namespace pip
 {
-    Market::Market(const std::string &_name, OrderBook &_ob, ActionToMarket &_input, MarketToNet &_output)
+    Market::Market(const std::string &_name, OrderBook &_ob, InMarket &_input, InOutNetwork &_output)
         : m_name(_name), m_input(_input), m_output(_output), m_ob(_ob)
     {
     }
@@ -29,7 +29,7 @@ namespace pip
     void Market::loop()
     {
         Logger::SetThreadName(THIS_THREAD_ID, "Market - " + m_name);
-        MarketIn input;
+        MarketInput input;
 
         while (m_running) {
             if (!m_input.empty()) {
@@ -39,9 +39,9 @@ namespace pip
         }
     }
 
-    void Market::process(MarketIn &_data)
+    void Market::process(MarketInput &_data)
     {
-        Logger::Log("[Market] Processing new action: "); // todo log
+        Logger::Log("[Market] Processing new action: ", _data.Client.User); // todo log
 
         switch (_data.OrderData.action) {
             case OrderBook::Data::Action::Add:
@@ -65,12 +65,12 @@ namespace pip
         }
     }
 
-    bool Market::runAdd(const MarketIn &_data)
+    bool Market::runAdd(const MarketInput &_data)
     {
         fix::ExecutionReport report;
         Order order = _data.OrderData.order;
 
-        Logger::Log("[Market] (New) request: "); // todo log
+        Logger::Log("[Market] (New) request: ", _data.OrderData.order); // todo log
         if (!m_ob.add(_data.OrderData.type, _data.OrderData.price, order)) {
             Logger::Log("[Market] (New) Reject: Order ID already used: ", _data.OrderData.order.orderId);
             report.set14_cumQty("0");
@@ -81,7 +81,7 @@ namespace pip
             report.set39_ordStatus("8");
             report.set40_ordType("2");
             report.set44_price(std::to_string(_data.OrderData.price));
-            report.set54_side((_data.OrderData.type == OrderType::Ask) ? "3" : "4");
+            report.set54_side((_data.OrderData.type == OrderType::Ask) ? "4" : "3");
             report.set58_text("Order Id already used");
             report.set151_leavesQty("0");
             m_output.append(std::move(_data.Client), std::move(report));
@@ -91,7 +91,7 @@ namespace pip
         return true;
     }
 
-    bool Market::runModify(const MarketIn &_data)
+    bool Market::runModify(const MarketInput &_data)
     {
         fix::OrderCancelReject report;
         Order order = _data.OrderData.order;
@@ -117,7 +117,7 @@ namespace pip
         return true;
     }
 
-    bool Market::runCancel(const MarketIn &_data)
+    bool Market::runCancel(const MarketInput &_data)
     {
         fix::OrderCancelReject report;
 
