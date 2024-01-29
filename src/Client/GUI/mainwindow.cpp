@@ -173,7 +173,7 @@ void MainWindow::slot_cancelOrder()
         orderCancel.set11_clOrdID(utils::generateRandomNumericID());
         orderCancel.set41_origClOrdID(m_ui->orderIDValue_OrderCancel->text().toStdString());
         orderCancel.set54_side(side);
-        orderCancel.set55_symbol("3");
+        orderCancel.set55_symbol(m_ui->marketSymbol->currentText().toStdString());
         orderCancel.set60_transactTime(getDate());
 
         m_netio.tcp_in.push(std::move(orderCancel));
