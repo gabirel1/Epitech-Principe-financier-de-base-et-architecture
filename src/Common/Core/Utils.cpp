@@ -2,6 +2,7 @@
 #include <sstream>
 
 #include "Common/Core/Utils.hpp"
+#include <random>
 
 namespace utils
 {
@@ -31,4 +32,20 @@ namespace utils
         ss << std::hex << randomNum;
         return ss.str().substr(0, 7);
     }
+
+    std::string generateRandomNumericID() {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dis(0, 9999999);
+
+        unsigned int id = dis(gen);
+        std::string idStr = std::to_string(id);
+
+        while (idStr.length() < 7) {
+            idStr = "0" + idStr;
+        }
+
+        return idStr;
+    }
+
 }

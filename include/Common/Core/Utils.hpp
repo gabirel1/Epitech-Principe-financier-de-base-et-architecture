@@ -18,6 +18,7 @@ namespace utils
     std::vector<std::string> split(const std::string &_str);
 
     std::string id();
+    std::string generateRandomNumericID();
 
 }
 

@@ -109,10 +109,12 @@ void MainWindow::slot_sendNewOrderSingle()
 
     std::cout << m_msgId <<std::endl;
 
+    std::string myOrderId = utils::generateRandomNumericID();
+
     newOrderSingle.header.set34_msgSeqNum(std::to_string(m_msgId));
     newOrderSingle.header.set49_SenderCompId(m_userID);
     newOrderSingle.header.set56_TargetCompId("MyMarket");
-    newOrderSingle.set11_clOrdID(utils::id());
+    newOrderSingle.set11_clOrdID(myOrderId);
     newOrderSingle.set21_handlInst("3");
     newOrderSingle.set38_orderQty(m_ui->quantityValue_NewOrderSingle->text().toStdString());
     newOrderSingle.set40_ordType("2");
@@ -124,7 +126,7 @@ void MainWindow::slot_sendNewOrderSingle()
     m_netio.tcp_in.push(std::move(newOrderSingle));
 
     Order orderTemp;
-    orderTemp.orderId = utils::id();
+    orderTemp.orderId = myOrderId;
     orderTemp.quantity = m_ui->quantityValue_NewOrderSingle->text().toULongLong();
     orderTemp.userId = m_ui->userIdValue->text().toULongLong();
 
@@ -168,7 +170,7 @@ void MainWindow::slot_cancelOrder()
         orderCancel.header.set34_msgSeqNum(std::to_string(m_msgId));
         orderCancel.header.set49_SenderCompId(m_userID);
         orderCancel.header.set56_TargetCompId("MyMarket");
-        orderCancel.set11_clOrdID(utils::id());
+        orderCancel.set11_clOrdID(utils::generateRandomNumericID());
         orderCancel.set41_origClOrdID(m_ui->orderIDValue_OrderCancel->text().toStdString());
         orderCancel.set54_side(side);
         orderCancel.set55_symbol("3");
@@ -194,7 +196,7 @@ void MainWindow::slot_modifyOrder()
         orderCancelReplace.header.set34_msgSeqNum(std::to_string(m_msgId));
         orderCancelReplace.header.set49_SenderCompId(m_userID);
         orderCancelReplace.header.set56_TargetCompId("MyMarket");
-        orderCancelReplace.set11_clOrdID(m_ui->orderIDValue_OrderCancelReplace->text().toStdString());
+        orderCancelReplace.set11_clOrdID(utils::generateRandomNumericID());
         orderCancelReplace.set21_handlInst("3");
         orderCancelReplace.set38_orderQty(m_ui->quantityValue_OrderCancelReplace->text().toStdString());
         orderCancelReplace.set40_ordType("2");
