@@ -1,6 +1,6 @@
 #include "Client/Data/UDPHandler.hpp"
 
-UDPHandler::UDPHandler(uint32_t _port, const net::Ip &_ip, UDPInput &_input, UDPOutput &_output)
+UDPHandler::UDPHandler(const net::Ip &_ip, uint32_t _port, UDPInput &_input, UDPOutput &_output)
     : m_ip(_ip), m_input(_input), m_output(_output)
 {
     m_socket = std::make_shared<net::udp::Socket>();

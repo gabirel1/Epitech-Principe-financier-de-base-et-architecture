@@ -15,7 +15,7 @@ class UDPHandler
     public:
         using Client = net::Selector<net::udp::Socket>::Client;
 
-        UDPHandler(uint32_t _port, const net::Ip &_ip, UDPInput &_input, UDPOutput &_output);
+        UDPHandler(const net::Ip &_ip, uint32_t _port, UDPInput &_input, UDPOutput &_output);
         ~UDPHandler();
 
         [[nodiscard]] bool start();
