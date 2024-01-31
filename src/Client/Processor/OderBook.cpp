@@ -1,5 +1,5 @@
 #include "Common/Core/Logger.hpp"
-#include "Client/Data/OrderBook.hpp"
+#include "Client/Processor/OrderBook.hpp"
 #include "Common/Message/MarketDataIncrementalRefresh.hpp"
 #include "Common/Message/MarketDataRequest.hpp"
 #include "Common/Message/MarketDataSnapshotFullRefresh.hpp"
@@ -15,8 +15,10 @@ namespace data
 
 namespace proc
     {
-    std::optional<fix::Message> OrderBook::process(fix::Serializer::AnonMessage &_msg)
+    std::optional<fix::Message> OrderBook::process(fix::Serializer::AnonMessage &_msg, Context &_context)
     {
+        if (!_context.Loggin)
+            return {};
         Logger::Log("[TCPOutput] received new message: { MsgType: ", _msg.at(fix::Tag::MsgType), " }");
         if (_msg.at(fix::Tag::MsgType) != "" && _msg.at(fix::Tag::MsgType) != "")
             Logger::Log("[TCPOutput] Message not handle by OrderBook");
@@ -27,8 +29,10 @@ namespace proc
         return {};
     }
 
-    std::optional<fix::Message> OrderBook::build(char _tag) const
+    std::optional<fix::Message> OrderBook::build(char _tag, Context &_context) const
     {
+        std::ignore = _context;
+
         if (_tag == fix::MarketDataSnapshotFullRefresh::cMsgType)
             return buildFullRefresh();
         else if (_tag == fix::MarketDataSnapshotFullRefresh::cMsgType)
@@ -36,8 +40,10 @@ namespace proc
         return {};
     }
 
-    std::optional<data::UDPPackage> OrderBook::process(const data::UDPPackage &_package)
+    std::optional<data::UDPPackage> OrderBook::process(const data::UDPPackage &_package, Context &_context)
     {
+        std::ignore = _context;
+
         Logger::Log("[UDPOutput] receive new actions: ", _package); // todo log
         if (UDP_FLAG_GET_BOOK(_package.flag) == OrderType::Bid)
             functional_sync(m_bid, _package.symbol, _package.price, _package.quantity, OrderBook::QtySync);
@@ -115,7 +121,7 @@ namespace proc
     data::FullRefresh OrderBook::loadFullRefresh(fix::Serializer::AnonMessage &_msg)
     {
         size_t size = utils::to<size_t>(_msg.at(fix::Tag::NoMDEntries));
-        data::FullRefresh refresh{size};
+        data::FullRefresh refresh;
 
         refresh.symbol = _msg.at(fix::Tag::Symbol);
         Logger::Log("[FIX] {LoadIncrRefresh} Loading: ", size, " modifications on symbol: ", refresh.symbol);

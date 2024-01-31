@@ -3,14 +3,12 @@
 #include <memory>
 #include <vector>
 
-#include "Client/Data/IProcessor.hpp"
+#include "Client/Handler/UDPHandler.hpp"
+#include "Client/Handler/UserInput.hpp"
+#include "Client/Handler/TCPHandler.hpp"
+#include "Client/Processor/OrderBook.hpp"
 #include "Common/Network/Ip.hpp"
 #include "Common/Thread/Queue.hpp"
-#include "Client/Data/UDPHandler.hpp"
-#include "Client/Data/UserInput.hpp"
-
-using TCPInput = ts::Queue<fix::Message>;
-using TCPOutput = ts::Queue<fix::Serializer::AnonMessage>;
 
 class Core
 {
@@ -29,14 +27,11 @@ class Core
 
         bool m_running = false;
 
-        TCPInput m_tcp_in;
-        TCPOutput m_tcp_out;
-        UDPInput m_udp_in;
-        UDPOutput m_udp_out;
-        EntryOutput m_entry;
+        Context m_context;
 
-        UserInput m_input;
-        UDPHandler m_udp;
+        io::UserInput m_input;
+        io::TCPHandler m_tcp;
+        io::UDPHandler m_udp;
 
         std::thread m_thread;
 };

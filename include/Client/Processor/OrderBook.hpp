@@ -8,8 +8,7 @@
 #include "Common/Network/UDPPackage.hpp"
 #include "Common/Thread/Queue.hpp"
 #include "Common/Message/Fix.hpp"
-#include "Client/Data/IProcessor.hpp"
-#include "Client/Data/UDPHandler.hpp"
+#include "Client/Processor/IProcessor.hpp"
 
 namespace data
 {
@@ -59,10 +58,10 @@ namespace proc
             OrderBook() = default;
             ~OrderBook() = default;
 
-            std::optional<fix::Message> process(fix::Serializer::AnonMessage &_msg) override final;
-            std::optional<data::UDPPackage> process(const data::UDPPackage &_package) override final;
+            std::optional<fix::Message> process(fix::Serializer::AnonMessage &_msg, Context &_ctx) override final;
+            std::optional<data::UDPPackage> process(const data::UDPPackage &_package, Context &_ctx) override final;
 
-            virtual std::optional<fix::Message> build(char _tag) const override final;
+            virtual std::optional<fix::Message> build(char _tag, Context &_ctx) const override final;
 
         protected:
             void treatIncrRefresh(fix::Serializer::AnonMessage &_msg);
@@ -113,4 +112,4 @@ namespace proc
     };
 }
 
-#include "Client/Data/OrderBook.inl"
+#include "Client/Processor/OrderBook.inl"

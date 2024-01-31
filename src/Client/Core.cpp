@@ -1,9 +1,7 @@
 #include "Client/Core.hpp"
-#include "Client/Data/OrderBook.hpp"
-#include "Client/Data/UserInput.hpp"
 
 Core::Core(const net::Ip &_ip, uint32_t _tcp, uint32_t _udp)
-    : m_udp(_ip, _udp, m_udp_in, m_udp_out), m_input(m_entry) //, m_tcp(_ip, _tcp, m_tcp_in, m_tcp_out)
+    : m_tcp(_ip, _tcp), m_udp(_ip, _udp)
 {
     std::shared_ptr<proc::OrderBook> ob = std::make_shared<proc::OrderBook>();
 
@@ -21,58 +19,45 @@ void Core::start()
     m_running = true;
 
     (void)m_udp.start();
-    // m_tcp.start();
+    m_tcp.start();
     m_input.start();
-    bool found = false;
 
     while (m_running) {
-        if (!m_udp_out.empty()) {
-            found = false;
-            for (auto &_proc : m_proc_udp) {
-                std::optional<data::UDPPackage> res = _proc->process(m_udp_out.pop_front());
+        // if (!m_udp.empty(io::Side::Recv)) {
+        //     const data::UDPPackage package = m_udp.pop_front_recv();
 
-                if (res) {
-                    found = true;
-                    m_udp_in.push(res.value());
-                    break;
-                }
-            }
-            if (!found) {
-                std::cout << "[Error] unknow message received (UDP)" << std::endl;
-                m_udp_out.pop();
-            }
-        }
-        if (!m_tcp_out.empty()) {
-            found = false;
-            for (auto &_proc : m_proc_tcp) {
-                fix::Serializer::AnonMessage val = m_tcp_out.pop_front();
-                std::optional<fix::Message> res = _proc->process(val);
+        //     for (auto &_proc : m_proc_udp) {
+        //         std::optional<data::UDPPackage> res = _proc->process(package, m_context);
 
-                if (res) {
-                    found = true;
-                    m_tcp_in.push(res.value());
-                    break;
-                }
-            }
-            if (!found) {
-                std::cout << "[Error] unknow message received (TCP)" << std::endl;
-                m_tcp_out.pop();
-            }
-        }
-        if (!m_entry.empty()) {
-            found = false;
+        //         if (res) {
+        //             m_udp.send_to_send(std::move(res.value()));
+        //             break;
+        //         }
+        //     }
+        // }
+        // if (!m_tcp.empty(io::Side::Recv)) {
+        //     fix::Serializer::AnonMessage val = m_tcp.pop_front_recv();
+
+        //     for (auto &_proc : m_proc_tcp) {
+        //         std::optional<fix::Message> res = _proc->process(val, m_context);
+
+        //         if (res) {
+        //             m_tcp.send_to_send(std::move(res.value()));
+        //             break;
+        //         }
+        //     }
+        // }
+        if (!m_input.empty(io::Side::Recv)) {
+            const std::string entry = m_input.pop_front_recv();
+
             for (auto &_proc : m_proc_entry) {
-                std::string log = m_entry.pop_front();
-                std::optional<fix::Message> res = _proc->process(log);
+                std::optional<fix::Message> res = _proc->process(entry, m_context);
 
                 if (res) {
-                    found = true;
-                    m_entry.push(res.value());
+                    m_input.send_to_send(std::move(res.value()));
                     break;
                 }
             }
-            if (!found)
-                std::cout << "[Error] unknow command: " << m_entry.pop_front() << std::endl;
         }
     }
 }
