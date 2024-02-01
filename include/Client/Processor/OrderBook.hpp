@@ -79,8 +79,6 @@ namespace proc
             template<class T>
             static bool functional_sync(T &_map, const std::string &_sym, Price _price, Quantity _qty, SyncFn _sync);
 
-            bool m_running = false;
-
             bool m_is_sync = false;
 
             BidMap m_bid;

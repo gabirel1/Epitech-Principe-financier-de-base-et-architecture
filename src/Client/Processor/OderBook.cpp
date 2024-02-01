@@ -20,11 +20,12 @@ namespace proc
         if (!_context.Loggin)
             return {};
         Logger::Log("[TCPOutput] received new message: { MsgType: ", _msg.at(fix::Tag::MsgType), " }");
-        if (_msg.at(fix::Tag::MsgType) != "" && _msg.at(fix::Tag::MsgType) != "")
+        if (_msg.at(fix::Tag::MsgType) != fix::MarketDataIncrementalRefresh::MsgType &&
+            _msg.at(fix::Tag::MsgType) != fix::MarketDataSnapshotFullRefresh::MsgType)
             Logger::Log("[TCPOutput] Message not handle by OrderBook");
-        else if (_msg.at(fix::Tag::MsgType) == "")
+        else if (_msg.at(fix::Tag::MsgType) == fix::MarketDataSnapshotFullRefresh::MsgType)
             treatFullRefresh(_msg);
-        else if (_msg.at(fix::Tag::MsgType) == "")
+        else if (_msg.at(fix::Tag::MsgType) == fix::MarketDataIncrementalRefresh::MsgType)
             treatIncrRefresh(_msg);
         return {};
     }

@@ -38,4 +38,17 @@ namespace utils
         return idStr;
     }
 
+    std::vector<std::string> space_split(const std::string &_str)
+    {
+        std::stringstream stream(_str);
+        std::string value;
+        std::vector<std::string> result;
+
+        while (stream) {
+            stream >> value;
+            if (stream)
+                result.emplace_back(value);
+        }
+        return result;
+    }
 }

@@ -18,8 +18,8 @@ namespace utils
     std::vector<std::string> split(const std::string &_str);
 
     std::string id();
-    std::string id();
 
+    std::vector<std::string> space_split(const std::string &_str);
 }
 
 #include "Common/Core/Utils.inl"
