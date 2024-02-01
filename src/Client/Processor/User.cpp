@@ -177,6 +177,7 @@ namespace proc
             std::cout << "  logon -u <user>" << std::endl;
             std::cout << "  new_order -i <id> -q <quantity> -p <price> -s <side>(buy|sell) -S <symbol>(GOLD|USD|EURO)" << std::endl;
             std::cout << "  cancel_order -i <id> -t <target_id> -S <symbol>(GOLD|USD|EURO) -s <side>(buy|sell)" << std::endl;
+            std::cout << "  cancel_replace -i <id> -t <target_id> -q <quantity> -p <price> -s <side>(buy|sell) -S <symbol>(GOLD|USD|EURO)" << std::endl;
             std::cout << "  logout" << std::endl;
             std::cout << "  status" << std::endl;
             std::cout << "  help" << std::endl;
