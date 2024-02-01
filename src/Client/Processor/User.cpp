@@ -4,6 +4,7 @@
 #include "Common/Message/Logon.hpp"
 #include "Common/Message/Logout.hpp"
 #include "Common/Message/Tag.hpp"
+#include "Common/Core/Logger.hpp"
 
 namespace proc
 {
@@ -50,6 +51,15 @@ namespace proc
             if (words.size() != 1)
                 return {};
             std::cout << _ctx << std::endl;
+            return {};
+        } else if (words.at(0) == "help") {
+            if (words.size() != 1)
+                return {};
+            std::cout << "Commands:" << std::endl;
+            std::cout << "  logon -u <user>" << std::endl;
+            std::cout << "  logout" << std::endl;
+            std::cout << "  status" << std::endl;
+            std::cout << "  help" << std::endl;
             return {};
         }
         return {};
