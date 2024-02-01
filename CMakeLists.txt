@@ -49,7 +49,7 @@ target_compile_definitions(MarketServer PRIVATE TS_SIZE_OB=1)                   
 target_compile_definitions(MarketServer PRIVATE TS_SIZE_ON=1)                       # Thread Pool size from Output network
 target_compile_definitions(MarketServer PRIVATE NET_RECV_SIZE=4096)                 # Package max read size
 target_compile_definitions(MarketServer PRIVATE PROVIDER_NAME="MyMarket")           # Server name (used for TargetCompId from client)
-target_compile_definitions(MarketServer PRIVATE MARKET_NAME="GOLD","EURO","USD")    # Server name (used for TargetCompId from client)
+target_compile_definitions(MarketServer PRIVATE MARKET_NAME="GOLD","EURO","USD")    # Name of availalbe market
 
 # Client
 
@@ -66,6 +66,9 @@ add_executable(MarketClient
 target_link_libraries(MarketClient PRIVATE MarketCommon)
 
 target_include_directories(MarketClient PRIVATE include)
+
+target_compile_definitions(MarketClient PRIVATE PROVIDER_NAME="MyMarket")
+target_compile_definitions(MarketClient PRIVATE MARKET_NAME="GOLD","EURO","USD")
 
 # Setup GTest
 # include(FetchContent)

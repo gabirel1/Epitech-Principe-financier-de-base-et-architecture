@@ -25,6 +25,8 @@ class Core
         std::vector<std::shared_ptr<proc::IUDP>> m_proc_udp;
         std::vector<std::shared_ptr<proc::IEntry>> m_proc_entry;
 
+        void setContext(fix::Message &_msg);
+
         bool m_running = false;
 
         Context m_context;

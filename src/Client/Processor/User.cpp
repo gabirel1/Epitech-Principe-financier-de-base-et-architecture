@@ -9,10 +9,14 @@ namespace proc
 {
     std::optional<fix::Message> User::process(fix::Serializer::AnonMessage &_msg, Context &_ctx)
     {
-        if (_msg.at(fix::Tag::MsgType) == fix::Logon::MsgType)
+        if (_msg.at(fix::Tag::MsgType) == fix::Logon::MsgType) {
+            _ctx.User = _msg.at(fix::Tag::TargetCompId);
+            _ctx.HeartBit = utils::to<uint32_t>(_msg.at(fix::Tag::HearBtInt));
             _ctx.Loggin = true;
-        else if (_ctx.Loggin && _msg.at(fix::Tag::MsgType) == fix::Logout::MsgType)
-            _ctx.Loggin = false;
+        }
+        else if (_ctx.Loggin && _msg.at(fix::Tag::MsgType) == fix::Logout::MsgType) {
+            _ctx.reset();
+        }
         return {};
     }
 
@@ -23,21 +27,18 @@ namespace proc
 
         if (words.size() < 1)
             return {};
-        std::cout << words.at(0) << std::endl;
         if (words.at(0) == "logon") {
-            std::vector<const char *> cwords{words.size()};
+            std::vector<const char *> cwords;
 
             for (auto &_word : words)
-                cwords.emplace_back(std::move(_word.c_str()));
+                cwords.emplace_back(_word.c_str());
             while (param != -1) {
                 param = getopt(words.size(), const_cast<char * const *>(cwords.data()), "u:");
                 switch (param) {
-                    case -1:        // no more option
                     case ':':       // missing param
                     case '?':       // unknow
                         return {};
                     case 'u':
-                        _ctx.HeartBit = 30;
                         return buildLogon(optarg);
                 };
             }

@@ -10,7 +10,7 @@ namespace io
             std::string input;
 
             std::cout << "$> ";
-            std::cin >> input;
+            std::getline(std::cin, input);
             send_to_recv(std::move(input));
             while (!empty(Side::Send))
                 (void)pop_front_send();

@@ -32,7 +32,6 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
             event.userId = order.userId;
             event.quantity = 0;
             event.orgQty = order.quantity;
-            std::cout << "here" << std::endl;
             if (order.quantity == _order.quantity) {
                 Logger::Log("[OrderBook] (", m_name, ") {Add} Filled the order: ", order, ", price: ", _key);
                 Logger::Log("[OrderBook] (", m_name, ") {Add-Incoming} Filled the order: ", _order);

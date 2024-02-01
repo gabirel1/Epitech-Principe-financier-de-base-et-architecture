@@ -4,14 +4,17 @@ namespace io
 {
     TCPHandler::TCPHandler(const net::Ip &_ip, uint32_t _port)
     {
-        m_socket = std::make_unique<net::tcp::Socket>();
-        m_socket->connect(_ip, _port);
+        m_socket = std::make_shared<net::tcp::Socket>();
+        if (!m_socket->connect(_ip, _port))
+            std::cout << "Restart needed, you are not connected to the server" << std::endl;
+        else
+            m_selector.client(m_socket);
     }
 
     void TCPHandler::loop()
     {
         int error = 0;
-        std::vector<Client> clients{1};
+        std::vector<Client> clients;
 
         while (*this) {
             clients = m_selector.pull();
@@ -26,8 +29,9 @@ namespace io
                     continue;
                 send_to_recv(std::move(msg));
             }
-            if (!empty(Side::Send))
+            if (!empty(Side::Send)) {
                 m_socket->send(pop_front_send().to_string());
+            }
         }
     }
 }

@@ -42,9 +42,7 @@ namespace net::c
         struct sockaddr_in addr;
         socklen_t addr_len = sizeof(addr);
 
-        std::cout << "before recv" <<std::endl;
         _error = ::recvfrom(_fd, data.get(), _size, 0, (struct sockaddr*)&addr, &addr_len);
-        std::cout << "error => " << _error <<std::endl;
         return data.release();
     }
 
@@ -52,9 +50,7 @@ namespace net::c
     {
         std::unique_ptr<uint8_t []> data(new uint8_t[_size]{});
 
-        std::cout << "before recv" <<std::endl;
         _error = ::recv(_fd, data.get(), _size, 0);
-        std::cout << "error => " << _error <<std::endl;
         return data.release();
     }
 
@@ -166,9 +162,7 @@ namespace net::c
         struct sockaddr_in addr;
 
         addr.sin_family = m_dom;
-        std::cout <<"DOM => " << m_dom << std::endl;
         addr.sin_port = htons(_port);
-        std::cout <<"PORT => " << addr.sin_port << std::endl;
         if (inet_pton(m_dom, _ip, &addr.sin_addr) <= 0) {
             Logger::Log("[c::Socket] Connection failed: ", strerror(errno), ", when converting Ip");
             return false;
@@ -177,9 +171,6 @@ namespace net::c
             Logger::Log("[c::Socket] Connection failed: ", strerror(errno));
             return false;
         }
-        std::cout << addr.sin_addr.s_addr <<std::endl;
-        std::cout << "Address: " << inet_ntoa(addr.sin_addr) << std::endl;
-        std::cout << "Port: " << ntohs(addr.sin_port) << std::endl;
         return true;
     }
 
@@ -200,9 +191,6 @@ namespace net::c
 
     const uint8_t *Socket::c_receive(size_t _size, int &_error)
     {
-        std::cout << "c_receive: _size" << _size << std::endl;
-        std::cout << "c_receive: _error: " << _error << std::endl;
-        std::cout << "c_receive: m_fd: " << m_fd << std::endl;
         return receive(m_fd, _size, _error);
     }
 

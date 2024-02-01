@@ -14,6 +14,7 @@ Core::Core(const net::Ip &_ip, uint32_t _tcp, uint32_t _udp)
     m_proc_udp.push_back(ob);
 
     m_proc_entry.push_back(user);
+    m_context.reset();
 }
 
 Core::~Core()
@@ -36,7 +37,7 @@ void Core::start()
             for (auto &_proc : m_proc_udp) {
                 std::optional<data::UDPPackage> res = _proc->process(package, m_context);
 
-                if (res) {
+                if (res.has_value()) {
                     m_udp.send_to_send(std::move(res.value()));
                     break;
                 }
@@ -48,7 +49,8 @@ void Core::start()
             for (auto &_proc : m_proc_tcp) {
                 std::optional<fix::Message> res = _proc->process(val, m_context);
 
-                if (res) {
+                if (res.has_value()) {
+                    setContext(res.value());
                     m_tcp.send_to_send(std::move(res.value()));
                     break;
                 }
@@ -60,8 +62,9 @@ void Core::start()
             for (auto &_proc : m_proc_entry) {
                 std::optional<fix::Message> res = _proc->process(entry, m_context);
 
-                if (res) {
-                    m_input.send_to_send(std::move(res.value()));
+                if (res.has_value()) {
+                    setContext(res.value());
+                    m_tcp.send_to_send(std::move(res.value()));
                     break;
                 }
             }
@@ -76,4 +79,12 @@ void Core::stop()
     (void)m_udp.stop();
     // m_tcp.stop();
     (void)m_input.stop();
+}
+
+void Core::setContext(fix::Message &_msg)
+{
+    _msg.header.set56_TargetCompId(PROVIDER_NAME);
+    _msg.header.set34_msgSeqNum(m_context.SeqNum++);
+    if (m_context.Loggin)
+        _msg.header.set49_SenderCompId(m_context.User);
 }
