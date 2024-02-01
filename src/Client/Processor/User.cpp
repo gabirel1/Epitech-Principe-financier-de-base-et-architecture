@@ -83,6 +83,41 @@ namespace proc
                 return {};
             }
             return buildNewOrder(orderId, quantity, price, side, symbol);
+        } else if (words.at(0) == "cancel_order") {
+            std::vector<const char *> cwords;
+            std::string cancelOrderId = "";
+            std::string targetOrderId = "";
+            std::string symbol = "";
+            std::string side = "";
+
+            for (auto &_word : words)
+                cwords.emplace_back(_word.c_str());
+
+            while (param != -1) {
+                param = getopt(words.size(), const_cast<char * const *>(cwords.data()), "i:t:S:s:");
+                switch (param) {
+                    case ':':       // missing param
+                    case '?':       // unknow
+                        return {};
+                    case 'i':
+                        cancelOrderId = optarg;
+                        break;
+                    case 't':
+                        targetOrderId = optarg;
+                        break;
+                    case 'S':
+                        symbol = optarg;
+                        break;
+                    case 's':
+                        side = optarg;
+                        break;
+                };
+            }
+            if (cancelOrderId.empty() || targetOrderId.empty() || symbol.empty() || side.empty()) {
+                Logger::Log("[User Input]: Missing parameter for cancel_order");
+                return {};
+            }
+            return buildOrderCancel(cancelOrderId, targetOrderId, symbol, side);
         } else if (words.at(0) == "logout") {
             if (words.size() != 1)
                 return {};
@@ -98,6 +133,7 @@ namespace proc
             std::cout << "Commands:" << std::endl;
             std::cout << "  logon -u <user>" << std::endl;
             std::cout << "  new_order -i <id> -q <quantity> -p <price> -s <side>(buy|sell) -S <symbol>(GOLD|USD|EURO)" << std::endl;
+            std::cout << "  cancel_order -i <id> -t <target_id> -S <symbol>(GOLD|USD|EURO) -s <side>(buy|sell)" << std::endl;
             std::cout << "  logout" << std::endl;
             std::cout << "  status" << std::endl;
             std::cout << "  help" << std::endl;
@@ -140,6 +176,20 @@ namespace proc
         order.set60_transactTime(utils::get_timestamp());
 
         return order;
+    }
+
+    fix::Message User::buildOrderCancel(const std::string &_cancelOrderId, const std::string &_targetOrderId, const std::string &_symbol, const std::string &_side) const
+    {
+        fix::OrderCancelRequest cancel;
+
+        cancel.header.set49_SenderCompId(_cancelOrderId);
+        cancel.set11_clOrdID(_cancelOrderId);
+        cancel.set41_origClOrdID(_targetOrderId);
+        cancel.set55_symbol(_symbol);
+        cancel.set54_side(_side);
+        cancel.set60_transactTime(utils::get_timestamp());
+
+        return cancel;
     }
 
     fix::Message User::buildLogout() const
