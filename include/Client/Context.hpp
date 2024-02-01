@@ -8,6 +8,7 @@ struct Context
     UserId User;
     uint32_t HeartBit = 0;
     uint32_t SeqNum = 1;
+    std::vector<OrderClient> MyOrders;
 
     void reset();
 };

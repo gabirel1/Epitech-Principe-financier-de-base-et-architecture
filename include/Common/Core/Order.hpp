@@ -37,4 +37,13 @@ enum class OrderType
     Bid
 };
 
+struct OrderClient
+{
+    OrderId orderId;
+    Quantity quantity;
+    OrderStatus status;
+    OrderType type;
+    Price price;
+};
+
 std::istream &operator>>(std::istream &_is, OrderType &_type);

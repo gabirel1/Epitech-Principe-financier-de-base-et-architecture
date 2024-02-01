@@ -83,8 +83,12 @@ void Core::stop()
 
 void Core::setContext(fix::Message &_msg)
 {
+    std::cout << "BEFORE: Sending a: '" << _msg.to_string() << "'" << std::endl;
+    std::cout << "BEFORE: Context: " << m_context << std::endl;
     _msg.header.set56_TargetCompId(PROVIDER_NAME);
     _msg.header.set34_msgSeqNum(m_context.SeqNum++);
     if (m_context.Loggin)
         _msg.header.set49_SenderCompId(m_context.User);
+    std::cout << "AFTER: Sending a: '" << _msg.to_string() << "'" << std::endl;
+    std::cout << "AFTER: Context: " << m_context << std::endl;
 }
