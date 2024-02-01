@@ -118,6 +118,49 @@ namespace proc
                 return {};
             }
             return buildOrderCancel(cancelOrderId, targetOrderId, symbol, side);
+        } else if (words.at(0) == "cancel_replace") {
+            std::vector<const char *> cwords;
+            std::string cancelReplaceOrderId = "";
+            std::string targetOrderId = "";
+            std::string quantity = "";
+            std::string price = "";
+            std::string side = "";
+            std::string symbol = "";
+
+            for (auto &_word : words)
+                cwords.emplace_back(_word.c_str());
+
+            while (param != -1) {
+                param = getopt(words.size(), const_cast<char * const *>(cwords.data()), "i:t:q:p:s:S:");
+                switch (param) {
+                    case ':':       // missing param
+                    case '?':       // unknow
+                        return {};
+                    case 'i':
+                        cancelReplaceOrderId = optarg;
+                        break;
+                    case 't':
+                        targetOrderId = optarg;
+                        break;
+                    case 'q':
+                        quantity = optarg;
+                        break;
+                    case 'p':
+                        price = optarg;
+                        break;
+                    case 's':
+                        side = optarg;
+                        break;
+                    case 'S':
+                        symbol = optarg;
+                        break;
+                };
+            }
+            if (cancelReplaceOrderId.empty() || targetOrderId.empty() || quantity.empty() || price.empty() || side.empty() || symbol.empty()) {
+                Logger::Log("[User Input]: Missing parameter for cancel_replace");
+                return {};
+            }
+            return buildOrderCancelReplace(cancelReplaceOrderId, targetOrderId, quantity, price, side, symbol);
         } else if (words.at(0) == "logout") {
             if (words.size() != 1)
                 return {};
@@ -186,10 +229,28 @@ namespace proc
         cancel.set11_clOrdID(_cancelOrderId);
         cancel.set41_origClOrdID(_targetOrderId);
         cancel.set55_symbol(_symbol);
-        cancel.set54_side(_side);
+        cancel.set54_side((_side == "buy") ? "3" : "4");
         cancel.set60_transactTime(utils::get_timestamp());
 
         return cancel;
+    }
+
+    fix::Message User::buildOrderCancelReplace(const std::string &_cancelReplaceOrderId, const std::string &_targetOrderId, const std::string &_quantity, const std::string &_price, const std::string &_side, const std::string &_symbol) const
+    {
+        fix::OrderCancelReplaceRequest cancelReplace;
+
+        cancelReplace.header.set49_SenderCompId(_cancelReplaceOrderId);
+        cancelReplace.set11_clOrdID(_cancelReplaceOrderId);
+        cancelReplace.set21_handlInst("3");
+        cancelReplace.set38_orderQty(_quantity);
+        cancelReplace.set40_ordType("2");
+        cancelReplace.set41_origClOrdID(_targetOrderId);
+        cancelReplace.set44_price(_price);
+        cancelReplace.set54_side((_side == "buy") ? "3" : "4");
+        cancelReplace.set55_symbol(_symbol);
+        cancelReplace.set60_transactTime(utils::get_timestamp());
+
+        return cancelReplace;
     }
 
     fix::Message User::buildLogout() const
