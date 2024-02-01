@@ -1,6 +1,7 @@
 #include "Client/Core.hpp"
 #include "Client/Processor/OrderBook.hpp"
 #include "Client/Processor/User.hpp"
+#include "Common/Message/Tag.hpp"
 
 Core::Core(const net::Ip &_ip, uint32_t _tcp, uint32_t _udp)
     : m_tcp(_ip, _tcp), m_udp(_ip, _udp)
@@ -46,6 +47,7 @@ void Core::start()
         if (!m_tcp.empty(io::Side::Recv)) {
             fix::Serializer::AnonMessage val = m_tcp.pop_front_recv();
 
+            std::cout << "RECEIVED: '" << val.at(fix::Tag::MsgType) << "'" << std::endl;
             for (auto &_proc : m_proc_tcp) {
                 std::optional<fix::Message> res = _proc->process(val, m_context);
 

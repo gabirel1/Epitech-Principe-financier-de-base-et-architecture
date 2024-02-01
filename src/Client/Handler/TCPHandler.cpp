@@ -25,6 +25,7 @@ namespace io
 
                 if (error == 0)
                     continue;
+                Logger::Log("TCPHandler: Received: '", data, "'");
                 if (fix::Serializer::run(data, msg) != fix::Serializer::Error::None)
                     continue;
                 send_to_recv(std::move(msg));
