@@ -161,6 +161,37 @@ namespace proc
                 return {};
             }
             return buildOrderCancelReplace(cancelReplaceOrderId, targetOrderId, quantity, price, side, symbol);
+        } else if (words.at(0) == "market_data") {
+            std::vector<const char *> cwords;
+            std::string symbol = "";
+            std::string requestId = "";
+            std::string subscriptionType = "";
+
+            for (auto &_word : words)
+                cwords.emplace_back(_word.c_str());
+            
+            while (param != -1) {
+                param = getopt(words.size(), const_cast<char * const *>(cwords.data()), "i:S:t:");
+                switch (param) {
+                    case ':':       // missing param
+                    case '?':       // unknow
+                        return {};
+                    case 'S':
+                        symbol = optarg;
+                        break;
+                    case 'i':
+                        requestId = optarg;
+                        break;
+                    case 't':
+                        subscriptionType = optarg;
+                        break;
+                };
+            }
+            if (symbol.empty() || requestId.empty() || subscriptionType.empty()) {
+                Logger::Log("[User Input]: Missing parameter for market_data");
+                return {};
+            }
+            return buildMarketDataRequest(symbol, requestId, subscriptionType);
         } else if (words.at(0) == "logout") {
             if (words.size() != 1)
                 return {};
@@ -209,7 +240,6 @@ namespace proc
     {
         fix::NewOrderSingle order;
 
-        order.header.set49_SenderCompId(_orderId);
         order.set11_clOrdID(_orderId);
         order.set21_handlInst("3");
         order.set38_orderQty(_quantity);
@@ -226,7 +256,6 @@ namespace proc
     {
         fix::OrderCancelRequest cancel;
 
-        cancel.header.set49_SenderCompId(_cancelOrderId);
         cancel.set11_clOrdID(_cancelOrderId);
         cancel.set41_origClOrdID(_targetOrderId);
         cancel.set55_symbol(_symbol);
@@ -240,7 +269,6 @@ namespace proc
     {
         fix::OrderCancelReplaceRequest cancelReplace;
 
-        cancelReplace.header.set49_SenderCompId(_cancelReplaceOrderId);
         cancelReplace.set11_clOrdID(_cancelReplaceOrderId);
         cancelReplace.set21_handlInst("3");
         cancelReplace.set38_orderQty(_quantity);
@@ -252,6 +280,22 @@ namespace proc
         cancelReplace.set60_transactTime(utils::get_timestamp());
 
         return cancelReplace;
+    }
+
+    fix::Message User::buildMarketDataRequest(const std::string &_symbol, std::string &_requestId, std::string &_subscriptionType) const
+    {
+        fix::MarketDataRequest marketDataRequest;
+        (void)_subscriptionType;
+
+        marketDataRequest.set55_symbol(_symbol);
+        marketDataRequest.set262_mDReqID(_requestId);
+        // marketDataRequest.set263_subscriptionRequestType(_subscriptionType);
+        marketDataRequest.set263_subscriptionRequestType("0");
+        marketDataRequest.set264_marketDepth("0");
+        marketDataRequest.set267_noMDEntryTypes("2");
+        marketDataRequest.set269_mDEntryType("0,1");
+
+        return marketDataRequest;
     }
 
     fix::Message User::buildLogout() const

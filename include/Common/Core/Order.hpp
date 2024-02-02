@@ -44,6 +44,7 @@ struct OrderClient
     OrderStatus status;
     OrderType type;
     Price price;
+    std::string symbol;
 };
 
 std::istream &operator>>(std::istream &_is, OrderType &_type);

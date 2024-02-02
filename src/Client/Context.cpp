@@ -18,6 +18,6 @@ std::ostream &operator<<(std::ostream &_os, const Context &_ctx)
     _os << "\t- HeartBit: " << _ctx.HeartBit << std::endl;
     _os << "\t- MyOrders: " << std::endl;
     for (auto &_order : _ctx.MyOrders)
-        _os << "\t\t- " << "[" << ((_order.type == OrderType::Bid) ? "Buy" : "Sell") << "]orderId: '" << _order.orderId << "', quantity: '" << _order.quantity << "', price: '" << _order.price << "', status: '" << (int)_order.status << "'" << std::endl;
+        _os << "\t\t- " << "[" << ((_order.type == OrderType::Bid) ? "Buy" : "Sell") << "] orderId: '" << _order.orderId << "', quantity: '" << _order.quantity << "', price: '" << _order.price << "', status: '" << (int)_order.status << "'" << std::endl;
     return _os;
 }

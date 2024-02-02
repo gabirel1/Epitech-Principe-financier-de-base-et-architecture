@@ -57,6 +57,7 @@ namespace proc
         protected:
             void treatIncrRefresh(fix::Serializer::AnonMessage &_msg);
             void treatFullRefresh(fix::Serializer::AnonMessage &_msg);
+            void treatExecutionReport(fix::Serializer::AnonMessage &_msg, Context &_ctx);
 
             data::IncrRefresh loadIncrRefresh(fix::Serializer::AnonMessage &_msg);
             data::FullRefresh loadFullRefresh(fix::Serializer::AnonMessage &_msg);
