@@ -96,6 +96,7 @@ namespace proc
             }), _ctx.MyOrders.end());
         else
             _ctx.MyOrders.push_back(_order);
+        _ctx.MyOrderHistory.push_back(_order);
         std::cout << "[2]_ctx.MyOrders.size() = " << _ctx.MyOrders.size() << std::endl;
     }
 

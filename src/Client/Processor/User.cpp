@@ -213,6 +213,14 @@ namespace proc
             std::cout << "  status" << std::endl;
             std::cout << "  help" << std::endl;
             return {};
+        } else if (words.at(0) == "order_history") {
+            if (words.size() != 1)
+                return {};
+            std::cout << _ctx.MyOrderHistory << std::endl;
+            return {};
+        } else {
+            Logger::Log("[User Input]: Unknow command");
+            return {};
         }
         return {};
     }
