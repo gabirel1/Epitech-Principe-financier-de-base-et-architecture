@@ -28,7 +28,8 @@ enum OrderStatus {
     Filled,
     Canceld = 4,
     Replaced,
-    Pending
+    Pending,
+    Rejected = 8
 };
 
 enum class OrderType

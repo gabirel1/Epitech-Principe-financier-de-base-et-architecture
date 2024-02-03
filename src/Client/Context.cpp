@@ -17,7 +17,35 @@ std::ostream &operator<<(std::ostream &_os, const Context &_ctx)
     _os << "\t- UserId: " << _ctx.User << "\n";
     _os << "\t- HeartBit: " << _ctx.HeartBit << std::endl;
     _os << "\t- MyOrders: " << std::endl;
-    for (auto &_order : _ctx.MyOrders)
-        _os << "\t\t- " << "[" << ((_order.type == OrderType::Bid) ? "Buy" : "Sell") << "] orderId: '" << _order.orderId << "', quantity: '" << _order.quantity << "', price: '" << _order.price << "', status: '" << (int)_order.status << "'" << std::endl;
+    for (auto &_order : _ctx.MyOrders) {
+        _os << "\t\t- " << "[" << ((_order.type == OrderType::Bid) ? "Buy" : "Sell") <<
+        "] orderId: '" << _order.orderId << "', quantity: '" << _order.quantity <<
+        "', price: '" << _order.price << "', status: '";
+        switch (_order.status)
+        {
+            case OrderStatus::New:
+                _os << "New";
+                break;
+            case OrderStatus::PartiallyFilled:
+                _os << "PartiallyFilled";
+                break;
+            case OrderStatus::Filled:
+                _os << "Filled";
+                break;
+            case OrderStatus::Canceld:
+                _os << "Canceld";
+                break;
+            case OrderStatus::Replaced:
+                _os << "Replaced";
+                break;
+            case OrderStatus::Pending:
+                _os << "Pending";
+                break;
+            case OrderStatus::Rejected:
+                _os << "Rejected";
+                break;
+        }
+        _os << "', symbol: '" << _order.symbol << "'" << std::endl;
+    }
     return _os;
 }

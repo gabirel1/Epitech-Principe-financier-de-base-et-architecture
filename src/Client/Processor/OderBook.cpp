@@ -25,7 +25,8 @@ namespace proc
         if (_msg.at(fix::Tag::MsgType) == fix::Reject::MsgType)
             Logger::Log("[TCPOutput] There was an error with your request: ", _msg.at(fix::Tag::Text), ", please try again (make sure you are logged in)");
         else if (_msg.at(fix::Tag::MsgType) != fix::MarketDataIncrementalRefresh::MsgType &&
-            _msg.at(fix::Tag::MsgType) != fix::MarketDataSnapshotFullRefresh::MsgType && _msg.at(fix::Tag::MsgType) != fix::ExecutionReport::MsgType)
+            _msg.at(fix::Tag::MsgType) != fix::MarketDataSnapshotFullRefresh::MsgType &&
+            _msg.at(fix::Tag::MsgType) != fix::ExecutionReport::MsgType)
             Logger::Log("[TCPOutput] Message not handle by OrderBook");
         else if (_msg.at(fix::Tag::MsgType) == fix::MarketDataSnapshotFullRefresh::MsgType)
             treatFullRefresh(_msg);
@@ -67,6 +68,12 @@ namespace proc
         std::string price = _msg.at(fix::Tag::Price);
         std::string side = _msg.at(fix::Tag::Side);
         std::string symbol = _msg.at(fix::Tag::Symbol);
+        std::string status = _msg.at(fix::Tag::OrdStatus);
+
+        if (status == "8") {
+            Logger::Log("[TCPOutput] {Execution Report} Order rejected: [", orderId, "] reason: ", _msg.at(fix::Tag::Text));
+            return;
+        }
 
         Logger::Log("[TCPOutput] {NewOrder} New order: ", orderId, " ", quantity, " ", price, " ", side, " ", symbol);
         // if (side == "1")
@@ -80,9 +87,15 @@ namespace proc
         _order.price = std::stoi(price);
         _order.type = (side == "1" ? OrderType::Bid : OrderType::Ask);
         _order.symbol = symbol;
+        _order.status = static_cast<OrderStatus>(std::stoi(status));
 
         std::cout << "[1]_ctx.MyOrders.size() = " << _ctx.MyOrders.size() << std::endl;
-        _ctx.MyOrders.push_back(_order);
+        if (_order.status == OrderStatus::Filled || _order.status == OrderStatus::Canceld)
+            _ctx.MyOrders.erase(std::remove_if(_ctx.MyOrders.begin(), _ctx.MyOrders.end(), [&_order](const OrderClient &_o) {
+                return _o.orderId == _order.orderId;
+            }), _ctx.MyOrders.end());
+        else
+            _ctx.MyOrders.push_back(_order);
         std::cout << "[2]_ctx.MyOrders.size() = " << _ctx.MyOrders.size() << std::endl;
     }
 
