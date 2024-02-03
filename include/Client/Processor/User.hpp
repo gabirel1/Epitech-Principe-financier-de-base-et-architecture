@@ -15,5 +15,6 @@ namespace proc
         protected:
             fix::Message buildLogon(const UserId &_id) const;
             fix::Message buildLogout() const;
+            fix::Message buildNewOrder(const std::string &_orderId, const std::string &_quantity, const std::string &_price, const std::string &_side, const std::string &_symbol) const;
     };
 }

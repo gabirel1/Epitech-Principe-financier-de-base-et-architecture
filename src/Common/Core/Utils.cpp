@@ -3,6 +3,7 @@
 
 #include "Common/Core/Utils.hpp"
 #include <random>
+#include <iomanip>
 
 namespace utils
 {
@@ -50,5 +51,32 @@ namespace utils
                 result.emplace_back(value);
         }
         return result;
+    }
+
+    std::string get_timestamp()
+    {
+        time_t currentTime = time(nullptr);
+        struct tm *timeInfo = localtime(&currentTime);
+
+        // Get the microseconds since the last second
+        struct timeval tv;
+        gettimeofday(&tv, nullptr);
+        int microseconds = tv.tv_usec;
+
+        // Format the current time as a string
+        char dateTimeBuffer[80];
+        strftime(dateTimeBuffer, sizeof(dateTimeBuffer), "%Y%m%d-%H:%M:%S", timeInfo);
+
+        // Convert the formatted time string to a C++ string
+        std::string formattedTime = dateTimeBuffer;
+
+        // Prepend two zeros to the microsecond value
+        std::string microsecondsString = std::to_string(microseconds);
+        if (microsecondsString.length() < 3)
+            microsecondsString = "00" + microsecondsString;
+
+        // Combine the formatted time string with the microsecond value
+        formattedTime = formattedTime + "." + microsecondsString.substr(0, 3);
+        return formattedTime;
     }
 }
