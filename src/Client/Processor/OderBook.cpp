@@ -17,10 +17,14 @@ namespace proc
     {
     std::optional<fix::Message> OrderBook::process(fix::Serializer::AnonMessage &_msg, Context &_context)
     {
-        if (!_context.Loggin)
+        if (!_context.Loggin && _msg.at(fix::Tag::MsgType) != fix::Logon::MsgType) {
+            Logger::Log("[TCPOutput] You are not logged in, please log in first");
             return {};
+        }
         Logger::Log("[TCPOutput] received new message: { MsgType: ", _msg.at(fix::Tag::MsgType), " }");
-        if (_msg.at(fix::Tag::MsgType) != fix::MarketDataIncrementalRefresh::MsgType &&
+        if (_msg.at(fix::Tag::MsgType) == fix::Reject::MsgType)
+            Logger::Log("[TCPOutput] There was an error with your request: ", _msg.at(fix::Tag::Text), ", please try again (make sure you are logged in)");
+        else if (_msg.at(fix::Tag::MsgType) != fix::MarketDataIncrementalRefresh::MsgType &&
             _msg.at(fix::Tag::MsgType) != fix::MarketDataSnapshotFullRefresh::MsgType && _msg.at(fix::Tag::MsgType) != fix::ExecutionReport::MsgType)
             Logger::Log("[TCPOutput] Message not handle by OrderBook");
         else if (_msg.at(fix::Tag::MsgType) == fix::MarketDataSnapshotFullRefresh::MsgType)
