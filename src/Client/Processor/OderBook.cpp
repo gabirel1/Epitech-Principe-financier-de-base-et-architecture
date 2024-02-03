@@ -14,7 +14,7 @@ namespace data
 }
 
 namespace proc
-    {
+{
     std::optional<fix::Message> OrderBook::process(fix::Serializer::AnonMessage &_msg, Context &_context)
     {
         if (!_context.Loggin)
@@ -27,17 +27,6 @@ namespace proc
             treatFullRefresh(_msg);
         else if (_msg.at(fix::Tag::MsgType) == fix::MarketDataIncrementalRefresh::MsgType)
             treatIncrRefresh(_msg);
-        return {};
-    }
-
-    std::optional<fix::Message> OrderBook::build(char _tag, Context &_context) const
-    {
-        std::ignore = _context;
-
-        if (_tag == fix::MarketDataSnapshotFullRefresh::cMsgType)
-            return buildFullRefresh();
-        else if (_tag == fix::MarketDataSnapshotFullRefresh::cMsgType)
-            return buildIncrRefresh();
         return {};
     }
 
@@ -135,48 +124,6 @@ namespace proc
             refresh.types.push_back(types[it]);
         }
         return refresh;
-    }
-
-    fix::Message OrderBook::buildFullRefresh() const
-    {
-        fix::MarketDataRequest request;
-        const std::vector<std::string> symbols{ MARKET_NAME };
-        std::string lsymbols;
-
-        request.set146_noRelatedSym(std::to_string(symbols.size()));
-        for (const auto &_sym : symbols)
-            lsymbols += _sym + ",";
-        if (!symbols.empty())
-            lsymbols.erase(lsymbols.end());
-        request.set55_symbol(lsymbols);
-        request.set262_mDReqID(utils::id());
-        request.set263_subscriptionRequestType("0");
-        request.set264_marketDepth("0");
-        request.set267_noMDEntryTypes("2");
-        request.set269_mDEntryType("0,1");
-        Logger::Log("[TCPInput] Sending a data full refresh request");
-        return request;
-    }
-
-    fix::Message OrderBook::buildIncrRefresh() const
-    {
-        fix::MarketDataRequest request;
-        const std::vector<std::string> symbols{ MARKET_NAME };
-        std::string lsymbols;
-
-        request.set146_noRelatedSym(std::to_string(symbols.size()));
-        for (const auto &_sym : symbols)
-            lsymbols += _sym + ",";
-        if (!symbols.empty())
-            lsymbols.erase(lsymbols.end());
-        request.set55_symbol(lsymbols);
-        request.set262_mDReqID(utils::id());
-        request.set263_subscriptionRequestType("1");
-        request.set264_marketDepth("0");
-        request.set267_noMDEntryTypes("2");
-        request.set269_mDEntryType("0,1");
-        Logger::Log("[TCPInput] Sending a data incremental refresh request");
-        return request;
     }
 
     Quantity OrderBook::QtySync(Quantity _left, Quantity _right)

@@ -4,11 +4,9 @@
 #include <map>
 #include <optional>
 
-#include "Common/Core/Utils.hpp"
-#include "Common/Network/UDPPackage.hpp"
-#include "Common/Thread/Queue.hpp"
-#include "Common/Message/Fix.hpp"
+#include "Client/Processor/Common/DataRequest.hpp"
 #include "Client/Processor/IProcessor.hpp"
+#include "Common/Thread/Queue.hpp"
 
 namespace data
 {
@@ -40,7 +38,7 @@ namespace data
 
 namespace proc
 {
-    class OrderBook : public proc::IMessage, public proc::IUDP
+    class OrderBook : public com::DataRequest, public proc::IMessage, public proc::IUDP, public proc::IEntry
     {
         public:
             using BidBook = std::map<Price, Quantity, std::less_equal<Price>>;
@@ -49,10 +47,8 @@ namespace proc
             OrderBook() = default;
             ~OrderBook() = default;
 
-            std::optional<fix::Message> process(fix::Serializer::AnonMessage &_msg, Context &_ctx) override final;
-            std::optional<data::UDPPackage> process(const data::UDPPackage &_package, Context &_ctx) override final;
-
-            virtual std::optional<fix::Message> build(char _tag, Context &_ctx) const override final;
+            virtual std::optional<fix::Message> process(fix::Serializer::AnonMessage &_msg, Context &_ctx) override final;
+            virtual std::optional<data::UDPPackage> process(const data::UDPPackage &_package, Context &_ctx) override final;
 
         protected:
             void treatIncrRefresh(fix::Serializer::AnonMessage &_msg);

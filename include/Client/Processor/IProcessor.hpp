@@ -9,7 +9,18 @@
 
 namespace proc
 {
-    class IMessage
+    class IBuildFIX
+    {
+        public:
+            /// @brief Doit verifier qu'ilm peut build le type de message
+            ///         Puis géré le message
+            ///         Renvoie le message ou rien (std::optional)
+            /// @param _tag type de message à build
+            /// @return le message généré
+            virtual std::optional<fix::Message> build(char _tag, Context &_ctx) const = 0;
+    };
+
+    class IMessage : public IBuildFIX
     {
         public:
             /// @brief Doit verifier qu'il peut géré le type de message
@@ -18,13 +29,6 @@ namespace proc
             /// @param _entry message recu par le tcp
             /// @return message envoie ensuite au server
             virtual std::optional<fix::Message> process(fix::Serializer::AnonMessage &_msg, Context &_ctx) = 0;
-
-            /// @brief Doit verifier qu'ilm peut build le type de message
-            ///         Puis géré le message
-            ///         Renvoie le message ou rien (std::optional)
-            /// @param _tag type de message à build
-            /// @return le message généré
-            virtual std::optional<fix::Message> build(char _tag, Context &_ctx) const = 0;
     };
 
     class IUDP
@@ -38,7 +42,7 @@ namespace proc
             virtual std::optional<data::UDPPackage> process(const data::UDPPackage &_entry, Context &_ctx) = 0;
     };
 
-    class IEntry
+    class IEntry : public IBuildFIX
     {
         public:
             /// @brief Doit verifier qu'il peut géré le type de message
@@ -47,12 +51,5 @@ namespace proc
             /// @param _entry l'entré du client
             /// @return message envoie ensuite au server
             virtual std::optional<fix::Message> process(const std::string &_entry, Context &_ctx) = 0;
-
-            /// @brief Doit verifier qu'ilm peut build le type de message
-            ///         Puis géré le message
-            ///         Renvoie le message ou rien (std::optional)
-            /// @param _tag type de message à build
-            /// @return le message généré
-            virtual std::optional<fix::Message> build(char _tag, Context &_ctx) const = 0;
     };
 }
