@@ -211,6 +211,7 @@ namespace proc
             std::cout << "  cancel_replace -i <id> -t <target_id> -q <quantity> -p <price> -s <side>(buy|sell) -S <symbol>(GOLD|USD|EURO)" << std::endl;
             std::cout << "  logout" << std::endl;
             std::cout << "  status" << std::endl;
+            std::cout << "  order_history" << std::endl;
             std::cout << "  help" << std::endl;
             return {};
         } else if (words.at(0) == "order_history") {
