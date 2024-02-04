@@ -8,6 +8,8 @@ void Context::reset()
     HeartBit = 0;
     SeqNum = 1;
     MyOrders.clear();
+    MyOrderHistory.clear();
+    userInfos.reset();
 }
 
 std::ostream &operator<<(std::ostream &_os, const std::vector<OrderClient> &_history)

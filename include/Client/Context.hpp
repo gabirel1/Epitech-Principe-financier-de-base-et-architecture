@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Common/Core/Order.hpp"
+#include "Client/History.hpp"
 
 struct Context
 {
@@ -11,10 +12,11 @@ struct Context
     std::string orderToCancel = "";
     std::vector<OrderClient> MyOrders;
     std::vector<OrderClient> MyOrderHistory;
+    History userInfos;
 
     void reset();
 };
 
-std::ostream &operator<<(std::ostream &_os, const std::vector<OrderClient> &_history);
 
+std::ostream &operator<<(std::ostream &_os, const std::vector<OrderClient> &_history);
 std::ostream &operator<<(std::ostream &_os, const Context &_ctx);
