@@ -4,6 +4,7 @@ void Context::reset()
 {
     Loggin = false;
     User = "";
+    orderToCancel = "";
     HeartBit = 0;
     SeqNum = 1;
     MyOrders.clear();

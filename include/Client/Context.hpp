@@ -8,6 +8,7 @@ struct Context
     UserId User;
     uint32_t HeartBit = 0;
     uint32_t SeqNum = 1;
+    std::string orderToCancel = "";
     std::vector<OrderClient> MyOrders;
     std::vector<OrderClient> MyOrderHistory;
 

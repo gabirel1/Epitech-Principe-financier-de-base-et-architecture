@@ -160,6 +160,7 @@ namespace proc
                 Logger::Log("[User Input]: Missing parameter for cancel_replace");
                 return {};
             }
+            _ctx.orderToCancel = targetOrderId;
             return buildOrderCancelReplace(cancelReplaceOrderId, targetOrderId, quantity, price, side, symbol);
         } else if (words.at(0) == "market_data") {
             std::vector<const char *> cwords;
