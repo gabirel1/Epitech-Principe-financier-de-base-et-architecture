@@ -8,7 +8,6 @@ namespace pip
     UDPOutNetwork::UDPOutNetwork(InUDP &_input, uint32_t _port)
         : m_input(_input)
     {
-        std::cout << "[UDPOutNetwork] Port => " << _port << std::endl;
 
         if (!m_socket.broadcastOn(_port))
             Logger::Log("[UDPOutNetwork] Failed to setup broadcast, crashing after first action");
@@ -31,8 +30,6 @@ namespace pip
     {
         Logger::SetThreadName(THIS_THREAD_ID, "UDP Network Output");
 
-        std::cout << "TEST LOOP CALLED" <<std::endl;
-
         while (m_running) {
             auto now = std::chrono::steady_clock::now();
 
@@ -43,7 +40,6 @@ namespace pip
             if (m_message.size())
                 Logger::Log("[UDPOutNetwork] Broadcasting message number: ", m_message.size());
             for (const auto &[_, _val] : m_message) {
-                std::cout << "PORT BROADCAST SERVEUR => " << m_socket.getPort() <<std::endl;
                 (void)m_socket.broadcast(reinterpret_cast<const uint8_t*>(&_val), sizeof(data::UDPPackage));
             }
             clean();

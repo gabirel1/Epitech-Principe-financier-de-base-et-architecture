@@ -124,16 +124,11 @@ namespace net
                 return false;
             }
 
-            std::cout << "PORT BROADCAST => "<< _port << std::endl;
             std::memset(&m_broad_addr, 0, sizeof(m_broad_addr));
             m_broad_addr.sin_family = AF_INET;
             m_broad_addr.sin_port = htons(8081);
-            std::cout << "PORT BROADCAST => "<< m_broad_addr.sin_port << std::endl;
             m_broad_addr.sin_addr.s_addr =  htonl(INADDR_LOOPBACK);
             m_broadcast = true;
-
-            std::cout << "Address: " << inet_ntoa(m_broad_addr.sin_addr) << std::endl;
-            std::cout << "Port: " << ntohs(m_broad_addr.sin_port) << std::endl;
 
             return true;
         }

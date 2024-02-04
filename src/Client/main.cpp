@@ -1,13 +1,9 @@
-#include <QApplication>
+#include "Client/Core.hpp"
 
-#include "Client/GUI/GestionnaireSocket.hpp"
-#include "Client/GUI/mainwindow.hpp"
-
-
-int main(int _ac, char **_av)
+int main(int _ac, const char **_av)
 {
-    QApplication a(_ac, _av);
-    MainWindow w;
-    w.show();
-    return a.exec();
+    Core core("127.0.0.1", 8080, 8081);
+
+    core.start();
+    return 0;
 }

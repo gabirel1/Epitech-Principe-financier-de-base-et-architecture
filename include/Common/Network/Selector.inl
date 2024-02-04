@@ -59,7 +59,6 @@ namespace net
         }
         for (int it = 0; it < std::min(set, MAX_SOCKET); it++) {
             clients.emplace_back(m_clients.at(events[it].data.fd));
-            std::cout << "add" << std::endl;
         }
         return clients;
     }

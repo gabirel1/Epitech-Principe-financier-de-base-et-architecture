@@ -45,9 +45,9 @@ namespace utils
         std::vector<std::string> result;
         size_t old = 0;
 
-        for (size_t pos = _str.find(C); pos != std::string::npos; pos = _str.find(C)) {
+        for (size_t pos = _str.find(C); pos != std::string::npos; pos = _str.find(C, pos)) {
             result.emplace_back(std::move(_str.substr(old, pos)));
-            old = pos;
+            pos = old + 1;
         }
         return result;
     }

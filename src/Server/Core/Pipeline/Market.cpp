@@ -100,6 +100,7 @@ namespace pip
         report.set37_orderID(_data.OrderData.target);
         report.set11_clOrdID(_data.OrderData.target);
         report.set41_origClOrdID(_data.OrderData.order.orderId);
+        std::cout << "\n\n\n_data.OrderData.type: '" << (_data.OrderData.type == OrderType::Bid ? "Bid" : "Ask") << "', _data.OrderData.target: '" << _data.OrderData.target << "'" << std::endl;
         if (!m_ob.cancel(_data.OrderData.type, _data.OrderData.target, false)) {
             report.set39_ordStatus("8");
             report.set58_text("Order ID doesn't exist");

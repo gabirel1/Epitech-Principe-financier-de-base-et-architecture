@@ -103,7 +103,6 @@ namespace net::tcp
 
             _data.Message.header.set49_SenderCompId(PROVIDER_NAME);
             if (client != _clients.end()) {
-                std::cout << "target user id: " << userId << " " << _data.Client.User << std::endl;
                 _data.Message.header.set34_msgSeqNum(std::to_string((client->SeqNumber)++));
                 if (client->Logged) {
                     _data.Message.header.set56_TargetCompId(client->User);

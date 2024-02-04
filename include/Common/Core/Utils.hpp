@@ -19,6 +19,9 @@ namespace utils
 
     std::string id();
 
+    std::vector<std::string> space_split(const std::string &_str);
+
+    std::string get_timestamp();
 }
 
 #include "Common/Core/Utils.inl"

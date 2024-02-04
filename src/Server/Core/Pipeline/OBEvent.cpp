@@ -47,7 +47,6 @@ namespace pip
         fix::ExecutionReport report;
         ClientSocket client{};
 
-        std::cout << "User id: " << _input.userId << std::endl;
         client.User = _input.userId;
         client.Logged = true;
         client.Disconnect = false;
