@@ -18,7 +18,7 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
         event.side = OrderType::Ask;
     event.sold = true;
     for (auto &[_key, _val] : _book) {
-        if (cmp(_key, _price))
+        if (_key != _price && cmp(_key, _price))
             break;
 
         event.price = _key;
@@ -66,6 +66,9 @@ template<IsBook T>
 bool OrderBook::cancel(OrderIdMap<T> &_mapId, OrderId _orderId, bool _event)
 {
     std::lock_guard<std::mutex> guard(m_mutex);
+
+    std::cout << "\n\n[OrderBook] (Cancel) _orderId: '" << _orderId << "'\n\n" << std::endl; // todo log
+
     typename OrderIdMap<T>::iterator it = _mapId.find(_orderId);
 
     if (it != _mapId.end()) {
@@ -98,6 +101,8 @@ template<IsBookCache T>
 fix::MarketDataSnapshotFullRefresh OrderBook::refresh(T &_cache, size_t _depth)
 {
     std::lock_guard<std::mutex> guard(m_mutex);
+
+
     size_t size = 0;
     fix::MarketDataSnapshotFullRefresh result;
     const std::string type = (std::is_same_v<T, cache_BidBook>) ? "0" : "1";

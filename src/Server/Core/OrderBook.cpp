@@ -114,6 +114,9 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
 
             Logger::Log("[OrderBook] (", m_name, ") {Add} New order in BID: ", _order, " at price: ", _price);
             m_bid[_price].push_back(_order);
+
+            // std::cout << "\n\n\n\nm_bid[price]: " << m_bid[_price].size() << ", " << m_bid[_price].back().orderId << std::endl;
+
             m_bid_id.emplace(_order.orderId, std::make_pair(m_bid.find(_price), m_bid[_price].end() - 1));
             event.status = OrderStatus::PartiallyFilled;
         }
@@ -123,8 +126,12 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
             std::lock_guard<std::mutex> guard(m_mutex);
 
             Logger::Log("[OrderBook] (", m_name, ") {Add} New order in ASK: ", _order, " at price: ", _price);
+
             m_ask[_price].push_back(_order);
+
+            std::cout << "\n\n\nm_ask_id.size: " << m_ask_id.size() << std::endl;
             m_ask_id.emplace(_order.orderId, std::make_pair(m_ask.find(_price), m_ask[_price].end() - 1));
+            std::cout << "\n\n\nm_ask_id.size2: " << m_ask_id.size() << std::endl;
         }
     }
     event.quantity = _order.quantity;
