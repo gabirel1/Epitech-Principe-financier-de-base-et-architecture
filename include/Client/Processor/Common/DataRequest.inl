@@ -1,19 +1,26 @@
 #include "Client/Processor/Common/DataRequest.hpp"
+#include "Common/Core/Logger.hpp"
+#include "Common/Core/Utils.hpp"
+#include "Common/Message/MarketDataSnapshotFullRefresh.hpp"
+#include "Common/Message/MarketDataRequest.hpp"
+#include "Common/Message/MarketDataIncrementalRefresh.hpp"
 
 namespace proc::com
 {
-    std::optional<fix::Message> DataRequest::build(char _tag, Context &_context) const
+    template<IsBuildFIX T>
+    std::optional<fix::Message> DataRequest<T>::build(char _tag, Context &_context) const
     {
         std::ignore = _context;
 
         if (_tag == fix::MarketDataSnapshotFullRefresh::cMsgType)
             return buildFullRefresh();
-        else if (_tag == fix::MarketDataSnapshotFullRefresh::cMsgType)
+        else if (_tag == fix::MarketDataIncrementalRefresh::cMsgType)
             return buildIncrRefresh();
         return {};
     }
 
-    fix::Message OrderBook::buildFullRefresh() const
+    template<IsBuildFIX T>
+    fix::Message DataRequest<T>::buildFullRefresh() const
     {
         fix::MarketDataRequest request;
         const std::vector<std::string> symbols{ MARKET_NAME };
@@ -34,7 +41,8 @@ namespace proc::com
         return request;
     }
 
-    fix::Message OrderBook::buildIncrRefresh() const
+    template<IsBuildFIX T>
+    fix::Message DataRequest<T>::buildIncrRefresh() const
     {
         fix::MarketDataRequest request;
         const std::vector<std::string> symbols{ MARKET_NAME };

@@ -2,16 +2,21 @@
 
 #include "Client/Processor/IProcessor.hpp"
 
+template<class T>
+concept IsBuildFIX = std::is_base_of_v<proc::IBuildFIX, T>;
+
 namespace proc::com
 {
-    class DataRequest : public proc::IBuildFIX
+    template<IsBuildFIX T>
+    class DataRequest : public T
     {
         public:
-            std::optional<fix::Message> build(char _tag, Context &_context) const;
+            virtual std::optional<fix::Message> build(char _tag, Context &_context) const override final;
 
         private:
             fix::Message buildFullRefresh() const;
             fix::Message buildIncrRefresh() const;
-
     };
 }
+
+#include "Client/Processor/Common/DataRequest.inl"

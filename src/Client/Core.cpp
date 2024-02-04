@@ -1,11 +1,13 @@
 #include "Client/Core.hpp"
 #include "Client/Processor/OrderBook.hpp"
+#include "Client/Processor/OBData.hpp"
 #include "Client/Processor/User.hpp"
 
 Core::Core(const net::Ip &_ip, uint32_t _tcp, uint32_t _udp)
     : m_tcp(_ip, _tcp), m_udp(_ip, _udp)
 {
     std::shared_ptr<proc::OrderBook> ob = std::make_shared<proc::OrderBook>();
+    std::shared_ptr<proc::OBData> obdata = std::make_shared<proc::OBData>();
     std::shared_ptr<proc::User> user = std::make_shared<proc::User>();
 
     m_proc_tcp.push_back(ob);
@@ -14,7 +16,7 @@ Core::Core(const net::Ip &_ip, uint32_t _tcp, uint32_t _udp)
     m_proc_udp.push_back(ob);
 
     m_proc_entry.push_back(user);
-    m_context.reset();
+    m_proc_entry.push_back(obdata);
 }
 
 Core::~Core()
@@ -27,8 +29,8 @@ void Core::start()
     m_running = true;
 
     (void)m_udp.start();
-    m_tcp.start();
-    m_input.start();
+    (void)m_tcp.start();
+    (void)m_input.start();
 
     while (m_running) {
         if (!m_udp.empty(io::Side::Recv)) {
@@ -77,7 +79,7 @@ void Core::stop()
     m_running = false;
 
     (void)m_udp.stop();
-    // m_tcp.stop();
+    (void)m_tcp.stop();
     (void)m_input.stop();
 }
 

@@ -38,7 +38,7 @@ namespace data
 
 namespace proc
 {
-    class OrderBook : public com::DataRequest, public proc::IMessage, public proc::IUDP, public proc::IEntry
+    class OrderBook : public com::DataRequest<proc::IMessage>, public proc::IUDP
     {
         public:
             using BidBook = std::map<Price, Quantity, std::less_equal<Price>>;

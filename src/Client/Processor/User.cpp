@@ -14,9 +14,8 @@ namespace proc
             _ctx.User = _msg.at(fix::Tag::TargetCompId);
             _ctx.HeartBit = utils::to<uint32_t>(_msg.at(fix::Tag::HearBtInt));
             _ctx.Loggin = true;
-        }
-        else if (_ctx.Loggin && _msg.at(fix::Tag::MsgType) == fix::Logout::MsgType) {
-            _ctx.reset();
+        } else if (_ctx.Loggin && _msg.at(fix::Tag::MsgType) == fix::Logout::MsgType) {
+            _ctx.Loggin = false;
         }
         return {};
     }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Common/Network/UDPPackage.hpp"
 #include "Common/Core/Order.hpp"
 
 struct Subscribtion

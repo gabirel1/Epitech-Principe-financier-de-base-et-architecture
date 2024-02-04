@@ -1,13 +1,5 @@
 #include "Client/Context.hpp"
 
-void Context::reset()
-{
-    Loggin = false;
-    User = "";
-    HeartBit = 0;
-    SeqNum = 1;
-}
-
 std::ostream &operator<<(std::ostream &_os, const Context &_ctx)
 {
     _os << "Context:\n";
