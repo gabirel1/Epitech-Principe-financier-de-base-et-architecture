@@ -15,7 +15,11 @@ namespace proc
             Logger::Log("[ReportHandler] Received reject message: { RefSeqNum: '", _msg.at(fix::Tag::RefSeqNum), "', Text: '", _msg.at(fix::Tag::Text), "' }");
             return {};
         }
-
+        if (_msg.at(fix::Tag::MsgType) == fix::ExecutionReport::MsgType) {
+            treatExecutionReport(_msg, _ctx);
+        } else {
+            Logger::Log("[ReportHandler] Message not handled by the ReportHandler: { MsgType: '", _msg.at(fix::Tag::MsgType), "' }");
+        }
         return {};
     }
 

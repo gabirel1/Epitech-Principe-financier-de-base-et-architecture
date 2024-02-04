@@ -32,8 +32,8 @@ namespace proc
             treatFullRefresh(_msg);
         else if (_msg.at(fix::Tag::MsgType) == fix::MarketDataIncrementalRefresh::MsgType)
             treatIncrRefresh(_msg);
-        else if (_msg.at(fix::Tag::MsgType) == fix::ExecutionReport::MsgType)
-            treatExecutionReport(_msg, _context);
+        // else if (_msg.at(fix::Tag::MsgType) == fix::ExecutionReport::MsgType)
+        //     treatExecutionReport(_msg, _context);
         return {};
     }
 

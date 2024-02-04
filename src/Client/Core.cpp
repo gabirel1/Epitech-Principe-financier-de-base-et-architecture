@@ -1,5 +1,6 @@
 #include "Client/Core.hpp"
 #include "Client/Processor/OrderBook.hpp"
+#include "Client/Processor/ReportHandler.hpp"
 #include "Client/Processor/User.hpp"
 #include "Common/Message/Tag.hpp"
 
@@ -8,9 +9,11 @@ Core::Core(const net::Ip &_ip, uint32_t _tcp, uint32_t _udp)
 {
     std::shared_ptr<proc::OrderBook> ob = std::make_shared<proc::OrderBook>();
     std::shared_ptr<proc::User> user = std::make_shared<proc::User>();
+    std::shared_ptr<proc::ReportHandler> report = std::make_shared<proc::ReportHandler>();
 
     m_proc_tcp.push_back(ob);
     m_proc_tcp.push_back(user);
+    m_proc_tcp.push_back(report);
 
     m_proc_udp.push_back(ob);
 
