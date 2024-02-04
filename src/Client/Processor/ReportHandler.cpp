@@ -52,30 +52,14 @@ namespace proc
         _order.status = static_cast<OrderStatus>(std::stoi(status));
         _order.symbol = symbol;
 
-        if (_ctx.orderToCancel != "" && _order.status == OrderStatus::Replaced) {
-            _ctx.userInfos.replaceOrder(_ctx.orderToCancel, _order);
-            _ctx.orderToCancel = "";
+        if (_ctx.userInfos.getOrderToCancel() != "" && _order.status == OrderStatus::Replaced) {
+            _ctx.userInfos.replaceOrder(_ctx.userInfos.getOrderToCancel(), _order);
+            _ctx.userInfos.clearOrderToCancel();
         }
         if (_order.status == OrderStatus::Filled || _order.status == OrderStatus::Canceld)
             _ctx.userInfos.removeOrder(_order.orderId);
         else
             _ctx.userInfos.addOrder(_order);
         _ctx.userInfos.addHistory(_order);
-
-        // if (_ctx.orderToCancel != "" && _order.status == OrderStatus::Replaced) {
-        //     Logger::Log("[TCPOutput] {Execution Report} Order replaced: ", _ctx.orderToCancel, " -> ", orderId);
-        //     // remove order that has the same orderId contained in _ctx.orderToCancel
-        //     _ctx.MyOrders.erase(std::remove_if(_ctx.MyOrders.begin(), _ctx.MyOrders.end(), [&_ctx](const OrderClient &_o) {
-        //         return _o.orderId == _ctx.orderToCancel;
-        //     }), _ctx.MyOrders.end());
-        //     _ctx.orderToCancel = "";
-        // }
-        // if (_order.status == OrderStatus::Filled || _order.status == OrderStatus::Canceld)
-        //     _ctx.MyOrders.erase(std::remove_if(_ctx.MyOrders.begin(), _ctx.MyOrders.end(), [&_order](const OrderClient &_o) {
-        //         return _o.orderId == _order.orderId;
-        //     }), _ctx.MyOrders.end());
-        // else
-        //     _ctx.MyOrders.push_back(_order);
-        // _ctx.MyOrderHistory.push_back(_order);
     }
 }

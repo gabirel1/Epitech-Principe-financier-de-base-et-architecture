@@ -39,9 +39,18 @@ class History
          */
         void reset();
 
+        void setOrderToCancel(const std::string &_orderId) { m_orderToCancel = _orderId; };
+
+        void clearOrderToCancel() { m_orderToCancel = ""; };
+
         friend std::ostream &operator<<(std::ostream &_os, const History &_history);
-        // friend std::ostream &operator<<(std::ostream &_os, const std::vector<OrderClient> &_orders);
+        std::vector<OrderClient> getOrders() const { return m_orders; };
+        std::vector<OrderClient> getHistory() const { return m_history; };
+        std::string getOrderToCancel() const { return m_orderToCancel; };
     private:
         std::vector<OrderClient> m_orders{};
         std::vector<OrderClient> m_history{};
+        std::string m_orderToCancel = "";
 };
+
+std::ostream &operator<<(std::ostream &_os, const std::vector<OrderClient> &_orders);

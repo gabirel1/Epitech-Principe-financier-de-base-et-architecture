@@ -160,7 +160,7 @@ namespace proc
                 Logger::Log("[User Input]: Missing parameter for cancel_replace");
                 return {};
             }
-            _ctx.orderToCancel = targetOrderId;
+            _ctx.userInfos.setOrderToCancel(targetOrderId);
             return buildOrderCancelReplace(cancelReplaceOrderId, targetOrderId, quantity, price, side, symbol);
         } else if (words.at(0) == "market_data") {
             std::vector<const char *> cwords;
@@ -218,7 +218,7 @@ namespace proc
         } else if (words.at(0) == "order_history") {
             if (words.size() != 1)
                 return {};
-            std::cout << _ctx.MyOrderHistory << std::endl;
+            std::cout << _ctx.userInfos.getHistory() << std::endl;
             return {};
         } else {
             Logger::Log("[User Input]: Unknow command");

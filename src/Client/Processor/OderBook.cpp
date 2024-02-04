@@ -89,24 +89,16 @@ namespace proc
         _order.type = (side == "1" ? OrderType::Bid : OrderType::Ask);
         _order.symbol = symbol;
         _order.status = static_cast<OrderStatus>(std::stoi(status));
-        if (_ctx.orderToCancel != "" && _order.status == OrderStatus::Replaced) {
-            Logger::Log("[TCPOutput] {Execution Report} Order replaced: ", _ctx.orderToCancel, " -> ", orderId);
-            // remove order that has the same orderId contained in _ctx.orderToCancel
-            _ctx.MyOrders.erase(std::remove_if(_ctx.MyOrders.begin(), _ctx.MyOrders.end(), [&_ctx](const OrderClient &_o) {
-                return _o.orderId == _ctx.orderToCancel;
-            }), _ctx.MyOrders.end());
-            _ctx.orderToCancel = "";
-        }
 
-        std::cout << "[1]_ctx.MyOrders.size() = " << _ctx.MyOrders.size() << std::endl;
+        if (_ctx.userInfos.getOrderToCancel() != "" && _order.status == OrderStatus::Replaced) {
+            _ctx.userInfos.replaceOrder(_ctx.userInfos.getOrderToCancel(), _order);
+            _ctx.userInfos.clearOrderToCancel();
+        }
         if (_order.status == OrderStatus::Filled || _order.status == OrderStatus::Canceld)
-            _ctx.MyOrders.erase(std::remove_if(_ctx.MyOrders.begin(), _ctx.MyOrders.end(), [&_order](const OrderClient &_o) {
-                return _o.orderId == _order.orderId;
-            }), _ctx.MyOrders.end());
+            _ctx.userInfos.removeOrder(_order.orderId);
         else
-            _ctx.MyOrders.push_back(_order);
-        _ctx.MyOrderHistory.push_back(_order);
-        std::cout << "[2]_ctx.MyOrders.size() = " << _ctx.MyOrders.size() << std::endl;
+            _ctx.userInfos.addOrder(_order);
+        _ctx.userInfos.addHistory(_order);
     }
 
     void OrderBook::treatFullRefresh(fix::Serializer::AnonMessage &_msg)
