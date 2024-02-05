@@ -36,12 +36,15 @@ namespace pip
     void DataRefresh::process(MarketDataInput &_input)
     {
         if (_input.SubType == 0) {
+            Logger::Log("[DataRefresh] SubType is refresh");
             OrderBook::Subscription sub;
             fix::MarketDataSnapshotFullRefresh message;
 
             message.set262_mDReqID(_input.Id);
             for (const auto &_sym : _input.Symbols) {
+                Logger::Log("[DataRefresh] Checking for symbol: ", _sym);
                 for (OrderType _type : _input.Types) {
+                    Logger::Log("[DataRefresh] Checking symbol: ", _sym, ", for type: ", (int)_type);
                     sub.depth = _input.Depth;
                     sub.type = _type;
                     message += m_markets.at(_sym).refresh(sub);
@@ -50,7 +53,9 @@ namespace pip
                 message.set55_symbol(_sym);
                 m_output.append(std::move(_input.Client), std::move(message));
             }
+            Logger::Log("[DataRefresh] Refresh done");
         } else if (_input.SubType == 1) {
+            Logger::Log("[DataRefresh] SubType is subscribe");
             OrderBook::Subscription sub;
 
             sub.depth = _input.Depth;
@@ -69,6 +74,7 @@ namespace pip
                 m_output.append(std::move(_input.Client), std::move(message));
             }
         } else {
+            Logger::Log("[DataRefresh] SubType is unsubscribe");
             for (const auto &_sym : _input.Symbols) {
                 std::vector<OrderBook::Subscription> &subs = _input.Client.subscribe(_sym);
 

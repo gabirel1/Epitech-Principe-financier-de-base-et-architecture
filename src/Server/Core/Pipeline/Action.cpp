@@ -215,16 +215,21 @@ namespace pip
 
         sub.Client = std::move(_input.Client);
         sub.Id = _input.Message.at(fix::Tag::MDReqID);
-        sub.SubType = utils::to<uint8_t>(_input.Message.at(fix::Tag::SubscriptionRequestType));
+        sub.SubType = _input.Message.at(fix::Tag::SubscriptionRequestType)[0] - '0';
         sub.Depth = utils::to<size_t>(_input.Message.at(fix::Tag::MarketDepth));
         if (sub.SubType == 1)
-            sub.UpdateType = utils::to<uint8_t>(_input.Message.at(fix::Tag::MDUpdateType));
+            sub.UpdateType = _input.Message.at(fix::Tag::MDUpdateType)[0] - '0';
         for (const auto &_type : types) {
             if (_type == "0")
                 sub.Types.push_back(OrderType::Bid);
-            else
+            else if (_type == "1")
                 sub.Types.push_back(OrderType::Ask);
+            else
+                return false; // build reject
         }
+        for (const auto &_sym : symbols)
+            sub.Symbols.push_back(std::move(_sym));
+        Logger::Log("[Action] (MarketDataRequest) Validate from client: ", _input.Client.User);
         m_q_data.push(std::move(sub));
         return true;
     }

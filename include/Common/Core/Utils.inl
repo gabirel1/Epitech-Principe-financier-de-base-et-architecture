@@ -43,12 +43,11 @@ namespace utils
     std::vector<std::string> split(const std::string &_str)
     {
         std::vector<std::string> result;
-        size_t old = 0;
+        std::istringstream ss(_str);
+        std::string token;
 
-        for (size_t pos = _str.find(C); pos != std::string::npos; pos = _str.find(C, pos)) {
-            result.emplace_back(std::move(_str.substr(old, pos)));
-            pos = old + 1;
-        }
+        while (std::getline(ss, token, C))
+            result.push_back(token);
         return result;
     }
 }

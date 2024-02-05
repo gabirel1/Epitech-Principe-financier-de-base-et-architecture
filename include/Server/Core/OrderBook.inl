@@ -18,7 +18,7 @@ bool OrderBook::add(T &_book, Price _price, Order &_order)
         event.side = OrderType::Ask;
     event.sold = true;
     for (auto &[_key, _val] : _book) {
-        if (cmp(_key, _price))
+        if (_key != _price && cmp(_key, _price))
             break;
 
         event.price = _key;
@@ -130,7 +130,7 @@ fix::MarketDataSnapshotFullRefresh OrderBook::refresh(T &_cache, size_t _depth)
         types.erase(types.end());
     if (!quantity.empty())
         quantity.erase(quantity.end());
-
+    result.set55_symbol(m_name);
     result.set110_minQty(quantity);
     result.set267_noMDEntryTypes(ssize);
     result.set269_mDEntryType(types);

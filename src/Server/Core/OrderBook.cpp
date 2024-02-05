@@ -117,8 +117,7 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
             m_bid_id.emplace(_order.orderId, std::make_pair(m_bid.find(_price), m_bid[_price].end() - 1));
             event.status = OrderStatus::PartiallyFilled;
         }
-    }
-    else {
+    } else {
         if (add<BidBook, std::less_equal<Price>>(m_bid, _price, _order)) {
             std::lock_guard<std::mutex> guard(m_mutex);
 

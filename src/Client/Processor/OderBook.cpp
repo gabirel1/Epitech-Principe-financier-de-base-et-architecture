@@ -94,6 +94,7 @@ namespace proc
         size_t size = utils::to<size_t>(_msg.at(fix::Tag::NoMDEntries));
         data::IncrRefresh refresh{size};
 
+        refresh.size = size;
         Logger::Log("[FIX] {LoadIncrRefresh} Loading: ", size, " modifications");
         std::vector<Quantity> quantitys = data::extract<Quantity>(_msg, fix::Tag::MinQty);
         std::vector<Price> prices = data::extract<Price>(_msg, fix::Tag::MDEntryPx);
@@ -110,11 +111,12 @@ namespace proc
 
     data::FullRefresh OrderBook::loadFullRefresh(fix::Serializer::AnonMessage &_msg)
     {
-        size_t size = utils::to<size_t>(_msg.at(fix::Tag::NoMDEntries));
+        size_t size = utils::to<int>(_msg.at(fix::Tag::NoMDEntries));
         data::FullRefresh refresh;
 
+        refresh.size = size;
         refresh.symbol = _msg.at(fix::Tag::Symbol);
-        Logger::Log("[FIX] {LoadIncrRefresh} Loading: ", size, " modifications on symbol: ", refresh.symbol);
+        Logger::Log("[FIX] {LoadFullRefresh} Loading: ", size, " modifications on symbol: ", refresh.symbol);
         std::vector<Quantity> quantitys = data::extract<Quantity>(_msg, fix::Tag::MinQty);
         std::vector<Price> prices = data::extract<Price>(_msg, fix::Tag::MDEntryPx);
         std::vector<OrderType> types = data::extract<OrderType>(_msg, fix::Tag::MDEntryType);
