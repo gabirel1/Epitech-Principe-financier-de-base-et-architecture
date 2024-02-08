@@ -17,16 +17,23 @@ namespace proc
 {
     std::optional<fix::Message> OrderBook::process(fix::Serializer::AnonMessage &_msg, Context &_context)
     {
-        if (!_context.Loggin)
+        if (!_context.Loggin && _msg.at(fix::Tag::MsgType) != fix::Logon::MsgType) {
+            Logger::Log("[TCPOutput] You are not logged in, please log in first");
             return {};
+        }
         Logger::Log("[TCPOutput] received new message: { MsgType: ", _msg.at(fix::Tag::MsgType), " }");
-        if (_msg.at(fix::Tag::MsgType) != fix::MarketDataIncrementalRefresh::MsgType &&
-            _msg.at(fix::Tag::MsgType) != fix::MarketDataSnapshotFullRefresh::MsgType)
+        if (_msg.at(fix::Tag::MsgType) == fix::Reject::MsgType)
+            Logger::Log("[TCPOutput] There was an error with your request: ", _msg.at(fix::Tag::Text), ", please try again (make sure you are logged in)");
+        else if (_msg.at(fix::Tag::MsgType) != fix::MarketDataIncrementalRefresh::MsgType &&
+            _msg.at(fix::Tag::MsgType) != fix::MarketDataSnapshotFullRefresh::MsgType &&
+            _msg.at(fix::Tag::MsgType) != fix::ExecutionReport::MsgType)
             Logger::Log("[TCPOutput] Message not handle by OrderBook");
         else if (_msg.at(fix::Tag::MsgType) == fix::MarketDataSnapshotFullRefresh::MsgType)
             treatFullRefresh(_msg);
         else if (_msg.at(fix::Tag::MsgType) == fix::MarketDataIncrementalRefresh::MsgType)
             treatIncrRefresh(_msg);
+        // else if (_msg.at(fix::Tag::MsgType) == fix::ExecutionReport::MsgType)
+        //     treatExecutionReport(_msg, _context);
         return {};
     }
 
@@ -40,6 +47,47 @@ namespace proc
         else
             functional_sync(m_ask, _package.symbol, _package.price, _package.quantity, OrderBook::QtySync);
         return {};
+    }
+
+    void OrderBook::treatExecutionReport(fix::Serializer::AnonMessage &_msg, Context &_ctx)
+    {
+        Logger::Log("[TCPOutput] {Execution Report} New execution report received");
+        std::string orderId = _msg.at(fix::Tag::OrderID);
+        std::string quantity = _msg.at(fix::Tag::OrderQty);
+        std::string price = _msg.at(fix::Tag::Price);
+        std::string side = _msg.at(fix::Tag::Side);
+        std::string symbol = _msg.at(fix::Tag::Symbol);
+        std::string status = _msg.at(fix::Tag::OrdStatus);
+
+        if (status == "8") {
+            Logger::Log("[TCPOutput] {Execution Report} Order rejected: [", orderId, "] reason: ", _msg.at(fix::Tag::Text));
+            return;
+        }
+
+
+        Logger::Log("[TCPOutput] {NewOrder} New order: ", orderId, " ", quantity, " ", price, " ", side, " ", symbol);
+        // if (side == "1")
+        //     functional_sync(m_bid, symbol, price, quantity, OrderBook::QtySync);
+        // else
+        //     functional_sync(m_ask, symbol, price, quantity, OrderBook::QtySync);
+        OrderClient _order;
+
+        _order.orderId = orderId;
+        _order.quantity = std::stoi(quantity);
+        _order.price = std::stoi(price);
+        _order.type = (side == "1" ? OrderType::Bid : OrderType::Ask);
+        _order.symbol = symbol;
+        _order.status = static_cast<OrderStatus>(std::stoi(status));
+
+        if (_ctx.userInfos.getOrderToCancel() != "" && _order.status == OrderStatus::Replaced) {
+            _ctx.userInfos.replaceOrder(_ctx.userInfos.getOrderToCancel(), _order);
+            _ctx.userInfos.clearOrderToCancel();
+        }
+        if (_order.status == OrderStatus::Filled || _order.status == OrderStatus::Canceld)
+            _ctx.userInfos.removeOrder(_order.orderId);
+        else
+            _ctx.userInfos.addOrder(_order);
+        _ctx.userInfos.addHistory(_order);
     }
 
     void OrderBook::treatFullRefresh(fix::Serializer::AnonMessage &_msg)

@@ -10,8 +10,8 @@
 #include "Common/Message/MarketDataSnapshotFullRefresh.hpp"
 #include "Common/Message/MarketDataIncrementalRefresh.hpp"
 
-using AskBook = std::map<Price, OrderList, std::greater_equal<Price>>;
-using BidBook = std::map<Price, OrderList, std::less_equal<Price>>;
+using AskBook = std::map<Price, OrderList, std::greater<Price>>;
+using BidBook = std::map<Price, OrderList, std::less<Price>>;
 
 class OrderBook
 {
@@ -93,26 +93,26 @@ class OrderBook
         template<IsBook T, IsBookCache _T>
         void cache_on(T &_book, _T &_cache, bool _ref);
 
-        bool m_is_cached;
-        bool m_is_cached_udp;
+        bool m_is_cached = false;
+        bool m_is_cached_udp = false;
 
-        cache_AskBook m_cache_ask;
-        cache_BidBook m_cache_bid;
+        cache_AskBook m_cache_ask{};
+        cache_BidBook m_cache_bid{};
 
-        cache_AskBook m_cache_ask_upd;
-        cache_BidBook m_cache_bid_upd;
+        cache_AskBook m_cache_ask_upd{};
+        cache_BidBook m_cache_bid_upd{};
 
         const std::string m_name;
 
         std::mutex m_mutex;
 
-        OrderIdMap<BidBook> m_bid_id;
-        OrderIdMap<AskBook> m_ask_id;
+        OrderIdMap<BidBook> m_bid_id{};
+        OrderIdMap<AskBook> m_ask_id{};
 
         EventQueue &m_output;
 
-        BidBook m_bid;
-        AskBook m_ask;
+        BidBook m_bid{};
+        AskBook m_ask{};
 };
 
 #include "Server/Core/OrderBook.inl"

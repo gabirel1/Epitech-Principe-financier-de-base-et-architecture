@@ -28,13 +28,24 @@ enum OrderStatus {
     Filled,
     Canceld = 4,
     Replaced,
-    Pending
+    Pending,
+    Rejected = 8
 };
 
 enum class OrderType
 {
     Ask,
     Bid
+};
+
+struct OrderClient
+{
+    OrderId orderId;
+    Quantity quantity;
+    OrderStatus status;
+    OrderType type;
+    Price price;
+    std::string symbol;
 };
 
 std::istream &operator>>(std::istream &_is, OrderType &_type);

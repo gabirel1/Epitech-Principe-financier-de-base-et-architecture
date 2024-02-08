@@ -1,7 +1,9 @@
 #include "Client/Core.hpp"
 #include "Client/Processor/OrderBook.hpp"
 #include "Client/Processor/OBData.hpp"
+#include "Client/Processor/ReportHandler.hpp"
 #include "Client/Processor/User.hpp"
+#include "Common/Message/Tag.hpp"
 
 Core::Core(const net::Ip &_ip, uint32_t _tcp, uint32_t _udp)
     : m_tcp(_ip, _tcp), m_udp(_ip, _udp)
@@ -9,9 +11,11 @@ Core::Core(const net::Ip &_ip, uint32_t _tcp, uint32_t _udp)
     std::shared_ptr<proc::OrderBook> ob = std::make_shared<proc::OrderBook>();
     std::shared_ptr<proc::OBData> obdata = std::make_shared<proc::OBData>();
     std::shared_ptr<proc::User> user = std::make_shared<proc::User>();
+    std::shared_ptr<proc::ReportHandler> report = std::make_shared<proc::ReportHandler>();
 
     m_proc_tcp.push_back(ob);
     m_proc_tcp.push_back(user);
+    m_proc_tcp.push_back(report);
 
     m_proc_udp.push_back(ob);
 
@@ -48,6 +52,7 @@ void Core::start()
         if (!m_tcp.empty(io::Side::Recv)) {
             fix::Serializer::AnonMessage val = m_tcp.pop_front_recv();
 
+            std::cout << "RECEIVED: '" << val.at(fix::Tag::MsgType) << "'" << std::endl;
             for (auto &_proc : m_proc_tcp) {
                 std::optional<fix::Message> res = _proc->process(val, m_context);
 
@@ -86,7 +91,7 @@ void Core::stop()
 void Core::setContext(fix::Message &_msg)
 {
     _msg.header.set56_TargetCompId(PROVIDER_NAME);
-    _msg.header.set34_msgSeqNum(m_context.SeqNum++);
+    _msg.header.set34_msgSeqNum(std::to_string(m_context.SeqNum++));
     if (m_context.Loggin)
         _msg.header.set49_SenderCompId(m_context.User);
 }

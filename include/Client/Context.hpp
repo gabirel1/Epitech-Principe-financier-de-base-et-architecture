@@ -2,6 +2,7 @@
 
 #include "Common/Network/UDPPackage.hpp"
 #include "Common/Core/Order.hpp"
+#include "Client/History.hpp"
 
 struct Subscribtion
 {
@@ -17,6 +18,7 @@ struct Context
     UserId User;
     uint32_t HeartBit = 0;
     uint32_t SeqNum = 1;
+    History userInfos;
 
     std::vector<Subscribtion> SubsStaging;
     std::vector<Subscribtion> Subs;
