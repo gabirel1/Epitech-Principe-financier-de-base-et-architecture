@@ -8,7 +8,7 @@ namespace utils
     template<class T>
     T to(const std::string &_str)
     {
-        T val;
+        T val{};
         std::istringstream stream(_str);
 
         stream >> val;

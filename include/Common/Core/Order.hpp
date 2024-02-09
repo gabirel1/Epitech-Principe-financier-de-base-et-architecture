@@ -32,11 +32,14 @@ enum OrderStatus {
     Rejected = 8
 };
 
-enum OrderType
+enum class OrderType : uint8_t
 {
     Ask,
     Bid
 };
+
+std::istream &operator>>(std::istream &_is, OrderType _type);
+std::ostream &operator<<(std::ostream &_os, OrderType _type);
 
 struct OrderClient
 {
@@ -48,4 +51,4 @@ struct OrderClient
     std::string symbol;
 };
 
-std::istream &operator>>(std::istream &_is, OrderType &_type);
+std::ostream &operator<<(std::ostream &_os, const OrderClient &_order);

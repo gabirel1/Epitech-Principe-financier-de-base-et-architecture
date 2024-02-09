@@ -6,12 +6,25 @@ std::ostream &operator<<(std::ostream &_os, const Order &_order)
     return _os;
 }
 
-std::istream &operator>>(std::istream &_is, OrderType &_type)
+std::istream &operator>>(std::istream &_is, OrderType _type)
 {
-    // warning maybe uint8_t is wrong type
     uint8_t type = 0;
 
-    _is >> _type;
+    _is >> type;
     _type = static_cast<OrderType>(type);
     return _is;
+}
+
+std::ostream &operator<<(std::ostream &_os, OrderType _type)
+{
+    switch (_type) {
+        case OrderType::Ask: return _os << "ask";
+        case OrderType::Bid: return _os << "bid";
+        default: return _os << "unknow";
+    }
+}
+
+std::ostream &operator<<(std::ostream &_os, const OrderClient &_order)
+{
+    return _os << "{ symbol: " << _order.symbol << ", id: " << _order.orderId << ", quantity: " << _order.quantity << ", status: " << _order.status << ", type: " << _order.type << " }";
 }

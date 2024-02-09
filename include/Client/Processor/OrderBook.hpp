@@ -55,7 +55,6 @@ namespace proc
         protected:
             void treatIncrRefresh(fix::Serializer::AnonMessage &_msg);
             void treatFullRefresh(fix::Serializer::AnonMessage &_msg);
-            void treatExecutionReport(fix::Serializer::AnonMessage &_msg, Context &_ctx);
 
             data::IncrRefresh loadIncrRefresh(fix::Serializer::AnonMessage &_msg);
             data::FullRefresh loadFullRefresh(fix::Serializer::AnonMessage &_msg);
@@ -67,7 +66,6 @@ namespace proc
             using BidMap = std::map<std::string, BidBook>;
             using AskMap = std::map<std::string, AskBook>;
 
-            // need new concept for (Ask/Bid)map
             template<class T>
             requires IsBookOf<T, Quantity>
             void displayBook(const T &_book) const;
