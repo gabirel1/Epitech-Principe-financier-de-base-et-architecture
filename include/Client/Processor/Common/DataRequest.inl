@@ -7,8 +7,9 @@
 
 namespace proc::com
 {
-    template<IsBuildFIX T>
-    std::optional<fix::Message> DataRequest<T>::build(char _tag, Context &_context) const
+    template<class ...Ts>
+    requires IsBuildFIX<Ts...>
+    std::optional<fix::Message> DataRequest<Ts...>::build(char _tag, Context &_context) const
     {
         std::ignore = _context;
 
@@ -19,8 +20,9 @@ namespace proc::com
         return {};
     }
 
-    template<IsBuildFIX T>
-    fix::Message DataRequest<T>::buildFullRefresh() const
+    template<class ...Ts>
+    requires IsBuildFIX<Ts...>
+    fix::Message DataRequest<Ts...>::buildFullRefresh() const
     {
         fix::MarketDataRequest request;
         const std::vector<std::string> symbols{ MARKET_NAME };
@@ -41,8 +43,9 @@ namespace proc::com
         return request;
     }
 
-    template<IsBuildFIX T>
-    fix::Message DataRequest<T>::buildIncrRefresh() const
+    template<class ...Ts>
+    requires IsBuildFIX<Ts...>
+    fix::Message DataRequest<Ts...>::buildIncrRefresh() const
     {
         fix::MarketDataRequest request;
         const std::vector<std::string> symbols{ MARKET_NAME };

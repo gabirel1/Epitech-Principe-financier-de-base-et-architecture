@@ -12,7 +12,6 @@ namespace proc
 
         if (words.size() < 1)
             return {};
-        std::cout << words.size() << std::endl;
         for (auto &_word : words)
             cwords.emplace_back(_word.c_str());
 

@@ -146,10 +146,7 @@ namespace pip
             return false;
         }
         data.OrderData.action = OrderBook::Data::Action::Cancel;
-        std::cout << "\n\n\n\n\n" << "[RECEIVED ORDER CANCEL REQUEST] 41 origClOrdID: '"  << _input.Message.at(fix::Tag::OrigClOrdID) << "'\n\n" << std::endl;
-        std::cout << "[41]utils::to<OrderId>: '" << utils::to<OrderId>(_input.Message.at(fix::Tag::OrigClOrdID)) << "'\n\n" << std::endl;
         data.OrderData.order.orderId = utils::to<OrderId>(_input.Message.at(fix::Tag::OrigClOrdID));
-        std::cout << "data.OrderData.order.orderId: '" << data.OrderData.order.orderId << "'\n\n" << std::endl;
         data.OrderData.order.userId = _input.Client.User;
         data.OrderData.type = (_input.Message.at(fix::Tag::Side) == "3") ? OrderType::Bid : OrderType::Ask;
         m_markets.at(_input.Message.at(fix::Tag::Symbol)).push(std::move(data));
@@ -169,8 +166,6 @@ namespace pip
             return false;
         }
 
-        std::cout << "\n\n\n\n\n" << "[RECEIVED ORDER CANCEL REQUEST] 41 origClOrdID: '"  << _input.Message.at(fix::Tag::OrigClOrdID) << "'\n\n" << std::endl;
-        std::cout << "[41]utils::to<OrderId>: '" << utils::to<OrderId>(_input.Message.at(fix::Tag::OrigClOrdID)) << "'\n\n" << std::endl;
         data.OrderData.action = OrderBook::Data::Action::Modify;
         data.OrderData.order.userId = _input.Client.User;
         data.OrderData.target = _input.Message.at(fix::Tag::OrigClOrdID);

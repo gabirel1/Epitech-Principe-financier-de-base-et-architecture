@@ -9,7 +9,7 @@ namespace data
     std::vector<T> extract(fix::Serializer::AnonMessage &_msg, const std::string &_tag)
     {
         std::vector<std::string> list = utils::split<','>(_msg.at(_tag));
-        std::vector<T> result(list.size());
+        std::vector<T> result{};
 
         std::for_each(list.begin(), list.end(), [&result] (const std::string &_value) {
             result.emplace_back(utils::to<T>(_value));
@@ -37,5 +37,15 @@ namespace proc
         else
             _map[_sym].erase(_price);
         return true;
+    }
+
+    template<class T>
+    requires IsBookOf<T, Quantity>
+    void OrderBook::displayBook(const T &_book) const
+    {
+        std::cout << "Total number of price: " << _book.size() << std::endl;
+        std::cout << "Price\t\tQuantity" << std::endl;
+        for (const auto &[_price, _qty] : _book)
+            std::cout << _price << "\t|\t" << _qty << std::endl;
     }
 }

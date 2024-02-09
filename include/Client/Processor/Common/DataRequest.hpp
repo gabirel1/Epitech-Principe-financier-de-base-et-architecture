@@ -2,13 +2,34 @@
 
 #include "Client/Processor/IProcessor.hpp"
 
-template<class T>
-concept IsBuildFIX = std::is_base_of_v<proc::IBuildFIX, T>;
+namespace imp
+{
+    template<typename... Ts>
+    struct is_buildfix_base;
+
+    template<>
+    struct is_buildfix_base<> : std::true_type {};
+
+    template<typename T, typename... Ts>
+    struct is_buildfix_base<T, Ts...> :
+        std::conditional<std::is_base_of<proc::IBuildFIX, T>::value,
+                        imp::is_buildfix_base<Ts...>,
+                        std::false_type>::type {};
+}
+
+template<typename... Ts>
+constexpr bool is_buildfix_base() {
+    return imp::is_buildfix_base<Ts...>::value;
+}
+
+template<class ...Ts>
+concept IsBuildFIX = is_buildfix_base<Ts...>();
 
 namespace proc::com
 {
-    template<IsBuildFIX T>
-    class DataRequest : public T
+    template<class ...Ts>
+    requires IsBuildFIX<Ts...>
+    class DataRequest : public Ts...
     {
         public:
             virtual std::optional<fix::Message> build(char _tag, Context &_context) const override final;

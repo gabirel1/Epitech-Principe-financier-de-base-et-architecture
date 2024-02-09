@@ -66,9 +66,6 @@ template<IsBook T>
 bool OrderBook::cancel(OrderIdMap<T> &_mapId, OrderId _orderId, bool _event)
 {
     std::lock_guard<std::mutex> guard(m_mutex);
-
-    std::cout << "\n\n[OrderBook] (Cancel) _orderId: '" << _orderId << "'\n\n" << std::endl; // todo log
-
     typename OrderIdMap<T>::iterator it = _mapId.find(_orderId);
 
     if (it != _mapId.end()) {
@@ -112,9 +109,9 @@ fix::MarketDataSnapshotFullRefresh OrderBook::refresh(T &_cache, size_t _depth)
             break;
         case 1: size = std::max((size_t)1, (_cache.size() / 10) * 2);
             break;
-        default: size = _depth;
+        default: size = std::min(_depth, _cache.size());
     }
-    size = std::min(size, _cache.size());
+    Logger::Log("[OrderBook] size: ", size, ", cache: ", _cache.size());
     std::string ssize = std::to_string(size);
     std::string price{};
     std::string quantity{};
@@ -130,23 +127,23 @@ fix::MarketDataSnapshotFullRefresh OrderBook::refresh(T &_cache, size_t _depth)
         size--;
     }
     if (!price.empty())
-        price.erase(price.end());
+        price.pop_back();
     if (!types.empty())
-        types.erase(types.end());
+        types.pop_back();
     if (!quantity.empty())
-        quantity.erase(quantity.end());
-    result.set55_symbol(m_name);
+        quantity.pop_back();
+    Logger::Log("[OrderBook] Final version: { quantity: ", quantity, ", price: ", price, ", type: ", types, " }, size: ", ssize);
     result.set110_minQty(quantity);
     result.set267_noMDEntryTypes(ssize);
     result.set269_mDEntryType(types);
     result.set270_mDEntryPx(price);
+    result.set55_symbol(m_name);
     return result;
 }
 
 template<IsBookCache T>
 fix::MarketDataIncrementalRefresh OrderBook::update(T &_cache_orig, T &_cache, size_t _depth)
 {
-    std::lock_guard<std::mutex> guard(m_mutex);
     size_t size = 0;
     fix::MarketDataIncrementalRefresh result;
     const std::string type = (std::is_same_v<T, cache_BidBook>) ? "0" : "1";
@@ -156,9 +153,8 @@ fix::MarketDataIncrementalRefresh OrderBook::update(T &_cache_orig, T &_cache, s
             break;
         case 1: size = std::max((size_t)1, (_cache.size() / 10) * 2);
             break;
-        default: size = _depth;
+        default: size = std::min(_depth, _cache.size());
     }
-    size = std::min(size, _cache.size());
     std::string ssize = std::to_string(size);
     std::string prices{};
     std::string quantity{};
@@ -196,12 +192,12 @@ fix::MarketDataIncrementalRefresh OrderBook::update(T &_cache_orig, T &_cache, s
     if (!symbols.empty())
         symbols.erase(symbols.end());
 
-    result.set55_symbol(symbols);
     result.set110_minQty(quantity);
     result.set267_noMDEntryTypes(ssize);
     result.set269_mDEntryType(types);
     result.set270_mDEntryPx(prices);
     result.set279_mDUpdateAction(actions);
+    result.set55_symbol(symbols);
     return result;
 }
 

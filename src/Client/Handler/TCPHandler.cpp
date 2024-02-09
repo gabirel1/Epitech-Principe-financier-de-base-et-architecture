@@ -6,7 +6,7 @@ namespace io
     {
         m_socket = std::make_shared<net::tcp::Socket>();
         if (!m_socket->connect(_ip, _port))
-            std::cout << "Restart needed, you are not connected to the server" << std::endl;
+            Logger::Log("Restart needed, you are not connected to the server");
         else
             m_selector.client(m_socket);
     }

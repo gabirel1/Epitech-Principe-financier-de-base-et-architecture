@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include "Common/Core/Logger.hpp"
 #include "Client/Processor/OrderBook.hpp"
 #include "Common/Message/MarketDataIncrementalRefresh.hpp"
@@ -15,6 +17,52 @@ namespace data
 
 namespace proc
 {
+    std::optional<fix::Message> OrderBook::process(const std::string &_entry, Context &_ctx)
+    {
+        std::ignore = _ctx;
+
+        std::vector<std::string> words = utils::space_split(_entry);
+        std::vector<const char *> cwords;
+        OrderType side;
+        std::string symbol;
+        int param = 0;
+
+        if (words.empty())
+            return {};
+        if (words.at(0) == "ob") {
+            for (auto &_word : words)
+                cwords.emplace_back(_word.c_str());
+            while (param != -1) {
+                param = getopt(cwords.size(), const_cast<char * const *>(cwords.data()), "s:S:");
+                switch (param) {
+                    case 'S': symbol = optarg;
+                        break;
+                    case 's': {
+                        if (std::strcmp(optarg, "ask") == 0)
+                            side = OrderType::Ask;
+                        else if (std::strcmp(optarg, "bid") == 0)
+                            side = OrderType::Bid;
+                        else
+                            return {};
+                        break;
+                    }
+                    case -1:
+                        break;
+                    default:
+                        return {};
+                };
+            }
+            if (side == OrderType::Ask && m_ask.contains(symbol)) {
+                std::cout << "Ask table of " << symbol << std::endl;
+                displayBook<AskBook>(m_ask.at(symbol));
+            } else if (side == OrderType::Bid && m_bid.contains(symbol)) {
+                std::cout << "Bid table of " << symbol << std::endl;
+                displayBook<BidBook>(m_bid.at(symbol));
+            }
+        }
+        return {};
+    }
+
     std::optional<fix::Message> OrderBook::process(fix::Serializer::AnonMessage &_msg, Context &_context)
     {
         if (!_context.Loggin && _msg.at(fix::Tag::MsgType) != fix::Logon::MsgType) {
@@ -66,10 +114,6 @@ namespace proc
 
 
         Logger::Log("[TCPOutput] {NewOrder} New order: ", orderId, " ", quantity, " ", price, " ", side, " ", symbol);
-        // if (side == "1")
-        //     functional_sync(m_bid, symbol, price, quantity, OrderBook::QtySync);
-        // else
-        //     functional_sync(m_ask, symbol, price, quantity, OrderBook::QtySync);
         OrderClient _order;
 
         _order.orderId = orderId;
@@ -159,7 +203,7 @@ namespace proc
 
     data::FullRefresh OrderBook::loadFullRefresh(fix::Serializer::AnonMessage &_msg)
     {
-        size_t size = utils::to<int>(_msg.at(fix::Tag::NoMDEntries));
+        size_t size = utils::to<size_t>(_msg.at(fix::Tag::NoMDEntryTypes));
         data::FullRefresh refresh;
 
         refresh.size = size;
@@ -167,11 +211,12 @@ namespace proc
         Logger::Log("[FIX] {LoadFullRefresh} Loading: ", size, " modifications on symbol: ", refresh.symbol);
         std::vector<Quantity> quantitys = data::extract<Quantity>(_msg, fix::Tag::MinQty);
         std::vector<Price> prices = data::extract<Price>(_msg, fix::Tag::MDEntryPx);
-        std::vector<OrderType> types = data::extract<OrderType>(_msg, fix::Tag::MDEntryType);
+        std::vector<int> types = data::extract<int>(_msg, fix::Tag::MDEntryType);
         for (size_t it = 0; it < size; it++) {
             refresh.quantitys.push_back(quantitys[it]);
             refresh.prices.push_back(prices[it]);
-            refresh.types.push_back(types[it]);
+            refresh.types.push_back(static_cast<OrderType>(types[it]));
+            Logger::Log("[FIX] {LoadFullRefresh} Symbol: ", refresh.symbol ,", Quantity: ", quantitys[it], ", prices: ", prices[it], ", type: ", (types[it] == OrderType::Ask) ? "ask" : "bid");
         }
         return refresh;
     }

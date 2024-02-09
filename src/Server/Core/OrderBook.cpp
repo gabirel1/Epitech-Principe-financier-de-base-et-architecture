@@ -7,16 +7,16 @@
 OrderBook::OrderBook(const std::string &_name, EventQueue &_output)
     : m_name(_name), m_output(_output)
 {
-    cache_on<AskBook, cache_AskBook>(m_ask, m_cache_ask, true);
-    cache_on<BidBook, cache_BidBook>(m_bid, m_cache_bid, true);
-    m_is_cached = true;
-    cache_on<AskBook, cache_AskBook>(m_ask, m_cache_ask_upd, false);
-    cache_on<BidBook, cache_BidBook>(m_bid, m_cache_bid_upd, false);
-    for (const auto &[_price, _qty] : m_cache_ask_upd)
-        m_cache_ask_upd.at(_price) = _qty - m_cache_ask[_price];
-    for (const auto &[_price, _qty] : m_cache_bid_upd)
-        m_cache_bid_upd.at(_price) = _qty - m_cache_bid[_price];
-    m_is_cached_udp = true;
+    // cache_on<AskBook, cache_AskBook>(m_ask, m_cache_ask, true);
+    // cache_on<BidBook, cache_BidBook>(m_bid, m_cache_bid, true);
+    // m_is_cached = false;
+    // cache_on<AskBook, cache_AskBook>(m_ask, m_cache_ask_upd, false);
+    // cache_on<BidBook, cache_BidBook>(m_bid, m_cache_bid_upd, false);
+    // for (const auto &[_price, _qty] : m_cache_ask_upd)
+    //     m_cache_ask_upd.at(_price) = _qty - m_cache_ask[_price];
+    // for (const auto &[_price, _qty] : m_cache_bid_upd)
+    //     m_cache_bid_upd.at(_price) = _qty - m_cache_bid[_price];
+    // m_is_cached_udp = true;
 }
 
 bool OrderBook::add(OrderType _type, Price _price, Order& _order)
@@ -56,8 +56,12 @@ fix::MarketDataSnapshotFullRefresh OrderBook::refresh(const OrderBook::Subscript
             return refresh<cache_BidBook>(m_cache_bid, _sub.depth);
         return refresh<cache_AskBook>(m_cache_ask, _sub.depth);
     }
+    Logger::Log("[OrderBook] Ask size: ", m_ask.size());
     cache_on<AskBook, cache_AskBook>(m_ask, m_cache_ask, true);
+    Logger::Log("[OrderBook] Cached ask size: ", m_cache_bid.size());
+    Logger::Log("[OrderBook] Bid size: ", m_bid.size());
     cache_on<BidBook, cache_BidBook>(m_bid, m_cache_bid, true);
+    Logger::Log("[OrderBook] Cached bid size: ", m_cache_bid.size());
     m_is_cached = true;
     return refresh(_sub);
 }
@@ -114,10 +118,7 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
 
             Logger::Log("[OrderBook] (", m_name, ") {Add} New order in BID: ", _order, " at price: ", _price);
             m_bid[_price].push_back(_order);
-
-            // std::cout << "\n\n\n\nm_bid[price]: " << m_bid[_price].size() << ", " << m_bid[_price].back().orderId << std::endl;
-
-            m_bid_id.emplace(_order.orderId, std::make_pair(m_bid.find(_price), m_bid[_price].end() - 1));
+            m_bid_id.emplace(_order.orderId, std::make_pair(m_bid.find(_price), m_bid.at(_price).end() - 1));
             event.status = OrderStatus::PartiallyFilled;
         }
     } else {
@@ -125,12 +126,9 @@ void OrderBook::add(OrderType _type, Price _price, Order &_order, OrderStatus _s
             std::lock_guard<std::mutex> guard(m_mutex);
 
             Logger::Log("[OrderBook] (", m_name, ") {Add} New order in ASK: ", _order, " at price: ", _price);
-
             m_ask[_price].push_back(_order);
-
-            std::cout << "\n\n\nm_ask_id.size: " << m_ask_id.size() << std::endl;
-            m_ask_id.emplace(_order.orderId, std::make_pair(m_ask.find(_price), m_ask[_price].end() - 1));
-            std::cout << "\n\n\nm_ask_id.size2: " << m_ask_id.size() << std::endl;
+            m_ask_id.emplace(_order.orderId, std::make_pair(m_ask.find(_price), m_ask.at(_price).end() - 1));
+            event.status = OrderStatus::PartiallyFilled;
         }
     }
     event.quantity = _order.quantity;

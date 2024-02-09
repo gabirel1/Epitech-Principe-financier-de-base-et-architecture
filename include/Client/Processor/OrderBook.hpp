@@ -7,6 +7,7 @@
 #include "Client/Processor/Common/DataRequest.hpp"
 #include "Client/Processor/IProcessor.hpp"
 #include "Common/Thread/Queue.hpp"
+#include "Client/meta.hpp"
 
 namespace data
 {
@@ -38,15 +39,16 @@ namespace data
 
 namespace proc
 {
-    class OrderBook : public com::DataRequest<proc::IMessage>, public proc::IUDP
+    class OrderBook : public com::DataRequest<proc::IMessage, proc::IEntry>, public proc::IUDP
     {
         public:
-            using BidBook = std::map<Price, Quantity, std::less_equal<Price>>;
-            using AskBook = std::map<Price, Quantity, std::greater_equal<Price>>;
+            using BidBook = std::map<Price, Quantity, std::less<Price>>;
+            using AskBook = std::map<Price, Quantity, std::greater<Price>>;
 
             OrderBook() = default;
             ~OrderBook() = default;
 
+            virtual std::optional<fix::Message> process(const std::string &_entry, Context &_ctx) override final;
             virtual std::optional<fix::Message> process(fix::Serializer::AnonMessage &_msg, Context &_ctx) override final;
             virtual std::optional<data::UDPPackage> process(const data::UDPPackage &_package, Context &_ctx) override final;
 
@@ -64,6 +66,12 @@ namespace proc
         private:
             using BidMap = std::map<std::string, BidBook>;
             using AskMap = std::map<std::string, AskBook>;
+
+            // need new concept for (Ask/Bid)map
+            template<class T>
+            requires IsBookOf<T, Quantity>
+            void displayBook(const T &_book) const;
+
             using SyncFn = Quantity (*)(Quantity, Quantity);
 
             static Quantity QtySync(Quantity _left, Quantity _right);

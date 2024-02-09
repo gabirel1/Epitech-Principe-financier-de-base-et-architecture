@@ -20,6 +20,7 @@ Core::Core(const net::Ip &_ip, uint32_t _tcp, uint32_t _udp)
     m_proc_udp.push_back(ob);
 
     m_proc_entry.push_back(user);
+    m_proc_entry.push_back(ob);
     m_proc_entry.push_back(obdata);
 }
 
@@ -52,7 +53,6 @@ void Core::start()
         if (!m_tcp.empty(io::Side::Recv)) {
             fix::Serializer::AnonMessage val = m_tcp.pop_front_recv();
 
-            std::cout << "RECEIVED: '" << val.at(fix::Tag::MsgType) << "'" << std::endl;
             for (auto &_proc : m_proc_tcp) {
                 std::optional<fix::Message> res = _proc->process(val, m_context);
 

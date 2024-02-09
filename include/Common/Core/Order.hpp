@@ -32,7 +32,7 @@ enum OrderStatus {
     Rejected = 8
 };
 
-enum class OrderType
+enum OrderType
 {
     Ask,
     Bid

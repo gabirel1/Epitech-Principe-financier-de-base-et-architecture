@@ -199,7 +199,6 @@ namespace proc
         } else if (words.at(0) == "status") {
             if (words.size() != 1)
                 return {};
-            std::cout << _ctx << std::endl;
             return {};
         } else if (words.at(0) == "help") {
             if (words.size() != 1)
@@ -209,6 +208,8 @@ namespace proc
             std::cout << "  new_order -i <id> -q <quantity> -p <price> -s <side>(buy|sell) -S <symbol>(GOLD|USD|EURO)" << std::endl;
             std::cout << "  cancel_order -i <id> -t <target_id> -S <symbol>(GOLD|USD|EURO) -s <side>(buy|sell)" << std::endl;
             std::cout << "  cancel_replace -i <id> -t <target_id> -q <quantity> -p <price> -s <side>(buy|sell) -S <symbol>(GOLD|USD|EURO)" << std::endl;
+            std::cout << "  fresh -i <id> -d <depth> -s <side>(buy|sell) -S <symbol>(GOLD|USD|EURO)" << std::endl;
+            std::cout << "  ob -s <side>(bid|ask) -S <symbol>(GOLD|USD|EURO)" << std::endl;
             std::cout << "  logout" << std::endl;
             std::cout << "  status" << std::endl;
             std::cout << "  order_history" << std::endl;
