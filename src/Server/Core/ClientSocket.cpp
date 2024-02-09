@@ -52,11 +52,8 @@ std::chrono::system_clock::time_point ClientSocket::getRequest(size_t _seqNumber
 
 bool ClientSocket::refreshSubscribe(const ClientSocket &&_client)
 {
-    if (this != &_client) {
-        m_subscribe = std::move(_client.m_subscribe);
-        return true;
-    }
-    return false;
+    m_subscribe = std::move(_client.m_subscribe);
+    return true;
 }
 
 ClientSocket::Subs &ClientSocket::subscribe(const std::string &_symbol)

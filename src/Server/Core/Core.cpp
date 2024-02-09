@@ -33,6 +33,7 @@ bool Core::start()
             for (auto &[_, _pip] : m_markets)
                 _pip.status();
             m_action.status();
+            m_data.status();
             m_outdata.status();
             m_outnet.status();
         } catch (std::future_error &_e) {

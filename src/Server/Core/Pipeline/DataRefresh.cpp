@@ -62,15 +62,17 @@ namespace pip
             sub.Id = _input.Id;
             for (const auto &_sym : _input.Symbols) {
                 std::vector<OrderBook::Subscription> &subs = _input.Client.subscribe(_sym);
+                fix::MarketDataSnapshotFullRefresh message;
 
                 for (OrderType _type : _input.Types) {
+                    Logger::Log("[DataRefresh] (Subscribe) to: ", _sym, " with type: ", _type);
                     sub.type = _type;
                     subs.push_back(sub);
                 }
-                fix::MarketDataSnapshotFullRefresh message;
                 message.set55_symbol(_sym);
                 message.set262_mDReqID(_input.Id);
                 message += m_markets.at(_sym).refresh(sub);
+                // std::cout << "subcribtion size after: " << _input.Client.subscribe(_sym).size() << std::endl;
                 m_output.append(std::move(_input.Client), std::move(message));
             }
         } else {

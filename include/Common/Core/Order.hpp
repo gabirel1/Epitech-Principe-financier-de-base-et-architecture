@@ -38,7 +38,7 @@ enum class OrderType : uint8_t
     Bid
 };
 
-std::istream &operator>>(std::istream &_is, OrderType _type);
+std::istream &operator>>(std::istream &_is, OrderType &_type);
 std::ostream &operator<<(std::ostream &_os, OrderType _type);
 
 struct OrderClient

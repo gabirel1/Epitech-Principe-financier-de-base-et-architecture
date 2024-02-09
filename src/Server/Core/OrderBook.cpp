@@ -7,16 +7,6 @@
 OrderBook::OrderBook(const std::string &_name, EventQueue &_output)
     : m_name(_name), m_output(_output)
 {
-    // cache_on<AskBook, cache_AskBook>(m_ask, m_cache_ask, true);
-    // cache_on<BidBook, cache_BidBook>(m_bid, m_cache_bid, true);
-    // m_is_cached = false;
-    // cache_on<AskBook, cache_AskBook>(m_ask, m_cache_ask_upd, false);
-    // cache_on<BidBook, cache_BidBook>(m_bid, m_cache_bid_upd, false);
-    // for (const auto &[_price, _qty] : m_cache_ask_upd)
-    //     m_cache_ask_upd.at(_price) = _qty - m_cache_ask[_price];
-    // for (const auto &[_price, _qty] : m_cache_bid_upd)
-    //     m_cache_bid_upd.at(_price) = _qty - m_cache_bid[_price];
-    // m_is_cached_udp = true;
 }
 
 bool OrderBook::add(OrderType _type, Price _price, Order& _order)
@@ -53,15 +43,13 @@ fix::MarketDataSnapshotFullRefresh OrderBook::refresh(const OrderBook::Subscript
 {
     if (m_is_cached) {
         if (_sub.type == OrderType::Bid)
-            return refresh<cache_BidBook>(m_cache_bid, _sub.depth);
-        return refresh<cache_AskBook>(m_cache_ask, _sub.depth);
+            return refresh<cache_BidBook>(m_cache_bid_full, _sub.depth);
+        return refresh<cache_AskBook>(m_cache_ask_full, _sub.depth);
     }
-    Logger::Log("[OrderBook] Ask size: ", m_ask.size());
-    cache_on<AskBook, cache_AskBook>(m_ask, m_cache_ask, true);
-    Logger::Log("[OrderBook] Cached ask size: ", m_cache_bid.size());
-    Logger::Log("[OrderBook] Bid size: ", m_bid.size());
-    cache_on<BidBook, cache_BidBook>(m_bid, m_cache_bid, true);
-    Logger::Log("[OrderBook] Cached bid size: ", m_cache_bid.size());
+    cache_on<AskBook, cache_AskBook>(m_ask, m_cache_ask_full);
+    Logger::Log("[OrderBook] {FullRefresh} Cached ask size: ", m_cache_bid.size());
+    cache_on<BidBook, cache_BidBook>(m_bid, m_cache_bid_full);
+    Logger::Log("[OrderBook] {FullRefresh} Cached bid size: ", m_cache_bid.size());
     m_is_cached = true;
     return refresh(_sub);
 }
@@ -73,16 +61,19 @@ fix::MarketDataIncrementalRefresh OrderBook::update(const OrderBook::Subscriptio
             return update<cache_BidBook>(m_cache_bid, m_cache_bid_upd, _sub.depth);
         return update<cache_AskBook>(m_cache_ask, m_cache_ask_upd, _sub.depth);
     }
-    cache_on<AskBook, cache_AskBook>(m_ask, m_cache_ask, true);
-    cache_on<BidBook, cache_BidBook>(m_bid, m_cache_bid, true);
-    m_is_cached = true;
-    cache_on<AskBook, cache_AskBook>(m_ask, m_cache_ask_upd, false);
-    cache_on<BidBook, cache_BidBook>(m_bid, m_cache_bid_upd, false);
-    for (const auto &[_price, _qty] : m_cache_ask_upd)
-        m_cache_ask_upd.at(_price) = _qty - m_cache_ask[_price];
-    for (const auto &[_price, _qty] : m_cache_bid_upd)
-        m_cache_bid_upd.at(_price) = _qty - m_cache_bid[_price];
+    m_cache_ask_upd = m_cache_ask;
+    Logger::Log("[OrderBook] {FullRefresh} Cached old bid size: ", m_cache_ask_upd.size());
+    m_cache_bid_upd = m_cache_bid;
+    Logger::Log("[OrderBook] {FullRefresh} Cached old bid size: ", m_cache_bid_upd.size());
     m_is_cached_udp = true;
+
+    std::lock_guard<std::mutex> guard(m_mutex);
+
+    cache_on<AskBook, cache_AskBook>(m_ask, m_cache_ask);
+    Logger::Log("[OrderBook] {FullRefresh} Cached new ask size: ", m_cache_ask.size());
+    cache_on<BidBook, cache_BidBook>(m_bid, m_cache_bid);
+    Logger::Log("[OrderBook] {FullRefresh} Cached new bid size: ", m_cache_bid.size());
+    m_is_cached = true;
     return update(_sub);
 }
 

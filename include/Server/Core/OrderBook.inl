@@ -182,16 +182,15 @@ fix::MarketDataIncrementalRefresh OrderBook::update(T &_cache_orig, T &_cache, s
         size--;
     }
     if (!types.empty())
-        types.erase(types.end());
+        types.pop_back();
     if (!prices.empty())
-        prices.erase(prices.end());
+        prices.pop_back();
     if (!actions.empty())
-        actions.erase(actions.end());
+        actions.pop_back();
     if (!quantity.empty())
-        quantity.erase(quantity.end());
+        quantity.pop_back();
     if (!symbols.empty())
-        symbols.erase(symbols.end());
-
+        symbols.pop_back();
     result.set110_minQty(quantity);
     result.set267_noMDEntryTypes(ssize);
     result.set269_mDEntryType(types);
@@ -202,16 +201,14 @@ fix::MarketDataIncrementalRefresh OrderBook::update(T &_cache_orig, T &_cache, s
 }
 
 template<IsBook T, IsBookCache _T>
-void OrderBook::cache_on(T &_book, _T &_cache, bool _ref)
+void OrderBook::cache_on(T &_book, _T &_cache)
 {
-    if (_ref) {
-        _cache.clear();
-        for (const auto &[_price, _orders] : _book) {
-            Quantity total_qty = std::accumulate(_orders.begin(), _orders.end(), 0,
-                [] (Quantity _sum, const Order& _order) {
-                    return _sum + _order.quantity;
-                });
-            _cache.emplace(_price, total_qty);
-        }
+    _cache.clear();
+    for (const auto &[_price, _orders] : _book) {
+        Quantity total_qty = std::accumulate(_orders.begin(), _orders.end(), 0,
+            [] (Quantity _sum, const Order& _order) {
+                return _sum + _order.quantity;
+            });
+        _cache.emplace(_price, total_qty);
     }
 }

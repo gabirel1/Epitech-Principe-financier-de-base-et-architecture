@@ -91,7 +91,7 @@ class OrderBook
         using cache_BidBook = std::map<Price, Quantity, std::less_equal<Price>>;
 
         template<IsBook T, IsBookCache _T>
-        void cache_on(T &_book, _T &_cache, bool _ref);
+        void cache_on(T &_book, _T &_cache);
 
         bool m_is_cached = false;
         bool m_is_cached_udp = false;
@@ -101,6 +101,9 @@ class OrderBook
 
         cache_AskBook m_cache_ask_upd{};
         cache_BidBook m_cache_bid_upd{};
+
+        cache_AskBook m_cache_ask_full{};
+        cache_BidBook m_cache_bid_full{};
 
         const std::string m_name;
 

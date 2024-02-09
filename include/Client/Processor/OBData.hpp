@@ -14,8 +14,7 @@ namespace proc
             virtual std::optional<fix::Message> process(const std::string &_entry, Context &_ctx) override final;
 
         private:
-            std::optional<fix::Message> buildForRefresh(const std::vector<const char *> &_words);
-            std::optional<fix::Message> buildForSub(const std::vector<const char *> &_words);
+            std::optional<fix::MarketDataRequest> buildRequest(const std::vector<const char *> &_words);
             std::optional<fix::Message> buildForUnsub(const std::vector<const char *> &_words);
 
             bool applyModification(char _param, const std::string &_value, fix::MarketDataRequest &_refresh);

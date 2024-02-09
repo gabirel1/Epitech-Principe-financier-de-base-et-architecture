@@ -36,14 +36,20 @@ namespace pip
                 for (auto &_client : m_clients) {
                     const ClientSocket::Subs &subs = _client.subscribe(m_name);
                     fix::MarketDataIncrementalRefresh notif;
-                    Logger::Log("[Refresh] Incremental For client: ", _client.User);
+                    Logger::Log("[Refresh] Incremental For client: ", _client.User, ", size of the query: ", subs.size());
 
-                    for (const auto &_sub : subs)
-                        notif += m_ob.update(_sub);
-                    notif.header.set34_msgSeqNum(std::to_string((_client.SeqNumber)++));
-                    notif.header.set49_SenderCompId(PROVIDER_NAME);
-                    notif.header.set56_TargetCompId(_client.User);
-                    _client.getSocket()->send(notif.to_string());
+                    if (!subs.empty()) {
+                        for (const auto &_sub : subs)
+                            notif += m_ob.update(_sub);
+                        notif.header.set34_msgSeqNum(std::to_string((_client.SeqNumber)++));
+                        notif.header.set49_SenderCompId(PROVIDER_NAME);
+                        notif.header.set56_TargetCompId(_client.User);
+                        Logger::Log("[Refresh] Subscribtion of user: ", _client.User, ", generated");
+                        if (_client.getSocket()->is_open()) {
+                            Logger::Log("[Refresh] Subscribtion notification for: ", _client.User, ", send");
+                            _client.getSocket()->send(notif.to_string());
+                        }
+                    }
                 }
                 m_ob.cache_flush();
                 Logger::Log("[Refresh] Incremenetal - done");

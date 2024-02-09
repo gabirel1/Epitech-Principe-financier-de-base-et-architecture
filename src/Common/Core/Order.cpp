@@ -6,7 +6,7 @@ std::ostream &operator<<(std::ostream &_os, const Order &_order)
     return _os;
 }
 
-std::istream &operator>>(std::istream &_is, OrderType _type)
+std::istream &operator>>(std::istream &_is, OrderType &_type)
 {
     uint8_t type = 0;
 

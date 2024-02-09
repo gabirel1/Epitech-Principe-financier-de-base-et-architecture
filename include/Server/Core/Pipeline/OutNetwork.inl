@@ -38,7 +38,7 @@ namespace pip
 
         while (this->m_running) {
             if (!this->m_input.empty()) {
-                input = this->m_input.pop_front();
+                input = std::move(this->m_input.pop_front());
 
                 m_tp.enqueue([this, _input = std::move(input)] () mutable {
                     _T::run(_input, m_clients);

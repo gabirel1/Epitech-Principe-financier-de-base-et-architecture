@@ -28,6 +28,8 @@ add_compile_definitions(N_THREAD_TP=1)                 # Default number of threa
 add_compile_definitions(LOG_DFT_FILE="./default.log")  # Default log file
 add_compile_definitions(MAX_RECV_SIZE=2048)            # Maximum of data received bu a socket
 add_compile_definitions(MARKET_NAME="GOLD","EURO","USD")    # Server name (used for TargetCompId from client)
+add_compile_definitions(NOTIF_UPDATE_TO=20)           # Time between each incremental refresh
+add_compile_definitions(NOTIF_REFRESH_TO=20)           # Time between each full refresh
 
 # Server
 

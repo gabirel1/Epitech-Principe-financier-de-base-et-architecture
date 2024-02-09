@@ -9,64 +9,44 @@ namespace proc
 
         std::vector<std::string> words = utils::space_split(_entry);
         std::vector<const char *> cwords;
+        std::optional<fix::MarketDataRequest> refresh{};
 
         if (words.size() < 1)
             return {};
         for (auto &_word : words)
             cwords.emplace_back(_word.c_str());
-
-        if (words.at(0) == "fresh")
-            return buildForRefresh(cwords);
-        else if (words.at(0) == "sub")
-            return buildForSub(cwords);
-        else if (words.at(0) == "unsub")
+        if (words.at(0) == "fresh") {
+            refresh = buildRequest(cwords);
+            if (refresh.has_value())
+                refresh.value().set263_subscriptionRequestType("0");
+        } else if (words.at(0) == "sub") {
+            refresh = buildRequest(cwords);
+            if (refresh.has_value())
+                refresh.value().set263_subscriptionRequestType("1");
+        } else if (words.at(0) == "unsub") {
             return buildForUnsub(cwords);
-        else
-            return {};
-    }
-
-    std::optional<fix::Message> OBData::buildForRefresh(const std::vector<const char *> &_words)
-    {
-        fix::MarketDataRequest refresh;
-        int param = 0;
-
-        while (param != -1) {
-            param = getopt(_words.size(), const_cast<char * const *>(_words.data()), "u:m:s:d:i:");
-            switch (param) {
-                case 'm':
-                case 's':
-                case 'd':
-                case 'i':
-                case -1:
-                    break;
-                default:
-                    return {};
-            };
-            if (param != -1 && !applyModification(param, optarg, refresh)) {
-                Logger::Log("failed to set param: ", param);
-                return {};
-            }
-        };
-        refresh.set263_subscriptionRequestType("0");
-        Logger::Log("[OBData] Request send succefully");
+        }
+        if (!refresh.has_value()) {
+            Logger::Log("not supported");
+        }
         return refresh;
     }
 
-    std::optional<fix::Message> OBData::buildForSub(const std::vector<const char *> &_words)
+    std::optional<fix::MarketDataRequest> OBData::buildRequest(const std::vector<const char *> &_words)
     {
         fix::MarketDataRequest refresh;
         int param = 0;
 
-        Logger::Log("[OBData] Parsing words");
         while (param != -1) {
-            param = getopt(_words.size(), const_cast<char * const *>(_words.data()), "u:m:s:d:i");
+            param = getopt(_words.size(), const_cast<char * const *>(_words.data()), "S:s:d:i:");
             switch (param) {
-                case 'm':
+                case 'S':
                 case 's':
                 case 'd':
                 case 'i':
                 case -1:
                     break;
+                case ':':
                 default:
                     return {};
             };
@@ -75,14 +55,13 @@ namespace proc
                 return {};
             }
         };
-        refresh.set263_subscriptionRequestType("1");
         Logger::Log("[OBData] Request send succefully");
         return refresh;
     }
 
     std::optional<fix::Message> OBData::buildForUnsub(const std::vector<const char *> &_words)
     {
-        // need to check for subscribtion
+        // todo
         return {};
     }
 
@@ -90,7 +69,7 @@ namespace proc
     {
         Logger::Log("[OBData] Apply the param: ", _param);
         switch (_param) {
-            case 'm': return setSymbol(_value, _refresh);
+            case 'S': return setSymbol(_value, _refresh);
             case 's': return setSide(_value, _refresh);
             case 'd': return setDepth(_value, _refresh);
             case 'i': return setReqId(_value, _refresh);

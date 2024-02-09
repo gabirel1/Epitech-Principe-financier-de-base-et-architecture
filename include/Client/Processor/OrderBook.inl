@@ -12,7 +12,10 @@ namespace data
         std::vector<T> result{};
 
         std::for_each(list.begin(), list.end(), [&result] (const std::string &_value) {
-            result.emplace_back(utils::to<T>(_value));
+            if constexpr (std::is_same_v<T, std::string>)
+                result.emplace_back(_value);
+            else
+                result.emplace_back(utils::to<T>(_value));
         });
         return result;
     }

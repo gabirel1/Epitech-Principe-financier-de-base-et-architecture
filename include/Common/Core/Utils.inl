@@ -11,7 +11,7 @@ namespace utils
         T val{};
         std::istringstream stream(_str);
 
-        stream >> val;
+        stream >> std::ref(val);
         return val;
     }
 

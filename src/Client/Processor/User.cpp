@@ -169,7 +169,6 @@ namespace proc
 
             for (auto &_word : words)
                 cwords.emplace_back(_word.c_str());
-            
             while (param != -1) {
                 param = getopt(words.size(), const_cast<char * const *>(cwords.data()), "i:S:t:");
                 switch (param) {
@@ -209,6 +208,7 @@ namespace proc
             std::cout << "  cancel_order -i <id> -t <target_id> -S <symbol>(GOLD|USD|EURO) -s <side>(buy|sell)" << std::endl;
             std::cout << "  cancel_replace -i <id> -t <target_id> -q <quantity> -p <price> -s <side>(buy|sell) -S <symbol>(GOLD|USD|EURO)" << std::endl;
             std::cout << "  fresh -i <id> -d <depth> -s <side>(buy|sell) -S <symbol>(GOLD|USD|EURO)" << std::endl;
+            std::cout << "  sub -i <id> -d <depth> -s <side>(buy|sell) -S <symbol>(GOLD|USD|EURO)" << std::endl;
             std::cout << "  ob -s <side>(bid|ask) -S <symbol>(GOLD|USD|EURO)" << std::endl;
             std::cout << "  logout" << std::endl;
             std::cout << "  status" << std::endl;

@@ -128,7 +128,7 @@ namespace pip
         data.OrderData.type = (_input.Message.at(fix::Tag::Side) == "3") ? OrderType::Bid : OrderType::Ask;
         data.OrderData.price = utils::to<Price>(_input.Message.at(fix::Tag::Price));
         data.OrderData.order.userId = _input.Client.User;
-        data.OrderData.order.orderId = utils::to<OrderId>(_input.Message.at(fix::Tag::ClOrdID));
+        data.OrderData.order.orderId = _input.Message.at(fix::Tag::ClOrdID);
         data.OrderData.order.quantity = utils::to<Quantity>(_input.Message.at(fix::Tag::OrderQty));
         Logger::Log("[Action] (New Order Single) Waiting for action from data: ", data.OrderData.order.userId); // todo log
         m_markets.at(_input.Message.at(fix::Tag::Symbol)).push(std::move(data));
@@ -146,7 +146,7 @@ namespace pip
             return false;
         }
         data.OrderData.action = OrderBook::Data::Action::Cancel;
-        data.OrderData.order.orderId = utils::to<OrderId>(_input.Message.at(fix::Tag::OrigClOrdID));
+        data.OrderData.order.orderId = _input.Message.at(fix::Tag::OrigClOrdID);
         data.OrderData.order.userId = _input.Client.User;
         data.OrderData.type = (_input.Message.at(fix::Tag::Side) == "3") ? OrderType::Bid : OrderType::Ask;
         m_markets.at(_input.Message.at(fix::Tag::Symbol)).push(std::move(data));
@@ -218,8 +218,8 @@ namespace pip
         sub.Id = _input.Message.at(fix::Tag::MDReqID);
         sub.SubType = _input.Message.at(fix::Tag::SubscriptionRequestType)[0] - '0';
         sub.Depth = utils::to<size_t>(_input.Message.at(fix::Tag::MarketDepth));
-        if (sub.SubType == 1)
-            sub.UpdateType = _input.Message.at(fix::Tag::MDUpdateType)[0] - '0';
+        // if (sub.SubType == 1)
+        //     sub.UpdateType = _input.Message.at(fix::Tag::MDUpdateType)[0] - '0';
         for (const auto &_type : types) {
             if (_type == "0")
                 sub.Types.push_back(OrderType::Bid);
