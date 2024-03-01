@@ -81,7 +81,7 @@ std::ostream &operator<<(std::ostream &_os, const History &_history)
     _os << "History:\n";
     _os << "\tOrders:\n";
     _os << "\t" << _history.m_orders;
-    _os << "\t" << "History:\n";
+    _os << "\tHistory:\n";
     _os << "\t" << _history.m_history;
     return _os;
 }

@@ -4,21 +4,21 @@
 
 namespace proc
 {
+    bool ReportHandler::handle(fix::Serializer::AnonMessage &_msg, const Context &_ctx) const
+    {
+        return _msg.at(fix::Tag::MsgType) == fix::Reject::MsgType || _msg.at(fix::Tag::MsgType) == fix::ExecutionReport::MsgType;
+    }
+
     std::optional<fix::Message> ReportHandler::process(fix::Serializer::AnonMessage &_msg, Context &_ctx)
     {
-        if (!_ctx.Loggin && _msg.at(fix::Tag::MsgType) != fix::Logon::MsgType) {
-            Logger::Log("[ReportHandler] You are not logged in, please log in first");
-            return {};
-        } else if (_msg.at(fix::Tag::MsgType) == fix::Reject::MsgType) {
+        if (_msg.at(fix::Tag::MsgType) == fix::Reject::MsgType)
             Logger::Log("[ReportHandler] Received reject message: { RefSeqNum: '", _msg.at(fix::Tag::RefSeqNum), "', Text: '", _msg.at(fix::Tag::Text), "' }");
-            return {};
-        } else if (_msg.at(fix::Tag::MsgType) == fix::ExecutionReport::MsgType) {
+        else if (_msg.at(fix::Tag::MsgType) == fix::ExecutionReport::MsgType)
             treatExecutionReport(_msg, _ctx);
-        }
         return {};
     }
 
-    std::optional<fix::Message> ReportHandler::build(char _tag, Context &_ctx) const
+    std::optional<fix::Message> ReportHandler::build(char _tag, const Context &_ctx) const
     {
         std::ignore = _tag;
         std::ignore = _ctx;

@@ -40,13 +40,27 @@ namespace io
     }
 
     template<class T, class _T>
-    void Handler<T, _T>::send_to_send(const T &&_val)
+    template<class ...Ts>
+    void Handler<T, _T>::send(const Ts &&..._args)
+    {
+        m_input.push(std::forward<Ts>(_args)...);
+    }
+
+    template<class T, class _T>
+    void Handler<T, _T>::send(const T &&_val)
     {
         m_input.push(std::move(_val));
     }
 
     template<class T, class _T>
-    void Handler<T, _T>::send_to_recv(const _T &&_val)
+    template<class ...Ts>
+    void Handler<T, _T>::recv(const Ts &&..._args)
+    {
+        m_output.push(std::forward<Ts>(_args)...);
+    }
+
+    template<class T, class _T>
+    void Handler<T, _T>::recv(const _T &&_val)
     {
         m_output.push(std::move(_val));
     }

@@ -32,7 +32,7 @@ namespace io
             if (!clients.empty()) {
                 const data::UDPPackage *package = reinterpret_cast<const data::UDPPackage *>(m_socket->receiveUDP(sizeof(data::UDPPackage), error).c_str());
 
-                send_to_recv(std::move(*package));
+                recv(std::move(*package));
             }
             if (!empty(io::Side::Send)) {
                 data::UDPPackage package = pop_front_send();

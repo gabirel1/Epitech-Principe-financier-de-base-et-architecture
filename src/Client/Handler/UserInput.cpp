@@ -11,7 +11,7 @@ namespace io
 
             std::cout << "$> ";
             std::getline(std::cin, input);
-            send_to_recv(std::move(input));
+            recv(std::move(input));
             while (!empty(Side::Send))
                 (void)pop_front_send();
         }

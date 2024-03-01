@@ -28,7 +28,7 @@ namespace io
                 Logger::Log("TCPHandler: Received: '", data, "'");
                 if (fix::Serializer::run(data, msg) != fix::Serializer::Error::None)
                     continue;
-                send_to_recv(std::move(msg));
+                recv(std::move(msg));
             }
             if (!empty(Side::Send)) {
                 m_socket->send(pop_front_send().to_string());

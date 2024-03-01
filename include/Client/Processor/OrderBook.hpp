@@ -48,19 +48,22 @@ namespace proc
             OrderBook() = default;
             ~OrderBook() = default;
 
-            virtual std::optional<fix::Message> process(const std::string &_entry, Context &_ctx) override final;
-            virtual std::optional<fix::Message> process(fix::Serializer::AnonMessage &_msg, Context &_ctx) override final;
-            virtual std::optional<data::UDPPackage> process(const data::UDPPackage &_package, Context &_ctx) override final;
+            [[nodiscard]] virtual bool handle(const Entry &_entry, const Context &_ctx) const override final;
+            [[nodiscard]] virtual bool handle(fix::Serializer::AnonMessage &_msg, const Context &_ctx) const override final;
+
+            [[nodiscard]] virtual std::optional<fix::Message> process(const Entry &_entry, Context &_ctx) override final;
+            [[nodiscard]] virtual std::optional<fix::Message> process(fix::Serializer::AnonMessage &_msg, Context &_ctx) override final;
+            [[nodiscard]] virtual std::optional<data::UDPPackage> process(const data::UDPPackage &_package, Context &_ctx) override final;
 
         protected:
             void treatIncrRefresh(fix::Serializer::AnonMessage &_msg);
             void treatFullRefresh(fix::Serializer::AnonMessage &_msg);
 
-            data::IncrRefresh loadIncrRefresh(fix::Serializer::AnonMessage &_msg);
-            data::FullRefresh loadFullRefresh(fix::Serializer::AnonMessage &_msg);
+            [[nodiscard]] data::IncrRefresh loadIncrRefresh(fix::Serializer::AnonMessage &_msg);
+            [[nodiscard]] data::FullRefresh loadFullRefresh(fix::Serializer::AnonMessage &_msg);
 
-            fix::Message buildFullRefresh() const;
-            fix::Message buildIncrRefresh() const;
+            [[nodiscard]] fix::Message buildFullRefresh() const;
+            [[nodiscard]] fix::Message buildIncrRefresh() const;
 
         private:
             using BidMap = std::map<std::string, BidBook>;
@@ -72,15 +75,15 @@ namespace proc
 
             using SyncFn = Quantity (*)(Quantity, Quantity);
 
-            static Quantity QtySync(Quantity _left, Quantity _right);
-            static Quantity CopySync(Quantity _left, Quantity _right);
+            [[nodiscard]] static Quantity QtySync(Quantity _left, Quantity _right);
+            [[nodiscard]] static Quantity CopySync(Quantity _left, Quantity _right);
 
             template<class T, class _T>
             static void sync_book(T &_origine, _T &_target, SyncFn _sync);
 
             // turn this function into class later
             template<class T>
-            static bool functional_sync(T &_map, const std::string &_sym, Price _price, Quantity _qty, SyncFn _sync);
+            static void functional_sync(T &_map, const std::string &_sym, Price _price, Quantity _qty, SyncFn _sync);
 
             bool m_is_sync = false;
 

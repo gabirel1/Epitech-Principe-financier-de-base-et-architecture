@@ -1,6 +1,7 @@
 #include "Client/Core.hpp"
-#include "Client/Processor/OrderBook.hpp"
 #include "Client/Processor/OBData.hpp"
+#include "Client/Processor/OrderBook.hpp"
+#include "Client/Processor/Order.hpp"
 #include "Client/Processor/ReportHandler.hpp"
 #include "Client/Processor/User.hpp"
 #include "Common/Message/Tag.hpp"
@@ -12,6 +13,7 @@ Core::Core(const net::Ip &_ip, uint32_t _tcp, uint32_t _udp)
     std::shared_ptr<proc::OBData> obdata = std::make_shared<proc::OBData>();
     std::shared_ptr<proc::User> user = std::make_shared<proc::User>();
     std::shared_ptr<proc::ReportHandler> report = std::make_shared<proc::ReportHandler>();
+    std::shared_ptr<proc::Order> order = std::make_shared<proc::Order>();
 
     m_proc_tcp.push_back(ob);
     m_proc_tcp.push_back(user);
@@ -22,6 +24,7 @@ Core::Core(const net::Ip &_ip, uint32_t _tcp, uint32_t _udp)
     m_proc_entry.push_back(user);
     m_proc_entry.push_back(ob);
     m_proc_entry.push_back(obdata);
+    m_proc_entry.push_back(order);
 }
 
 Core::~Core()
@@ -45,7 +48,7 @@ void Core::start()
                 std::optional<data::UDPPackage> res = _proc->process(package, m_context);
 
                 if (res.has_value()) {
-                    m_udp.send_to_send(std::move(res.value()));
+                    m_udp.send(std::move(res.value()));
                     break;
                 }
             }
@@ -54,24 +57,28 @@ void Core::start()
             fix::Serializer::AnonMessage val = m_tcp.pop_front_recv();
 
             for (auto &_proc : m_proc_tcp) {
-                std::optional<fix::Message> res = _proc->process(val, m_context);
+                if (_proc->handle(val, m_context)) {
+                    std::optional<fix::Message> res = _proc->process(val, m_context);
 
-                if (res.has_value()) {
-                    setContext(res.value());
-                    m_tcp.send_to_send(std::move(res.value()));
+                    if (res.has_value()) {
+                        setContext(res.value());
+                        m_tcp.send(std::move(res.value()));
+                    }
                     break;
                 }
             }
         }
         if (!m_input.empty(io::Side::Recv)) {
-            const std::string entry = m_input.pop_front_recv();
+            const Entry entry = m_input.pop_front_recv();
 
             for (auto &_proc : m_proc_entry) {
-                std::optional<fix::Message> res = _proc->process(entry, m_context);
+                if (_proc->handle(entry, m_context)) {
+                    std::optional<fix::Message> res = _proc->process(entry, m_context);
 
-                if (res.has_value()) {
-                    setContext(res.value());
-                    m_tcp.send_to_send(std::move(res.value()));
+                    if (res.has_value()) {
+                        setContext(res.value());
+                        m_tcp.send(std::move(res.value()));
+                    }
                     break;
                 }
             }

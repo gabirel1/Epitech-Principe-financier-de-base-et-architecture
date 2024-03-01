@@ -1,53 +1,53 @@
+#include <cstring>
+
 #include "Client/Processor/OBData.hpp"
 #include "Common/Core/Utils.hpp"
 
 namespace proc
 {
-    std::optional<fix::Message> OBData::process(const std::string &_entry, Context &_ctx)
+    bool OBData::handle(const Entry &_entry, const Context &_ctx) const
+    {
+        if (_entry.args.size() == 0 || (
+            std::strcmp(_entry.args.at(0), "fresh") != 0 &&
+            std::strcmp(_entry.args.at(0), "sub") != 0 &&
+            std::strcmp(_entry.args.at(0), "unsub") != 0))
+            return false;
+        if (!_ctx.Loggin) {
+            Logger::Log("You need to be connected to execute this command");
+            return false;
+        }
+        return true;
+    }
+
+    std::optional<fix::Message> OBData::process(const Entry &_entry, Context &_ctx)
     {
         std::ignore = _ctx;
-
-        std::vector<std::string> words = utils::space_split(_entry);
-        std::vector<const char *> cwords;
         std::optional<fix::MarketDataRequest> refresh{};
 
-        if (words.size() < 1)
-            return {};
-        for (auto &_word : words)
-            cwords.emplace_back(_word.c_str());
-        if (words.at(0) == "fresh") {
-            refresh = buildRequest(cwords);
+        if (std::strcmp(_entry.args.at(0), "fresh") == 0) {
+            refresh = buildRequest(_entry);
             if (refresh.has_value())
                 refresh.value().set263_subscriptionRequestType("0");
-        } else if (words.at(0) == "sub") {
-            refresh = buildRequest(cwords);
+        } else if (std::strcmp(_entry.args.at(0), "sub") == 0) {
+            refresh = buildRequest(_entry);
             if (refresh.has_value())
                 refresh.value().set263_subscriptionRequestType("1");
-        } else if (words.at(0) == "unsub") {
-            return buildForUnsub(cwords);
-        }
-        if (!refresh.has_value()) {
-            Logger::Log("not supported");
+        } else if (std::strcmp(_entry.args.at(0), "unsub") == 0) {
+            return buildForUnsub(_entry);
         }
         return refresh;
     }
 
-    std::optional<fix::MarketDataRequest> OBData::buildRequest(const std::vector<const char *> &_words)
+    std::optional<fix::MarketDataRequest> OBData::buildRequest(const Entry &_entry)
     {
         fix::MarketDataRequest refresh;
         int param = 0;
 
         while (param != -1) {
-            param = getopt(_words.size(), const_cast<char * const *>(_words.data()), "S:s:d:i:");
+            param = getopt(_entry.args.size(), const_cast<char * const *>(_entry.args.data()), "S:s:d:i:");
             switch (param) {
-                case 'S':
-                case 's':
-                case 'd':
-                case 'i':
-                case -1:
-                    break;
                 case ':':
-                default:
+                case '?':
                     return {};
             };
             if (param != -1 && !applyModification(param, optarg, refresh)) {
@@ -59,7 +59,7 @@ namespace proc
         return refresh;
     }
 
-    std::optional<fix::Message> OBData::buildForUnsub(const std::vector<const char *> &_words)
+    std::optional<fix::Message> OBData::buildForUnsub(const Entry &_words)
     {
         // todo
         return {};

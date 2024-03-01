@@ -23,8 +23,13 @@ namespace io
 
             bool stop();
 
-            void send_to_send(const T &&_val);
-            void send_to_recv(const _T &&_val);
+            template<class ...Ts>
+            void send(const Ts &&..._args);
+            void send(const T &&_val);
+
+            template<class ...Ts>
+            void recv(const Ts &&..._args);
+            void recv(const _T &&_val);
 
             [[nodiscard]] bool empty(Side _side) const;
 

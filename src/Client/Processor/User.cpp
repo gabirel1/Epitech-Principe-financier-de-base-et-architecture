@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include <getopt.h>
 
 #include "Client/Processor/User.hpp"
@@ -8,6 +10,16 @@
 
 namespace proc
 {
+    bool User::handle(fix::Serializer::AnonMessage &_msg, const Context &_ctx) const
+    {
+        return _msg.at(fix::Tag::MsgType) == fix::Logon::MsgType || (_ctx.Loggin && _msg.at(fix::Tag::MsgType) == fix::Logout::MsgType);
+    }
+
+    bool User::handle(const Entry &_entry, const Context &_ctx) const
+    {
+        return std::strcmp(_entry.args.at(0), "logon") == 0 || (_ctx.Loggin && std::strcmp(_entry.args.at(0), "logout"));
+    }
+
     std::optional<fix::Message> User::process(fix::Serializer::AnonMessage &_msg, Context &_ctx)
     {
         if (_msg.at(fix::Tag::MsgType) == fix::Logon::MsgType) {
@@ -20,21 +32,13 @@ namespace proc
         return {};
     }
 
-    std::optional<fix::Message> User::process(const std::string &_entry, Context &_ctx)
+    std::optional<fix::Message> User::process(const Entry &_entry, Context &_ctx)
     {
-        std::vector<std::string> words = utils::space_split(_entry);
         int param = 0;
-        optind = 1;
 
-        if (words.size() < 1)
-            return {};
-        if (words.at(0) == "logon") {
-            std::vector<const char *> cwords;
-
-            for (auto &_word : words)
-                cwords.emplace_back(_word.c_str());
+        if (std::strcmp(_entry.args.at(0), "logon") == 0) {
             while (param != -1) {
-                param = getopt(words.size(), const_cast<char * const *>(cwords.data()), "u:");
+                param = getopt(_entry.args.size(), const_cast<char * const *>(_entry.args.data()), "u:");
                 switch (param) {
                     case ':':       // missing param
                     case '?':       // unknow
@@ -43,191 +47,143 @@ namespace proc
                         return buildLogon(optarg);
                 };
             }
-        } else if (words.at(0) == "new_order") {
-            std::vector<const char *> cwords;
-            std::string orderId = "";
-            std::string quantity = "";
-            std::string price = "";
-            std::string side = "";
-            std::string symbol = "";
+        // } else if (words.at(0) == "new_order") {
+        //     std::vector<const char *> cwords;
+        //     std::string orderId = "";
+        //     std::string quantity = "";
+        //     std::string price = "";
+        //     std::string side = "";
+        //     std::string symbol = "";
 
-            for (auto &_word : words)
-                cwords.emplace_back(_word.c_str());
+        //     for (auto &_word : words)
+        //         cwords.emplace_back(_word.c_str());
 
-            while (param != -1) {
-                param = getopt(words.size(), const_cast<char * const *>(cwords.data()), "i:q:p:s:S:");
-                switch (param) {
-                    case ':':       // missing param
-                    case '?':       // unknow
-                        return {};
-                    case 'i':
-                        orderId = optarg;
-                        break;
-                    case 'q':
-                        quantity = optarg;
-                        break;
-                    case 'p':
-                        price = optarg;
-                        break;
-                    case 's':
-                        side = optarg;
-                        break;
-                    case 'S':
-                        symbol = optarg;
-                        break;
-                };
-            }
-            if (orderId.empty() || quantity.empty() || price.empty() || side.empty() || symbol.empty()) {
-                Logger::Log("[User Input]: Missing parameter for new_order");
-                return {};
-            }
-            return buildNewOrder(orderId, quantity, price, side, symbol);
-        } else if (words.at(0) == "cancel_order") {
-            std::vector<const char *> cwords;
-            std::string cancelOrderId = "";
-            std::string targetOrderId = "";
-            std::string symbol = "";
-            std::string side = "";
+        //     while (param != -1) {
+        //         param = getopt(words.size(), const_cast<char * const *>(cwords.data()), "i:q:p:s:S:");
+        //         switch (param) {
+        //             case ':':       // missing param
+        //             case '?':       // unknow
+        //                 return {};
+        //             case 'i':
+        //                 orderId = optarg;
+        //                 break;
+        //             case 'q':
+        //                 quantity = optarg;
+        //                 break;
+        //             case 'p':
+        //                 price = optarg;
+        //                 break;
+        //             case 's':
+        //                 side = optarg;
+        //                 break;
+        //             case 'S':
+        //                 symbol = optarg;
+        //                 break;
+        //         };
+        //     }
+        //     if (orderId.empty() || quantity.empty() || price.empty() || side.empty() || symbol.empty()) {
+        //         Logger::Log("[User Input]: Missing parameter for new_order");
+        //         return {};
+        //     }
+        //     return buildNewOrder(orderId, quantity, price, side, symbol);
+        // } else if (words.at(0) == "cancel_order") {
+        //     std::vector<const char *> cwords;
+        //     std::string cancelOrderId = "";
+        //     std::string targetOrderId = "";
+        //     std::string symbol = "";
+        //     std::string side = "";
 
-            for (auto &_word : words)
-                cwords.emplace_back(_word.c_str());
+        //     for (auto &_word : words)
+        //         cwords.emplace_back(_word.c_str());
 
-            while (param != -1) {
-                param = getopt(words.size(), const_cast<char * const *>(cwords.data()), "i:t:S:s:");
-                switch (param) {
-                    case ':':       // missing param
-                    case '?':       // unknow
-                        return {};
-                    case 'i':
-                        cancelOrderId = optarg;
-                        break;
-                    case 't':
-                        targetOrderId = optarg;
-                        break;
-                    case 'S':
-                        symbol = optarg;
-                        break;
-                    case 's':
-                        side = optarg;
-                        break;
-                };
-            }
-            if (cancelOrderId.empty() || targetOrderId.empty() || symbol.empty() || side.empty()) {
-                Logger::Log("[User Input]: Missing parameter for cancel_order");
-                return {};
-            }
-            return buildOrderCancel(cancelOrderId, targetOrderId, symbol, side);
-        } else if (words.at(0) == "cancel_replace") {
-            std::vector<const char *> cwords;
-            std::string cancelReplaceOrderId = "";
-            std::string targetOrderId = "";
-            std::string quantity = "";
-            std::string price = "";
-            std::string side = "";
-            std::string symbol = "";
+        //     while (param != -1) {
+        //         param = getopt(words.size(), const_cast<char * const *>(cwords.data()), "i:t:S:s:");
+        //         switch (param) {
+        //             case ':':       // missing param
+        //             case '?':       // unknow
+        //                 return {};
+        //             case 'i': cancelOrderId = optarg;
+        //                 break;
+        //             case 't': targetOrderId = optarg;
+        //                 break;
+        //             case 'S': symbol = optarg;
+        //                 break;
+        //             case 's': side = optarg;
+        //                 break;
+        //         };
+        //     }
+        //     if (cancelOrderId.empty() || targetOrderId.empty() || symbol.empty() || side.empty()) {
+        //         Logger::Log("[User Input]: Missing parameter for cancel_order");
+        //         return {};
+        //     }
+        //     return buildOrderCancel(cancelOrderId, targetOrderId, symbol, side);
+        // } else if (words.at(0) == "cancel_replace") {
+        //     std::vector<const char *> cwords;
+        //     std::string cancelReplaceOrderId = "";
+        //     std::string targetOrderId = "";
+        //     std::string quantity = "";
+        //     std::string price = "";
+        //     std::string side = "";
+        //     std::string symbol = "";
 
-            for (auto &_word : words)
-                cwords.emplace_back(_word.c_str());
+        //     for (auto &_word : words)
+        //         cwords.emplace_back(_word.c_str());
 
-            while (param != -1) {
-                param = getopt(words.size(), const_cast<char * const *>(cwords.data()), "i:t:q:p:s:S:");
-                switch (param) {
-                    case ':':       // missing param
-                    case '?':       // unknow
-                        return {};
-                    case 'i':
-                        cancelReplaceOrderId = optarg;
-                        break;
-                    case 't':
-                        targetOrderId = optarg;
-                        break;
-                    case 'q':
-                        quantity = optarg;
-                        break;
-                    case 'p':
-                        price = optarg;
-                        break;
-                    case 's':
-                        side = optarg;
-                        break;
-                    case 'S':
-                        symbol = optarg;
-                        break;
-                };
-            }
-            if (cancelReplaceOrderId.empty() || targetOrderId.empty() || quantity.empty() || price.empty() || side.empty() || symbol.empty()) {
-                Logger::Log("[User Input]: Missing parameter for cancel_replace");
-                return {};
-            }
-            _ctx.userInfos.setOrderToCancel(targetOrderId);
-            return buildOrderCancelReplace(cancelReplaceOrderId, targetOrderId, quantity, price, side, symbol);
-        } else if (words.at(0) == "market_data") {
-            std::vector<const char *> cwords;
-            std::string symbol = "";
-            std::string requestId = "";
-            std::string subscriptionType = "";
-
-            for (auto &_word : words)
-                cwords.emplace_back(_word.c_str());
-            while (param != -1) {
-                param = getopt(words.size(), const_cast<char * const *>(cwords.data()), "i:S:t:");
-                switch (param) {
-                    case ':':       // missing param
-                    case '?':       // unknow
-                        return {};
-                    case 'S':
-                        symbol = optarg;
-                        break;
-                    case 'i':
-                        requestId = optarg;
-                        break;
-                    case 't':
-                        subscriptionType = optarg;
-                        break;
-                };
-            }
-            if (symbol.empty() || requestId.empty() || subscriptionType.empty()) {
-                Logger::Log("[User Input]: Missing parameter for market_data");
-                return {};
-            }
-            return buildMarketDataRequest(symbol, requestId, subscriptionType);
-        } else if (words.at(0) == "logout") {
-            if (words.size() != 1)
-                return {};
+        //     while (param != -1) {
+        //         param = getopt(words.size(), const_cast<char * const *>(cwords.data()), "i:t:q:p:s:S:");
+        //         switch (param) {
+        //             case ':':       // missing param
+        //             case '?':       // unknow
+        //                 return {};
+        //             case 'i':
+        //                 cancelReplaceOrderId = optarg;
+        //                 break;
+        //             case 't':
+        //                 targetOrderId = optarg;
+        //                 break;
+        //             case 'q':
+        //                 quantity = optarg;
+        //                 break;
+        //             case 'p':
+        //                 price = optarg;
+        //                 break;
+        //             case 's':
+        //                 side = optarg;
+        //                 break;
+        //             case 'S':
+        //                 symbol = optarg;
+        //                 break;
+        //         };
+        //     }
+        //     if (cancelReplaceOrderId.empty() || targetOrderId.empty() || quantity.empty() || price.empty() || side.empty() || symbol.empty()) {
+        //         Logger::Log("[User Input]: Missing parameter for cancel_replace");
+        //         return {};
+        //     }
+        //     _ctx.userInfos.setOrderToCancel(targetOrderId);
+        //     return buildOrderCancelReplace(cancelReplaceOrderId, targetOrderId, quantity, price, side, symbol);
+        } else if (std::strcmp(_entry.args.at(0), "logout") == 0) {
             return buildLogout();
-        } else if (words.at(0) == "status") {
-            if (words.size() != 1)
-                return {};
-            return {};
-        } else if (words.at(0) == "help") {
-            if (words.size() != 1)
-                return {};
+        } else if (std::strcmp(_entry.args.at(0), "help") == 0) {
             std::cout << "Commands:" << std::endl;
-            std::cout << "  logon -u <user>" << std::endl;
-            std::cout << "  new_order -i <id> -q <quantity> -p <price> -s <side>(buy|sell) -S <symbol>(GOLD|USD|EURO)" << std::endl;
-            std::cout << "  cancel_order -i <id> -t <target_id> -S <symbol>(GOLD|USD|EURO) -s <side>(buy|sell)" << std::endl;
-            std::cout << "  cancel_replace -i <id> -t <target_id> -q <quantity> -p <price> -s <side>(buy|sell) -S <symbol>(GOLD|USD|EURO)" << std::endl;
-            std::cout << "  fresh -i <id> -d <depth> -s <side>(buy|sell) -S <symbol>(GOLD|USD|EURO)" << std::endl;
-            std::cout << "  sub -i <id> -d <depth> -s <side>(buy|sell) -S <symbol>(GOLD|USD|EURO)" << std::endl;
-            std::cout << "  ob -s <side>(bid|ask) -S <symbol>(GOLD|USD|EURO)" << std::endl;
-            std::cout << "  logout" << std::endl;
-            std::cout << "  status" << std::endl;
-            std::cout << "  order_history" << std::endl;
-            std::cout << "  help" << std::endl;
+            std::cout << "\tlogon\t-u <user>" << std::endl;
+            std::cout << "\tnew\t\t-i <id> -q <quantity> -p <price> -s <side>(buy|sell) -S <symbol>(GOLD|USD|EURO)" << std::endl;
+            std::cout << "\tcancel\t-i <id> -t <target_id> -s <side>(buy|sell) -S <symbol>(GOLD|USD|EURO)" << std::endl;
+            std::cout << "\treplace\t-i <id> -t <target_id> -q <quantity> -p <price> -s <side>(buy|sell) -S <symbol>(GOLD|USD|EURO)" << std::endl;
+            std::cout << "\tfresh\t-i <id> -d <depth> -s <side>(buy|sell) -S <symbol>(GOLD|USD|EURO)" << std::endl;
+            std::cout << "\tsub\t\t-i <id> -d <depth> -s <side>(buy|sell) -S <symbol>(GOLD|USD|EURO)" << std::endl;
+            std::cout << "\tob\t\t-s <side>(bid|ask) -S <symbol>(GOLD|USD|EURO)" << std::endl;
+            std::cout << "\tlogout" << std::endl;
+            std::cout << "\tstatus" << std::endl;
+            std::cout << "\torder_history" << std::endl;
+            std::cout << "\thelp" << std::endl;
             return {};
-        } else if (words.at(0) == "order_history") {
-            if (words.size() != 1)
-                return {};
+        } else if (std::strcmp(_entry.args.at(0), "order_history") == 0) {
             std::cout << _ctx.userInfos.getHistory() << std::endl;
-            return {};
-        } else {
-            Logger::Log("[User Input]: Unknow command");
-            return {};
         }
         return {};
     }
 
-    std::optional<fix::Message> User::build(char _tag, Context &_ctx) const
+    std::optional<fix::Message> User::build(char _tag, const Context &_ctx) const
     {
         if (_tag == fix::Logon::cMsgType)
             return buildLogon(_ctx.User);
@@ -270,7 +226,6 @@ namespace proc
         cancel.set41_origClOrdID(_targetOrderId);
         cancel.set55_symbol(_symbol);
         cancel.set54_side((_side == "buy") ? "3" : "4");
-        cancel.set60_transactTime(utils::get_timestamp());
 
         return cancel;
     }
@@ -287,25 +242,8 @@ namespace proc
         cancelReplace.set44_price(_price);
         cancelReplace.set54_side((_side == "buy") ? "3" : "4");
         cancelReplace.set55_symbol(_symbol);
-        cancelReplace.set60_transactTime(utils::get_timestamp());
 
         return cancelReplace;
-    }
-
-    fix::Message User::buildMarketDataRequest(const std::string &_symbol, std::string &_requestId, std::string &_subscriptionType) const
-    {
-        fix::MarketDataRequest marketDataRequest;
-        (void)_subscriptionType;
-
-        marketDataRequest.set55_symbol(_symbol);
-        marketDataRequest.set262_mDReqID(_requestId);
-        // marketDataRequest.set263_subscriptionRequestType(_subscriptionType);
-        marketDataRequest.set263_subscriptionRequestType("0");
-        marketDataRequest.set264_marketDepth("0");
-        marketDataRequest.set267_noMDEntryTypes("2");
-        marketDataRequest.set269_mDEntryType("0,1");
-
-        return marketDataRequest;
     }
 
     fix::Message User::buildLogout() const

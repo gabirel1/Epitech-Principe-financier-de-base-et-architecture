@@ -10,10 +10,13 @@ namespace proc
             ReportHandler() = default;
             ~ReportHandler() = default;
 
-            std::optional<fix::Message> process(fix::Serializer::AnonMessage &_msg, Context &_ctx) override final;
+            [[nodiscard]] virtual bool handle(fix::Serializer::AnonMessage &_msg, const Context &_ctx) const override final;
 
-            virtual std::optional<fix::Message> build(char _tag, Context &_ctx) const override final;
+            [[nodiscard]] std::optional<fix::Message> process(fix::Serializer::AnonMessage &_msg, Context &_ctx) override final;
+
+            [[nodiscard]] virtual std::optional<fix::Message> build(char _tag, const Context &_ctx) const override final;
+
         protected:
             void treatExecutionReport(fix::Serializer::AnonMessage &_msg, Context &_ctx);
     };
-};
+}

@@ -33,13 +33,12 @@ namespace proc
 
     // turn this function into class later
     template<class T>
-    bool OrderBook::functional_sync(T &_map, const std::string &_sym, Price _price, Quantity _qty, SyncFn _sync)
+    void OrderBook::functional_sync(T &_map, const std::string &_sym, Price _price, Quantity _qty, SyncFn _sync)
     {
         if (_qty != 0)
             _map[_sym][_price] = _sync(_qty, _map[_sym][_price]);
         else
             _map[_sym].erase(_price);
-        return true;
     }
 
     template<class T>

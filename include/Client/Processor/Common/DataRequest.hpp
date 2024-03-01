@@ -32,11 +32,11 @@ namespace proc::com
     class DataRequest : public Ts...
     {
         public:
-            virtual std::optional<fix::Message> build(char _tag, Context &_context) const override final;
+            [[nodiscard]] virtual std::optional<fix::Message> build(char _tag, const Context &_ctx) const override final;
 
         private:
-            fix::Message buildFullRefresh() const;
-            fix::Message buildIncrRefresh() const;
+            [[nodiscard]] fix::Message buildFullRefresh() const;
+            [[nodiscard]] fix::Message buildIncrRefresh() const;
     };
 }
 

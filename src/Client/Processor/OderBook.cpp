@@ -17,73 +17,69 @@ namespace data
 
 namespace proc
 {
-    std::optional<fix::Message> OrderBook::process(const std::string &_entry, Context &_ctx)
+    bool OrderBook::handle(const Entry &_entry, const Context &_ctx) const
+    {
+        return _ctx.Loggin && std::strcmp(_entry.args.at(0), "ob") == 0;
+    }
+
+    bool OrderBook::handle(fix::Serializer::AnonMessage &_msg, const Context &_ctx) const
+    {
+        return _ctx.Loggin && (_msg.at(fix::Tag::MsgType) == fix::MarketDataIncrementalRefresh::MsgType || _msg.at(fix::Tag::MsgType) == fix::MarketDataSnapshotFullRefresh::MsgType);
+    }
+
+    std::optional<fix::Message> OrderBook::process(const Entry &_entry, Context &_ctx)
     {
         std::ignore = _ctx;
-
-        std::vector<std::string> words = utils::space_split(_entry);
-        std::vector<const char *> cwords;
         OrderType side;
         std::string symbol;
         int param = 0;
 
-        if (words.empty())
-            return {};
-        if (words.at(0) == "ob") {
-            for (auto &_word : words)
-                cwords.emplace_back(_word.c_str());
-            while (param != -1) {
-                param = getopt(cwords.size(), const_cast<char * const *>(cwords.data()), "s:S:");
-                switch (param) {
-                    case 'S': symbol = optarg;
-                        break;
-                    case 's': {
-                        if (std::strcmp(optarg, "ask") == 0)
-                            side = OrderType::Ask;
-                        else if (std::strcmp(optarg, "bid") == 0)
-                            side = OrderType::Bid;
-                        else
-                            return {};
-                        break;
-                    }
-                    case -1:
-                        break;
-                    default:
+        while (param != -1) {
+            param = getopt(_entry.args.size(), const_cast<char * const *>(_entry.args.data()), "s:S:");
+            switch (param) {
+                case 'S': symbol = optarg;
+                    break;
+                case 's': {
+                    if (std::strcmp(optarg, "ask") == 0)
+                        side = OrderType::Ask;
+                    else if (std::strcmp(optarg, "bid") == 0)
+                        side = OrderType::Bid;
+                    else
                         return {};
-                };
-            }
-            if (side == OrderType::Ask && m_ask.contains(symbol)) {
-                std::cout << "Ask table of " << symbol << std::endl;
-                displayBook<AskBook>(m_ask.at(symbol));
-            } else if (side == OrderType::Bid && m_bid.contains(symbol)) {
-                std::cout << "Bid table of " << symbol << std::endl;
-                displayBook<BidBook>(m_bid.at(symbol));
-            }
+                    break;
+                }
+                case -1:
+                    break;
+                default:
+                    return {};
+            };
+        }
+        if (side == OrderType::Ask && m_ask.contains(symbol)) {
+            std::cout << "Ask table of " << symbol << std::endl;
+            displayBook<AskBook>(m_ask.at(symbol));
+        } else if (side == OrderType::Bid && m_bid.contains(symbol)) {
+            std::cout << "Bid table of " << symbol << std::endl;
+            displayBook<BidBook>(m_bid.at(symbol));
         }
         return {};
     }
 
-    std::optional<fix::Message> OrderBook::process(fix::Serializer::AnonMessage &_msg, Context &_context)
+    std::optional<fix::Message> OrderBook::process(fix::Serializer::AnonMessage &_msg, Context &_ctx)
     {
-        if (!_context.Loggin && _msg.at(fix::Tag::MsgType) != fix::Logon::MsgType) {
-            Logger::Log("[TCPOutput] You are not logged in, please log in first");
-            return {};
-        }
-        if (_msg.at(fix::Tag::MsgType) != fix::MarketDataIncrementalRefresh::MsgType &&
-            _msg.at(fix::Tag::MsgType) != fix::MarketDataSnapshotFullRefresh::MsgType)
-            return {};
-        else if (_msg.at(fix::Tag::MsgType) == fix::MarketDataSnapshotFullRefresh::MsgType)
+        std::ignore = _ctx;
+
+        if (_msg.at(fix::Tag::MsgType) == fix::MarketDataSnapshotFullRefresh::MsgType)
             treatFullRefresh(_msg);
         else if (_msg.at(fix::Tag::MsgType) == fix::MarketDataIncrementalRefresh::MsgType)
             treatIncrRefresh(_msg);
         return {};
     }
 
-    std::optional<data::UDPPackage> OrderBook::process(const data::UDPPackage &_package, Context &_context)
+    std::optional<data::UDPPackage> OrderBook::process(const data::UDPPackage &_package, Context &_ctx)
     {
-        std::ignore = _context;
+        std::ignore = _ctx;
 
-        Logger::Log("[UDPOutput] receive new actions: ", _package); // todo log
+        Logger::Log("[UDPOutput] receive new actions: ", _package);
         if (UDP_FLAG_GET_BOOK(_package.flag) == OrderType::Bid)
             functional_sync(m_bid, _package.symbol, _package.price, _package.quantity, OrderBook::QtySync);
         else

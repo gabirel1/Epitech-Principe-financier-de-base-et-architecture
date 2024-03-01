@@ -9,9 +9,9 @@ namespace proc::com
 {
     template<class ...Ts>
     requires IsBuildFIX<Ts...>
-    std::optional<fix::Message> DataRequest<Ts...>::build(char _tag, Context &_context) const
+    std::optional<fix::Message> DataRequest<Ts...>::build(char _tag, const Context &_ctx) const
     {
-        std::ignore = _context;
+        std::ignore = _ctx;
 
         if (_tag == fix::MarketDataSnapshotFullRefresh::cMsgType)
             return buildFullRefresh();

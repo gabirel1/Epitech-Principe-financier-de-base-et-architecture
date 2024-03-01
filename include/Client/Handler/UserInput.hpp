@@ -1,11 +1,12 @@
 #pragma once
 
+#include "Client/Handler/Entry.hpp"
 #include "Client/Handler/Handler.hpp"
 #include "Common/Thread/Queue.hpp"
 
 namespace io
 {
-    class UserInput : public Handler<std::string, std::string>
+    class UserInput : public Handler<Entry, std::string>
     {
         public:
             UserInput() = default;

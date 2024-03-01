@@ -11,17 +11,19 @@ namespace proc
             OBData() = default;
             ~OBData() = default;
 
-            virtual std::optional<fix::Message> process(const std::string &_entry, Context &_ctx) override final;
+            [[nodiscard]] virtual bool handle(const Entry &_entry, const Context &_ctx) const override final;
 
-        private:
-            std::optional<fix::MarketDataRequest> buildRequest(const std::vector<const char *> &_words);
-            std::optional<fix::Message> buildForUnsub(const std::vector<const char *> &_words);
+            [[nodiscard]] virtual std::optional<fix::Message> process(const Entry &_entry, Context &_ctx) override final;
 
-            bool applyModification(char _param, const std::string &_value, fix::MarketDataRequest &_refresh);
+        protected:
+            [[nodiscard]] std::optional<fix::MarketDataRequest> buildRequest(const Entry &_entry);
+            [[nodiscard]] std::optional<fix::Message> buildForUnsub(const Entry &_entry);
 
-            bool setSymbol(const std::string &_symbol, fix::MarketDataRequest &_request);
-            bool setDepth(const std::string &_depth, fix::MarketDataRequest &_request);
-            bool setSide(const std::string &_side, fix::MarketDataRequest &_request);
-            bool setReqId(const std::string &_reqid, fix::MarketDataRequest &_request);
+            [[nodiscard]] bool applyModification(char _param, const std::string &_value, fix::MarketDataRequest &_refresh);
+
+            [[nodiscard]] bool setSymbol(const std::string &_symbol, fix::MarketDataRequest &_request);
+            [[nodiscard]] bool setDepth(const std::string &_depth, fix::MarketDataRequest &_request);
+            [[nodiscard]] bool setSide(const std::string &_side, fix::MarketDataRequest &_request);
+            [[nodiscard]] bool setReqId(const std::string &_reqid, fix::MarketDataRequest &_request);
     };
 }
